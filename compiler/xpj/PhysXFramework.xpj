@@ -1,0 +1,121 @@
+<XPJ version="4">
+
+  <Project name="PhysXFramework" version="1">
+
+    <Export platform="win32" tool="vc14">../vc14win32</Export>
+
+    <Export platform="win64" tool="vc14">../vc14win64</Export>
+
+    <Target name="PhysXFramework">
+
+      <Export platform="win32" tool="vc14">../vc14win32</Export>
+
+      <Export platform="win64" tool="vc14">../vc14win64</Export>
+
+      <Files name="PhysXFramework" root="../.." type="header">
+		include/*.h
+		public/*.h
+		public/windows/*.h
+		src/*.cpp
+		ext/NvRenderDebug/*.h
+		ext/PhysX/Include/*.h
+		ext/PhysX/Include/characterkinematic/*.h
+		ext/PhysX/Include/cloth/*.h
+		ext/PhysX/Include/collision/*.h
+		ext/PhysX/Include/common/*.h
+		ext/PhysX/Include/common/windows/*.h
+		ext/PhysX/Include/cooking/*.h
+		ext/PhysX/Include/cudamanager/*.h
+		ext/PhysX/Include/extensions/*.h
+		ext/PhysX/Include/foundation/*.h
+		ext/PhysX/Include/foundation/windows/*.h
+		ext/PhysX/Include/geometry/*.h
+		ext/PhysX/Include/GeomUtils/*.h
+		ext/PhysX/Include/gpu/*.h
+		ext/PhysX/Include/particles/*.h
+		ext/PhysX/Include/pvd/*.h
+		ext/PhysX/Include/pvd/windows/*.h
+		ext/PhysX/Include/solver/*.h
+		ext/PhysX/Include/task/*.h
+		ext/PhysX/Include/vehicle/*.h
+      </Files>
+
+      <Configuration name="default" type="dll">
+        <Preprocessor type="define">
+          WIN32
+          _WINDOWS
+          UNICODE=1
+          _CRT_SECURE_NO_DEPRECATE
+          OPEN_SOURCE=1
+        </Preprocessor>
+        <CFlags tool="vc8">/wd4996</CFlags>
+        <LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
+
+        <SearchPaths type="header">
+        	"../../include"
+        	"../../public"
+        	"../../ext/NvRenderDebug"
+        	"../../ext/NvRenderDebug"
+        	"../../ext/PhysX/Include"
+        </SearchPaths>
+
+        <SearchPaths type="library">
+        </SearchPaths>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="debug" platform="win32">
+        <OutDir>../../bin/win32</OutDir>
+        <OutFile>PhysXFramework32DEBUG.dll</OutFile>
+        <CFlags>/fp:fast /WX /W4 /MTd /Zi</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">
+          _DEBUG
+          _ITERATOR_DEBUG_LEVEL=0
+        </Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="release" platform="win32">
+        <OutDir>../../bin/win32</OutDir>
+        <OutFile>PhysXFramework32.dll</OutFile>
+        <CFlags>/fp:fast /WX /W4 /MT /Zi /O2</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">NDEBUG</Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="debug" platform="win64">
+        <OutDir>../../bin/win64</OutDir>
+        <OutFile>PhysXFramework64DEBUG.dll</OutFile>
+        <CFlags>/fp:fast /WX /W4 /MTd /Zi</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">
+          _DEBUG
+          _ITERATOR_DEBUG_LEVEL=0
+        </Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="release" platform="win64">
+        <OutDir>../../bin/win64</OutDir>
+        <OutFile>PhysXFramework64.dll</OutFile>
+        <CFlags>/fp:fast /WX /W4 /MT /Zi /O2</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">NDEBUG</Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+
+      <Libraries>
+      </Libraries>
+      <Dependencies type="link">
+      </Dependencies>
+    </Target>
+  </Project>
+</XPJ>
