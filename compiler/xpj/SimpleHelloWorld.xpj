@@ -1,0 +1,107 @@
+<XPJ version="4">
+  <Project name="SimpleHelloWorld" version="1">
+
+    <Export platform="win32" tool="vc14">../vc14win32</Export>
+    <Export platform="win64" tool="vc14">../vc14win64</Export>
+
+	<Import root=".\" file="PhysXFramework.xpj"/>
+
+    <Target name="SimpleHelloWorld">
+
+      <Export platform="win32" tool="vc14">../vc14win32</Export>
+      <Export platform="win64" tool="vc14">../vc14win64</Export>
+
+
+      <Files name="src" root="../.." type="source">
+      	app/SimpleHelloWorld/*.cpp
+      	app/SimpleHelloWorld/*.h
+      	public/*.h
+      	public/*.cpp
+      	ext/NvRenderDebug/*.h
+      	public/*.h
+      </Files>
+
+        <Preprocessor type="define" platform="win32">
+         WIN32
+        </Preprocessor>
+        <Preprocessor type="define" platform="win64">
+         WIN64
+        </Preprocessor>
+
+      <Configuration name="default" type="console">
+        <Preprocessor type="define">
+          _WINDOWS
+          _CRT_SECURE_NO_DEPRECATE
+          UNICODE=1
+        </Preprocessor>
+        <CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+        <LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
+
+        <SearchPaths type="header">
+        	../../ext/NvRenderDebug
+        	../../public
+        </SearchPaths>
+
+        <SearchPaths type="library">
+        </SearchPaths>
+        <Libraries>
+		  winmm.lib
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="debug" platform="win32">
+        <OutDir>../../bin/win32</OutDir>
+        <OutFile>SimpleHelloWorldDEBUG.exe</OutFile>
+        <CFlags>/fp:fast /W4 /WX /MTd /Zi</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">
+          _DEBUG
+        </Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="release" platform="win32">
+        <OutDir>../../bin/win32</OutDir>
+        <OutFile>SimpleHelloWorld.exe</OutFile>
+        <CFlags>/fp:fast /WX /W4 /MT /Zi /O2</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">
+          NDEBUG
+        </Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="debug" platform="win64">
+        <OutDir>../../bin/win64</OutDir>
+        <OutFile>SimpleHelloWorldDEBUG.exe</OutFile>
+        <CFlags>/fp:fast /W4 /WX /MTd /Zi</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">
+          _DEBUG
+        </Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Configuration name="release" platform="win64">
+        <OutDir>../../bin/win64</OutDir>
+        <OutFile>SimpleHelloWorld.exe</OutFile>
+        <CFlags>/fp:fast /WX /W4 /MT /Zi /O2</CFlags>
+        <LFlags>/DEBUG</LFlags>
+        <Preprocessor type="define">
+        	NDEBUG
+       	</Preprocessor>
+        <Libraries>
+        </Libraries>
+      </Configuration>
+
+      <Libraries>
+      </Libraries>
+      <Dependencies>
+	    PhysXFramework
+      </Dependencies>
+    </Target>
+  </Project>
+</XPJ>

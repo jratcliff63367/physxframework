@@ -6,8 +6,7 @@
 #define _INTPTR 0
 #endif
 #endif
-#include <NvSimpleTypes.h>
-#include <NvPreprocessor.h>
+#include <stdint.h>
 
 
 /*!

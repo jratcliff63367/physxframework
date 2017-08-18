@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleHelloWorld", "./SimpleHelloWorld.vcxproj", "{667E3F9C-DEA4-9BDA-AA2E-48F8701727C2}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74} = {AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysXFramework", "./PhysXFramework.vcxproj", "{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|x64 = debug|x64
+		release|x64 = release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{667E3F9C-DEA4-9BDA-AA2E-48F8701727C2}.debug|x64.ActiveCfg = debug|x64
+		{667E3F9C-DEA4-9BDA-AA2E-48F8701727C2}.debug|x64.Build.0 = debug|x64
+		{667E3F9C-DEA4-9BDA-AA2E-48F8701727C2}.release|x64.ActiveCfg = release|x64
+		{667E3F9C-DEA4-9BDA-AA2E-48F8701727C2}.release|x64.Build.0 = release|x64
+		{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}.debug|x64.ActiveCfg = debug|x64
+		{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}.debug|x64.Build.0 = debug|x64
+		{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}.release|x64.ActiveCfg = release|x64
+		{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}.release|x64.Build.0 = release|x64
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddins) = postSolution
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal

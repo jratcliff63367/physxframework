@@ -1,6 +1,7 @@
 #include "NvPhysXFramework.h"
 #include <ctype.h>
 
+#include "Nv.h"
 #include "PxPhysicsAPI.h"
 #include "NvRenderDebugTyped.h"
 
@@ -42,8 +43,13 @@ namespace NV_PHYSX_FRAMEWORK
 
 	};
 
-PhysXFramework * createPhysXFramework(void)
+PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName)
 {
+	if (versionNumber != PHYSX_FRAMEWORK_VERSION_NUMBER)
+	{
+		return nullptr;
+	}
+	NV_UNUSED(dllName);
 	PhysXFrameworkImpl *ret = new PhysXFrameworkImpl;
 	return static_cast<PhysXFramework *>(ret);
 }

@@ -78,6 +78,9 @@
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
+		<ClCompile Include="..\..\src\DLLMain.cpp">
+			<Filter>PhysXFramework\src</Filter>
+		</ClCompile>
 		<ClCompile Include="..\..\src\ExtDefaultErrorCallback.cpp">
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>

@@ -153,6 +153,8 @@
 		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
+		<ClCompile Include="..\..\src\DLLMain.cpp">
+		</ClCompile>
 		<ClCompile Include="..\..\src\ExtDefaultErrorCallback.cpp">
 		</ClCompile>
 		<ClCompile Include="..\..\src\NvPhysXFramework.cpp">

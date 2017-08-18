@@ -10,8 +10,12 @@
 // to improve and test the V-HACD (voxelized hierarchical convex decomposition library) results.
 // @see: https://github.com/kmammou/v-hacd
 
+#include <stdint.h>
+
 namespace NV_PHYSX_FRAMEWORK
 {
+
+#define PHYSX_FRAMEWORK_VERSION_NUMBER 1
 
 // Instantiate the PhysX SDK, create a scene, and a ground plane
 class PhysXFramework
@@ -25,7 +29,7 @@ protected:
 	}
 };
 
-PhysXFramework *createPhysXFramework(void);
+PhysXFramework *createPhysXFramework(uint32_t versionNumber,const char *dllName);
 
 
 };
