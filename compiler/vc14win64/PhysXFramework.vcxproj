@@ -49,7 +49,7 @@
 			<AdditionalOptions>/W4</AdditionalOptions>
 			<Optimization>Disabled</Optimization>
 			<AdditionalIncludeDirectories>./../../include;./../../public;./../../ext/NvRenderDebug;./../../ext/PhysX/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-			<PreprocessorDefinitions>WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;_DEBUG;_ITERATOR_DEBUG_LEVEL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<PreprocessorDefinitions>WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;_DEBUG;_ITERATOR_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
 			<WarningLevel>Level3</WarningLevel>
 			<RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
 			<PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -58,9 +58,9 @@
 		</ClCompile>
 		<Link>
 			<AdditionalOptions>/DEBUG</AdditionalOptions>
-			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalDependencies>PhysX3CommonDEBUG_x64.lib;PhysX3CookingDEBUG_x64.lib;PhysX3DEBUG_x64.lib;PhysX3GpuDEBUG_x64.lib;PhysX3ExtensionsDEBUG.lib;PsFastXmlDEBUG_x64.lib;PxCudaContextManagerDEBUG_x64.lib;PxFoundationDEBUG_x64.lib;PxPvdSDKDEBUG_x64.lib;PxTaskDEBUG_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
 			<OutputFile>$(OutDir)PhysXFramework64DEBUG.dll</OutputFile>
-			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalLibraryDirectories>./../../ext/PhysX/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 			<ProgramDatabaseFile>$(OutDir)/PhysXFramework64DEBUG.dll.pdb</ProgramDatabaseFile>
 			<SubSystem>Console</SubSystem>
 			<ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
@@ -97,9 +97,9 @@
 		</ClCompile>
 		<Link>
 			<AdditionalOptions>/DEBUG</AdditionalOptions>
-			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+			<AdditionalDependencies>PhysX3CommonCHECKED_x64.lib;PhysX3CookingCHECKED_x64.lib;PhysX3CHECKED_x64.lib;PhysX3GpuCHECKED_x64.lib;PhysX3ExtensionsCHECKED.lib;PsFastXmlCHECKED_x64.lib;PxCudaContextManagerCHECKED_x64.lib;PxFoundationCHECKED_x64.lib;PxPvdSDKCHECKED_x64.lib;PxTaskCHECKED_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
 			<OutputFile>$(OutDir)PhysXFramework64.dll</OutputFile>
-			<AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<AdditionalLibraryDirectories>./../../ext/PhysX/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 			<ProgramDatabaseFile>$(OutDir)/PhysXFramework64.dll.pdb</ProgramDatabaseFile>
 			<SubSystem>Console</SubSystem>
 			<ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
@@ -165,6 +165,8 @@
 		</ClInclude>
 		<ClInclude Include="..\..\ext\NvRenderDebug\NvRenderDebugTyped.h">
 		</ClInclude>
+		<ClCompile Include="..\..\ext\NvRenderDebug\NvRenderDebugBinding.cpp">
+		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxBoxController.h">

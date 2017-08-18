@@ -14,9 +14,9 @@ PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName
 	NV_PHYSX_FRAMEWORK::PhysXFramework *ret = NULL;
 	UINT errorMode = 0;
 	errorMode = SEM_FAILCRITICALERRORS;
-	UINT oldErrorMode = SetErrorMode(errorMode);
+//	UINT oldErrorMode = SetErrorMode(errorMode);
 	HMODULE module = LoadLibraryA(dllName);
-	SetErrorMode(oldErrorMode);
+//	SetErrorMode(oldErrorMode);
 	if ( module )
 	{
 		void *proc = GetProcAddress(module,"createPhysXFrameworkExport");

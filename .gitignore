@@ -79,3 +79,6 @@
 /compiler/vc14win64/x64/SimpleHelloWorld/release
 /compiler/xpj/*.bak
 /public/*.bak
+/compiler/vc14win32/Win32/PhysXFramework/debug
+/compiler/vc14win32/Win32/SimpleHelloWorld/debug
+/*.bak

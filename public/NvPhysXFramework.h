@@ -12,6 +12,11 @@
 
 #include <stdint.h>
 
+namespace RENDER_DEBUG
+{
+	class RenderDebug;
+}
+
 namespace NV_PHYSX_FRAMEWORK
 {
 
@@ -21,6 +26,13 @@ namespace NV_PHYSX_FRAMEWORK
 class PhysXFramework
 {
 public:
+
+	virtual void simulate(void) = 0;
+
+	// Return the render debug interface if available
+	virtual RENDER_DEBUG::RenderDebug *getRenderDebug(void) = 0;
+
+	// Release the PhysXFramework interface
 	virtual void release(void) = 0;
 
 protected:

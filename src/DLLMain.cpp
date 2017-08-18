@@ -6,7 +6,7 @@
 #include "NvPreprocessor.h"
 #include "NvPhysXFramework.h"
 
-#pragma warning(disable:4100 4127)
+//#pragma warning(disable:4100 4127)
 
 
 extern "C"

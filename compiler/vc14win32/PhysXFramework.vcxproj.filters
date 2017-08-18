@@ -103,6 +103,9 @@
 		<ClInclude Include="..\..\ext\NvRenderDebug\NvRenderDebugTyped.h">
 			<Filter>PhysXFramework\ext\NvRenderDebug</Filter>
 		</ClInclude>
+		<ClCompile Include="..\..\ext\NvRenderDebug\NvRenderDebugBinding.cpp">
+			<Filter>PhysXFramework\ext\NvRenderDebug</Filter>
+		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="PhysXFramework\ext\PhysX">
