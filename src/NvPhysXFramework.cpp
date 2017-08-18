@@ -1,4 +1,5 @@
 #include "NvPhysXFramework.h"
+#include "RenderDebugPhysX.h"
 #include <ctype.h>
 
 #include "Nv.h"
@@ -52,6 +53,10 @@ namespace NV_PHYSX_FRAMEWORK
 				mRenderDebugTyped = mRenderDebug->getRenderDebugTyped();
 			}
 			initPhysics(true);
+			if (gScene && mRenderDebug )
+			{
+				mRenderDebugPhysX = createRenderDebugPhysX(gScene, mRenderDebug, true);
+			}
 		}
 
 		virtual ~PhysXFrameworkImpl(void)
@@ -59,6 +64,10 @@ namespace NV_PHYSX_FRAMEWORK
 			if (mRenderDebug)
 			{
 				mRenderDebug->release();
+			}
+			if (mRenderDebugPhysX)
+			{
+				mRenderDebugPhysX->release();
 			}
 			cleanupPhysics(true);
 		}
@@ -143,6 +152,10 @@ namespace NV_PHYSX_FRAMEWORK
 			PX_UNUSED(interactive);
 			gScene->simulate(1.0f / 60.0f);
 			gScene->fetchResults(true);
+			if (mRenderDebugPhysX)
+			{
+//				mRenderDebugPhysX->render(1.0f / 60.0f, true, true, true, false);
+			}
 		}
 
 		void cleanupPhysics(bool interactive)
@@ -165,6 +178,7 @@ namespace NV_PHYSX_FRAMEWORK
 
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
 		RENDER_DEBUG::RenderDebugTyped	*mRenderDebugTyped{ nullptr };
+		RenderDebugPhysX				*mRenderDebugPhysX{ nullptr };
 	};
 
 PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName)

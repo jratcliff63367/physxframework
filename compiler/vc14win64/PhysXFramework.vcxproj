@@ -111,6 +111,10 @@
 		</ProjectReference>
 	</ItemDefinitionGroup>
 	<ItemGroup>
+		<ClInclude Include="..\..\include\RenderDebugPhysX.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
 		<ClInclude Include="..\..\public\windows\NvWindowsIntrinsics.h">
 		</ClInclude>
 	</ItemGroup>
@@ -158,6 +162,8 @@
 		<ClCompile Include="..\..\src\ExtDefaultErrorCallback.cpp">
 		</ClCompile>
 		<ClCompile Include="..\..\src\NvPhysXFramework.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\RenderDebugPhysX.cpp">
 		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>
