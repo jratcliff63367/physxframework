@@ -15,10 +15,6 @@ using namespace physx;
 
 namespace NV_PHYSX_FRAMEWORK
 {
-
-
-
-
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
 	{
 	public:
@@ -69,7 +65,7 @@ namespace NV_PHYSX_FRAMEWORK
 			{
 				mRenderDebug->release();
 			}
-			cleanupPhysics(true);
+			cleanupPhysics();
 		}
 
 		// Return the render debug interface if available
@@ -156,26 +152,25 @@ namespace NV_PHYSX_FRAMEWORK
 			return dtime;
 		}
 
-		void cleanupPhysics(bool interactive)
+		void cleanupPhysics(void)
 		{
-			PX_UNUSED(interactive);
 			mScene->release();
 			mDispatcher->release();
 			mPhysics->release();
 			PxPvdTransport* transport = mPvd->getTransport();
 			mPvd->release();
 			transport->release();
-
 			mFoundation->release();
 		}
 
-		virtual void simulate(void) final
+		virtual float simulate(void) final
 		{
 			float dtime = stepPhysics(true);
 			if (mRenderDebug )
 			{
 				mRenderDebug->render(dtime, nullptr);
 			}
+			return dtime;
 		}
 
 		virtual void setCommandCallback(CommandCallback *cc)

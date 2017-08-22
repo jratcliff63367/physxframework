@@ -40,7 +40,8 @@ public:
 		virtual bool processDebugCommand(uint32_t argc, const char **argv) = 0;
 	};
 
-	virtual void simulate(void) = 0;
+	// Returns delta time since last simulation step
+	virtual float simulate(void) = 0;
 
 	// Create a default series of stacked boxes for testing purposes
 	virtual void createDefaultStacks(void) = 0;
