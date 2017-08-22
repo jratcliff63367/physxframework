@@ -13,6 +13,8 @@ using namespace physx;
 #define PVD_HOST "localhost"
 #define USE_DEBUG 0
 
+#pragma warning(disable:4100)
+
 namespace NV_PHYSX_FRAMEWORK
 {
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
@@ -207,6 +209,24 @@ namespace NV_PHYSX_FRAMEWORK
 				createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
 			}
 		}
+
+		// Create a convex mesh using the provided raw triangles describing a convex hull.
+		virtual ConvexMesh *createConvexMesh(uint32_t vcount,
+			const float *vertices,
+			uint32_t tcount,
+			const uint32_t *indices) final
+		{
+			ConvexMesh *ret = nullptr;
+			return ret;
+		}
+
+		// Create a physically simulated compound actor comprised of a collection of convex meshes
+		virtual CompoundActor *createCompoundActor(void) final
+		{
+			CompoundActor *ret = nullptr;
+			return ret;
+		}
+
 
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
