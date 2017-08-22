@@ -7,55 +7,78 @@
 #define USE_DEBUG 1
 #endif
 
-int main(int _argc,const char **_argv)
+class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
 {
-	const char *dllName = nullptr;
+public:
+	SimpleHelloWorld(void)
+	{
+		const char *dllName = nullptr;
 #if NV_X64
 #if USE_DEBUG
-	dllName = "PhysXFramework64DEBUG.dll";
+		dllName = "PhysXFramework64DEBUG.dll";
 #else
-	dllName = "PhysXFramework64.dll";
+		dllName = "PhysXFramework64.dll";
 #endif
 #else
 #if USE_DEBUG
-	dllName = "PhysXFramework32DEBUG.dll";
+		dllName = "PhysXFramework32DEBUG.dll";
 #else
-	dllName = "PhysXFramework32.dll";
+		dllName = "PhysXFramework32.dll";
 #endif
 #endif
-
-	NV_PHYSX_FRAMEWORK::PhysXFramework *pf = NV_PHYSX_FRAMEWORK::createPhysXFramework(PHYSX_FRAMEWORK_VERSION_NUMBER, dllName);
-	if (pf)
-	{
-
-		RENDER_DEBUG::RenderDebug *renderDebug = pf->getRenderDebug();
-		if (pf)
+		mPhysXFramework = NV_PHYSX_FRAMEWORK::createPhysXFramework(PHYSX_FRAMEWORK_VERSION_NUMBER, dllName);
+		if (mPhysXFramework)
 		{
-			for (;;)
-			{
-				pf->simulate();
-				float pos[3] = { 0,0,0 };
-				renderDebug->debugSphere(pos, 1);
-				renderDebug->render(1.0f / 60.0f, nullptr);
-
-				uint32_t argc;
-				const char **argv = renderDebug->getRemoteCommand(argc);
-				if (argv)
-				{
-					const char *cmd = argv[0];
-					if (strcmp(cmd, "client_stop") == 0)
-					{
-						break;
-					}
-				}
-			}
+			mPhysXFramework->setCommandCallback(this);
 		}
-
-
-		pf->release();
 	}
 
-	NV_UNUSED(_argc);
-	NV_UNUSED(_argv);
+	virtual ~SimpleHelloWorld(void)
+	{
+		if (mPhysXFramework)
+		{
+			mPhysXFramework->release();
+		}
+	}
+
+	bool process(void)
+	{
+		if (mPhysXFramework)
+		{
+			RENDER_DEBUG::RenderDebug *renderDebug = mPhysXFramework->getRenderDebug();
+			mPhysXFramework->simulate();
+			renderDebug->render(1.0f / 60.0f, nullptr);
+		}
+		return !mExit;
+	}
+
+	virtual bool processDebugCommand(uint32_t argc, const char **argv)
+	{
+		bool ret = false;
+
+		if (argc)
+		{
+			const char *cmd = argv[0];
+			if (strcmp(cmd, "client_stop") == 0)
+			{
+				mExit = true;
+				ret = true;
+			}
+		}
+		return ret;
+	}
+
+	bool								mExit{ false };
+	NV_PHYSX_FRAMEWORK::PhysXFramework *mPhysXFramework{ nullptr };
+};
+
+int main(int _argc,const char **_argv)
+{
+	(_argv);
+	(_argc);
+	SimpleHelloWorld shw;
+	while (shw.process());
+
+
 	return 0;
 }

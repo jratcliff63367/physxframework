@@ -16,7 +16,6 @@
 #include "PxDeletionListener.h"
 
 #define ALIAS_PHYSX
-#define USING_FEATURE
 
 #include "NvRenderDebugTyped.h"
 
@@ -360,9 +359,7 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 								uint32_t nbSubCols,
 								uint32_t nbSubRows)
 		{
-#ifdef USING_FEATURE
 			mTimestamp = mGeometry.heightField->getTimestamp(); // revise the timestamp...
-#endif
 			physx::PxHeightField *hf = mGeometry.heightField;
 			// Create render object
 			const physx::PxU32		nbCols = hf->getNbColumns();
@@ -661,17 +658,17 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 
 				if ( showStatics )
 				{
-					flags = physx::PxActorType::eRIGID_STATIC;
+					flags = physx::PxActorTypeFlag::eRIGID_STATIC;
 				}
 
 				if ( showDynamics )
 				{
-					flags|=physx::PxActorType::eRIGID_DYNAMIC;
+					flags|=physx::PxActorTypeFlag::eRIGID_DYNAMIC;
 				}
 
 				if ( showCloth )
 				{
-					flags|=physx::PxActorType::eCLOTH;
+					flags|=physx::PxActorTypeFlag::eCLOTH;
 				}
 
 				mScene->lockRead(__FILE__,__LINE__);
@@ -791,7 +788,6 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 			else
 			{
 				renderContext = (*found).second;
-#ifdef USING_FEATURE
 				if ( shape->getGeometryType() == physx::PxGeometryType::eHEIGHTFIELD )
 				{
 					physx::PxHeightFieldGeometry geom;
@@ -801,7 +797,6 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 						renderContext = createRenderContext(shape); // heightfields can be modified on the fly, so we need to check for this possibility!
 					}
 				}
-#endif
 			}
 
 			if ( renderContext )
@@ -857,11 +852,7 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 							{
 								physx::PxHeightFieldGeometry geom;
 								shape->getHeightFieldGeometry(geom);
-#ifdef USING_FEATURE
 								renderContext->mTimeStamp = geom.heightField->getTimestamp();
-#endif
-//								_scale = physx::PxVec3(geom.rowScale,geom.heightScale,geom.columnScale);
-//								scale = &_scale;
 							}
 							break;
 						default:
@@ -972,7 +963,6 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 						HeightFieldContext &chc = (*i);
 						if ( chc.mGeometry.heightField == geom.heightField )
 						{
-#ifdef USING_FEATURE
 							if ( chc.mTimestamp != geom.heightField->getTimestamp() )
 							{
 								needListen = false;
@@ -982,7 +972,6 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 								break;
 							}
 							else
-#endif
 							{
 								ret = chc.mMyContext;
 								break;
@@ -994,9 +983,7 @@ typedef std::vector< ModifySamplesPending > ModifySamplesPendingVector;
 						uint32_t context = getHeightFieldContext(geom);
 						ret = new MyRenderContext(context);
 						HeightFieldContext chc;
-#ifdef USING_FEATURE
 						chc.mTimestamp = geom.heightField->getTimestamp();
-#endif
 						chc.mMyContext = ret;
 						chc.mGeometry = geom;
 						mHeightFields.push_back(chc);
@@ -1856,11 +1843,13 @@ public:
 					}
 				}
 			}
+#if 0
 			else if ( strcmp(cmd,"client_stop") == 0 )
 			{
 				mActive = false;
 				ret = true;
 			}
+#endif
 			else if ( strcmp(cmd,"client_forward_one_frame") == 0 )
 			{
 				mOneFrameAdvance = true;
@@ -1909,7 +1898,7 @@ public:
 			else if ( strcmp(cmd,"mouseDown") == 0 )
 			{
 				ret = true;
-				if ( count == 10 )
+				if ( count == 15 )
 				{
 					physx::PxVec3 world;
 					physx::PxVec3 dir;
@@ -1929,7 +1918,13 @@ public:
 					mouseDir.x = (float)atof(argv[8]);
 					mouseDir.y = (float)atof(argv[9]);
 
-					processMouse(world,dir,shiftKey,mouseDir);
+					bool leftMouseButton = strcmp(argv[10], "true") == 0;
+					bool middleMouseButton = strcmp(argv[11], "true") == 0;
+					bool rightMouseButton = strcmp(argv[12], "true") == 0;
+					int32_t mouseX = atoi(argv[13]);
+					int32_t mouseY = atoi(argv[14]);
+
+					processMouse(world, dir, shiftKey, mouseDir, leftMouseButton, middleMouseButton, rightMouseButton, mouseX, mouseY);
 
 				}
 			}
@@ -2103,10 +2098,25 @@ public:
 		mCallback = iface;
 	}
 
-	void processMouse(const physx::PxVec3 &world,const physx::PxVec3 &dir,bool shiftKey,const physx::PxVec2 &mouseDir)
+	void processMouse(const physx::PxVec3 &world,
+					  const physx::PxVec3 &dir,
+					  bool shiftKey,
+					  const physx::PxVec2 &mouseDir,
+					  bool leftMouseButton,
+					  bool middleMouseButton,
+					  bool rightMouseButton,
+					  int32_t	mouseX,
+					  int32_t	mouseY)
 	{
+		if (!rightMouseButton )
+			return;
 		PX_UNUSED(shiftKey);
 		PX_UNUSED(mouseDir);
+		PX_UNUSED(leftMouseButton);
+		PX_UNUSED(middleMouseButton);
+		PX_UNUSED(rightMouseButton);
+		PX_UNUSED(mouseX);
+		PX_UNUSED(mouseY);
 		physx::PxU32 scount = mPhysics->getNbScenes();
 		if ( scount == 0 )
 			return;
@@ -2412,7 +2422,7 @@ private:
 	physx::PxMaterial			*mDefaultMaterial;
 	bool						mOwnRenderDebug;
 	RENDER_DEBUG::RenderDebugTyped	*mRenderDebug;
-	const char					*mApplicationName;
+	const char					*mApplicationName{ "RenderDebugPhysX" };
 };
 
 } // end of RENDER_DEUBG_PHYSX namespace

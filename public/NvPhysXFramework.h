@@ -26,8 +26,23 @@ namespace NV_PHYSX_FRAMEWORK
 class PhysXFramework
 {
 public:
+	class CommandCallback
+	{
+	public:
+		/**
+		*\brief Optional callback to the application to process an arbitrary console command.
+
+		This allows the application to process an incoming command from the server.  If the application consumes the command, then it will not be passed on
+		to the rest of the default processing.  Return true to indicate that you consumed the command, false if you did not.
+
+		\return Return true if your application consumed the command, return false if it did not.
+		*/
+		virtual bool processDebugCommand(uint32_t argc, const char **argv) = 0;
+	};
 
 	virtual void simulate(void) = 0;
+
+	virtual void setCommandCallback(CommandCallback *cc) = 0;
 
 	// Return the render debug interface if available
 	virtual RENDER_DEBUG::RenderDebug *getRenderDebug(void) = 0;

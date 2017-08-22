@@ -10,6 +10,7 @@ using namespace physx;
 
 #define HOST_NAME "localhost"
 #define PVD_HOST "localhost"
+#define USE_DEBUG 0
 
 namespace NV_PHYSX_FRAMEWORK
 {
@@ -28,7 +29,7 @@ namespace NV_PHYSX_FRAMEWORK
 
 	PxPvd*                  gPvd = NULL;
 
-	class PhysXFrameworkImpl : public PhysXFramework
+	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
 	{
 	public:
 		PhysXFrameworkImpl(void)
@@ -37,7 +38,11 @@ namespace NV_PHYSX_FRAMEWORK
 #ifdef _WIN64
 			dllName = "NvRenderDebug_x64.dll";
 #else
+#if USE_DEBUG
+			dllName = "NvRenderDebugDEBUG_x86.dll";
+#else
 			dllName = "NvRenderDebug_x86.dll";
+#endif
 #endif
 			printf("Loading RenderDebug DLL\r\n");
 			RENDER_DEBUG::RenderDebug::Desc desc;
@@ -56,6 +61,10 @@ namespace NV_PHYSX_FRAMEWORK
 			if (gScene && mRenderDebug )
 			{
 				mRenderDebugPhysX = createRenderDebugPhysX(gScene, mRenderDebug, true);
+				if (mRenderDebugPhysX)
+				{
+					mRenderDebugPhysX->setInterface(this);
+				}
 			}
 		}
 
@@ -154,7 +163,7 @@ namespace NV_PHYSX_FRAMEWORK
 			gScene->fetchResults(true);
 			if (mRenderDebugPhysX)
 			{
-//				mRenderDebugPhysX->render(1.0f / 60.0f, true, true, true, false);
+				mRenderDebugPhysX->render(1.0f / 60.0f, true, true, true, false);
 			}
 		}
 
@@ -176,6 +185,23 @@ namespace NV_PHYSX_FRAMEWORK
 			stepPhysics(true);
 		}
 
+		virtual void setCommandCallback(CommandCallback *cc)
+		{
+			mCommandCallback = cc;
+		}
+
+		virtual bool processDebugCommand(uint32_t argc, const char **argv)
+		{
+			bool ret = false;
+
+			if (mCommandCallback)
+			{
+				ret = mCommandCallback->processDebugCommand(argc, argv);
+			}
+			return ret;
+		}
+
+		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
 		RENDER_DEBUG::RenderDebugTyped	*mRenderDebugTyped{ nullptr };
 		RenderDebugPhysX				*mRenderDebugPhysX{ nullptr };
