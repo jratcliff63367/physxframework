@@ -70,13 +70,13 @@ namespace NV_PHYSX_FRAMEWORK
 
 		virtual ~PhysXFrameworkImpl(void)
 		{
-			if (mRenderDebug)
-			{
-				mRenderDebug->release();
-			}
 			if (mRenderDebugPhysX)
 			{
 				mRenderDebugPhysX->release();
+			}
+			if (mRenderDebug)
+			{
+				mRenderDebug->release();
 			}
 			cleanupPhysics(true);
 		}
@@ -183,6 +183,10 @@ namespace NV_PHYSX_FRAMEWORK
 		virtual void simulate(void) final
 		{
 			stepPhysics(true);
+			if (mRenderDebug )
+			{
+				mRenderDebug->render(1.0f / 60.0f, nullptr);
+			}
 		}
 
 		virtual void setCommandCallback(CommandCallback *cc)

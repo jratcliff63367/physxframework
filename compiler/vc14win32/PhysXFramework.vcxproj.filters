@@ -12,6 +12,9 @@
 		<ClInclude Include="..\..\include\RenderDebugPhysX.h">
 			<Filter>PhysXFramework\include</Filter>
 		</ClInclude>
+		<ClInclude Include="..\..\include\SimpleCamera.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="PhysXFramework\public">
@@ -97,6 +100,9 @@
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>
 		<ClCompile Include="..\..\src\RenderDebugPhysX.cpp">
+			<Filter>PhysXFramework\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\src\SimpleCamera.cpp">
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>
 	</ItemGroup>

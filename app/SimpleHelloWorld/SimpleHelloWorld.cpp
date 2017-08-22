@@ -45,9 +45,7 @@ public:
 	{
 		if (mPhysXFramework)
 		{
-			RENDER_DEBUG::RenderDebug *renderDebug = mPhysXFramework->getRenderDebug();
 			mPhysXFramework->simulate();
-			renderDebug->render(1.0f / 60.0f, nullptr);
 		}
 		return !mExit;
 	}

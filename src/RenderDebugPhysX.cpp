@@ -37,6 +37,7 @@
 #include "foundation/PxSimpleTypes.h"
 #include "foundation/PxAssert.h"
 #include "foundation/PxVec3.h"
+#include "SimpleCamera.h"
 
 #ifdef _MSC_VER
 #if _MSC_VER <= 1500
@@ -1539,6 +1540,8 @@ public:
 
 		mRenderDebug = renderDebug;
 
+		mSimpleCamera = new SimpleCamera(mRenderDebug);
+
 		mSimulationFilterData.word0 = 0;
 		mSimulationFilterData.word1 = 0;
 		mSimulationFilterData.word2 = 0;
@@ -1590,6 +1593,7 @@ public:
 		{
 			SAFE_RELEASE(mRenderDebug);
 		}
+		delete mSimpleCamera;
 	}
 
 	void createPhysXMenus(void)
@@ -1953,27 +1957,6 @@ public:
 					processMouseWheel(delta,isShift,rayOrigin,rayDir);
 				}
 			}
-			else if ( strcmp(cmd,"keypress") == 0 )
-			{
-				ret = true;
-				if ( count == 9 )
-				{
-					uint32_t key = atoi(argv[1]);
-					if ( key == 32 )
-					{
-						physx::PxVec3 p;
-						physx::PxVec3 dir;
-						physx::PxF32 radius = (float)atof( argv[2] );
-						p.x = (float)atof( argv[3] );
-						p.y = (float)atof( argv[4] );
-						p.z = (float)atof( argv[5] );
-						dir.x = (float) atof( argv[6] );
-						dir.y = (float) atof( argv[7] );
-						dir.z = (float) atof( argv[8] );
-						shootSphere(radius,p,dir);
-					}
-				}
-			}
 		}
 
 		return ret;
@@ -1983,6 +1966,11 @@ public:
 	{
 		if ( !mRenderDebug ) return false;
 		if ( !mPhysics ) return false;
+
+		if (mSimpleCamera)
+		{
+			mSimpleCamera->update(dtime);
+		}
 
 		mFrameCount++;
 
@@ -1998,6 +1986,16 @@ public:
 				snarfed = mCallback->processDebugCommand(argc,argv);
 			}
 			argv = mRenderDebug->getRemoteCommand(argc);
+		}
+
+		if (mSimpleCamera && mSimpleCamera->getSpacebarSemaphore())
+		{
+			// ok we are going to shoot a sphere into the scene!
+			const float *eyeDir = mSimpleCamera->getEyeDirection();
+			const float *eyePos = mSimpleCamera->getEyePosition();
+			physx::PxVec3 p(eyePos[0], eyePos[1], eyePos[2]);
+			physx::PxVec3 dir(eyeDir[0], eyeDir[1], eyeDir[2]);
+			shootSphere(1.0f, p, dir);
 		}
 
 		for (DebugSceneVector::iterator i=mDebugScenes.begin(); i!=mDebugScenes.end(); ++i)
@@ -2278,11 +2276,11 @@ public:
 			shape->setSimulationFilterData(mSimulationFilterData);
 			shape->setQueryFilterData(mQueryFilterData);
 		}
-		physx::PxVec3 linearVelocity = dir*20;
+		physx::PxVec3 linearVelocity = dir*100;
 		rd->setLinearVelocity(linearVelocity);
 		physx::PxVec3 rotationalVelocity(10,10,10);
 		rd->setAngularVelocity(rotationalVelocity);
-		rd->setLinearDamping(0.8f);
+		rd->setLinearDamping(0.1f);
 		ds.mScene->addActor(*rd);
 		ds.mScene->unlockWrite();
 	}
@@ -2423,6 +2421,7 @@ private:
 	bool						mOwnRenderDebug;
 	RENDER_DEBUG::RenderDebugTyped	*mRenderDebug;
 	const char					*mApplicationName{ "RenderDebugPhysX" };
+	SimpleCamera				*mSimpleCamera{ nullptr };
 };
 
 } // end of RENDER_DEUBG_PHYSX namespace
