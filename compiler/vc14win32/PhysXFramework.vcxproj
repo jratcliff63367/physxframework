@@ -111,6 +111,10 @@
 		</ProjectReference>
 	</ItemDefinitionGroup>
 	<ItemGroup>
+		<ClInclude Include="..\..\include\Ps.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\PsTime.h">
+		</ClInclude>
 		<ClInclude Include="..\..\include\RenderDebugPhysX.h">
 		</ClInclude>
 		<ClInclude Include="..\..\include\SimpleCamera.h">

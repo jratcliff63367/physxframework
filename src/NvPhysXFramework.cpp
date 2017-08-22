@@ -5,6 +5,7 @@
 #include "Nv.h"
 #include "PxPhysicsAPI.h"
 #include "NvRenderDebugTyped.h"
+#include "PsTime.h"
 
 using namespace physx;
 
@@ -16,18 +17,7 @@ namespace NV_PHYSX_FRAMEWORK
 {
 
 
-	PxDefaultAllocator		gAllocator;
-	PxDefaultErrorCallback	gErrorCallback;
 
-	PxFoundation*			gFoundation = NULL;
-	PxPhysics*				gPhysics = NULL;
-
-	PxDefaultCpuDispatcher*	gDispatcher = NULL;
-	PxScene*				gScene = NULL;
-
-	PxMaterial*				gMaterial = NULL;
-
-	PxPvd*                  gPvd = NULL;
 
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
 	{
@@ -57,15 +47,16 @@ namespace NV_PHYSX_FRAMEWORK
 			{
 				mRenderDebugTyped = mRenderDebug->getRenderDebugTyped();
 			}
-			initPhysics(true);
-			if (gScene && mRenderDebug )
+			initPhysics();
+			if (mScene && mRenderDebug )
 			{
-				mRenderDebugPhysX = createRenderDebugPhysX(gScene, mRenderDebug, true);
+				mRenderDebugPhysX = createRenderDebugPhysX(mScene, mRenderDebug, true);
 				if (mRenderDebugPhysX)
 				{
 					mRenderDebugPhysX->setInterface(this);
 				}
 			}
+			mTime.getElapsedSeconds();
 		}
 
 		virtual ~PhysXFrameworkImpl(void)
@@ -96,96 +87,94 @@ namespace NV_PHYSX_FRAMEWORK
 
 		PxRigidDynamic* createDynamic(const PxTransform& t, const PxGeometry& geometry, const PxVec3& velocity = PxVec3(0))
 		{
-			PxRigidDynamic* dynamic = PxCreateDynamic(*gPhysics, t, geometry, *gMaterial, 10.0f);
+			PxRigidDynamic* dynamic = PxCreateDynamic(*mPhysics, t, geometry, *mMaterial, 10.0f);
 			dynamic->setAngularDamping(0.5f);
 			dynamic->setLinearVelocity(velocity);
-			gScene->addActor(*dynamic);
+			mScene->addActor(*dynamic);
 			return dynamic;
 		}
 
 		void createStack(const PxTransform& t, PxU32 size, PxReal halfExtent)
 		{
-			PxShape* shape = gPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *gMaterial);
+			PxShape* shape = mPhysics->createShape(PxBoxGeometry(halfExtent, halfExtent, halfExtent), *mMaterial);
 			for (PxU32 i = 0; i < size; i++)
 			{
 				for (PxU32 j = 0; j < size - i; j++)
 				{
 					PxTransform localTm(PxVec3(PxReal(j * 2) - PxReal(size - i), PxReal(i * 2 + 1), 0) * halfExtent);
-					PxRigidDynamic* body = gPhysics->createRigidDynamic(t.transform(localTm));
+					PxRigidDynamic* body = mPhysics->createRigidDynamic(t.transform(localTm));
 					body->attachShape(*shape);
 					PxRigidBodyExt::updateMassAndInertia(*body, 10.0f);
-					gScene->addActor(*body);
+					mScene->addActor(*body);
 				}
 			}
 			shape->release();
 		}
 
-		void initPhysics(bool interactive)
+		void initPhysics(void)
 		{
-			gFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, gAllocator, gErrorCallback);
+			mFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, mAllocator, mErrorCallback);
 
-			gPvd = PxCreatePvd(*gFoundation);
+			mPvd = PxCreatePvd(*mFoundation);
 			PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
-			gPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
+			mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
-			gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale(), true, gPvd);
+			mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(), true, mPvd);
 
-			PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
+			PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
-			gDispatcher = PxDefaultCpuDispatcherCreate(2);
-			sceneDesc.cpuDispatcher = gDispatcher;
+			mDispatcher = PxDefaultCpuDispatcherCreate(2);
+			sceneDesc.cpuDispatcher = mDispatcher;
 			sceneDesc.filterShader = PxDefaultSimulationFilterShader;
-			gScene = gPhysics->createScene(sceneDesc);
+			mScene = mPhysics->createScene(sceneDesc);
 
-			PxPvdSceneClient* pvdClient = gScene->getScenePvdClient();
+			PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();
 			if (pvdClient)
 			{
 				pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
 				pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 				pvdClient->setScenePvdFlag(PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 			}
-			gMaterial = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+			mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 
-			PxRigidStatic* groundPlane = PxCreatePlane(*gPhysics, PxPlane(0, 1, 0, 0), *gMaterial);
-			gScene->addActor(*groundPlane);
+			PxRigidStatic* groundPlane = PxCreatePlane(*mPhysics, PxPlane(0, 1, 0, 0), *mMaterial);
+			mScene->addActor(*groundPlane);
 
-			for (PxU32 i = 0; i < 5; i++)
-				createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
 
-			if (!interactive)
-				createDynamic(PxTransform(PxVec3(0, 40, 100)), PxSphereGeometry(10), PxVec3(0, -50, -100));
 		}
 
-		void stepPhysics(bool interactive)
+		float stepPhysics(bool interactive)
 		{
 			PX_UNUSED(interactive);
-			gScene->simulate(1.0f / 60.0f);
-			gScene->fetchResults(true);
+			float dtime = float(mTime.getElapsedSeconds());
+			mScene->simulate(dtime);
+			mScene->fetchResults(true);
 			if (mRenderDebugPhysX)
 			{
-				mRenderDebugPhysX->render(1.0f / 60.0f, true, true, true, false);
+				mRenderDebugPhysX->render(dtime, true, true, true, false);
 			}
+			return dtime;
 		}
 
 		void cleanupPhysics(bool interactive)
 		{
 			PX_UNUSED(interactive);
-			gScene->release();
-			gDispatcher->release();
-			gPhysics->release();
-			PxPvdTransport* transport = gPvd->getTransport();
-			gPvd->release();
+			mScene->release();
+			mDispatcher->release();
+			mPhysics->release();
+			PxPvdTransport* transport = mPvd->getTransport();
+			mPvd->release();
 			transport->release();
 
-			gFoundation->release();
+			mFoundation->release();
 		}
 
 		virtual void simulate(void) final
 		{
-			stepPhysics(true);
+			float dtime = stepPhysics(true);
 			if (mRenderDebug )
 			{
-				mRenderDebug->render(1.0f / 60.0f, nullptr);
+				mRenderDebug->render(dtime, nullptr);
 			}
 		}
 
@@ -205,10 +194,28 @@ namespace NV_PHYSX_FRAMEWORK
 			return ret;
 		}
 
+		// Create a default series of stacked boxes for testing purposes
+		virtual void createDefaultStacks(void)
+		{
+			for (PxU32 i = 0; i < 5; i++)
+			{
+				createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
+			}
+		}
+
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
 		RENDER_DEBUG::RenderDebugTyped	*mRenderDebugTyped{ nullptr };
 		RenderDebugPhysX				*mRenderDebugPhysX{ nullptr };
+		PxDefaultAllocator				mAllocator;
+		PxDefaultErrorCallback			mErrorCallback;
+		PxFoundation					*mFoundation{ nullptr };
+		PxPhysics						*mPhysics{ nullptr };
+		PxDefaultCpuDispatcher			*mDispatcher{ nullptr };
+		PxScene							*mScene{ nullptr };
+		PxMaterial						*mMaterial{ nullptr };
+		PxPvd							*mPvd{ nullptr };
+		physx::shdfnd::Time				mTime;
 	};
 
 PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName)

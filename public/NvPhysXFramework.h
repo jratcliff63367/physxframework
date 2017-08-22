@@ -42,6 +42,9 @@ public:
 
 	virtual void simulate(void) = 0;
 
+	// Create a default series of stacked boxes for testing purposes
+	virtual void createDefaultStacks(void) = 0;
+
 	virtual void setCommandCallback(CommandCallback *cc) = 0;
 
 	// Return the render debug interface if available

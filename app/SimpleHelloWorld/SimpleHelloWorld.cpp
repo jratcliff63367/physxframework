@@ -30,6 +30,7 @@ public:
 		if (mPhysXFramework)
 		{
 			mPhysXFramework->setCommandCallback(this);
+			mPhysXFramework->createDefaultStacks();
 		}
 	}
 

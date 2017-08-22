@@ -9,6 +9,12 @@
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
+		<ClInclude Include="..\..\include\Ps.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\PsTime.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
 		<ClInclude Include="..\..\include\RenderDebugPhysX.h">
 			<Filter>PhysXFramework\include</Filter>
 		</ClInclude>
