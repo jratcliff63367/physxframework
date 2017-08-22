@@ -9,6 +9,57 @@
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
+		<ClInclude Include="..\..\include\Nv.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvAssert.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvBounds3.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvCTypes.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvFoundationMath.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvIntrinsics.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvMat33.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvMat44.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvMath.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvPlane.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvPreprocessor.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvQuat.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvSimpleTypes.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvTransform.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvVec2.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvVec3.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvVec4.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
 		<ClInclude Include="..\..\include\Ps.h">
 			<Filter>PhysXFramework\include</Filter>
 		</ClInclude>
@@ -27,67 +78,7 @@
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
-		<Filter Include="PhysXFramework\public\windows">
-		</Filter>
-	</ItemGroup>
-	<ItemGroup>
-		<ClInclude Include="..\..\public\windows\NvWindowsIntrinsics.h">
-			<Filter>PhysXFramework\public\windows</Filter>
-		</ClInclude>
-	</ItemGroup>
-	<ItemGroup>
-		<ClInclude Include="..\..\public\Nv.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvAssert.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvBounds3.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvCTypes.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvFoundationMath.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvIntrinsics.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvMat33.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvMat44.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvMath.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
 		<ClInclude Include="..\..\public\NvPhysXFramework.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvPlane.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvPreprocessor.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvQuat.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvSimpleTypes.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvTransform.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvVec2.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvVec3.h">
-			<Filter>PhysXFramework\public</Filter>
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvVec4.h">
 			<Filter>PhysXFramework\public</Filter>
 		</ClInclude>
 	</ItemGroup>

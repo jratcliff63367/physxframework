@@ -142,9 +142,19 @@ namespace NV_PHYSX_FRAMEWORK
 		float stepPhysics(bool interactive)
 		{
 			PX_UNUSED(interactive);
+			float STEP_TIME = 1.0f / 60.0f;
 			float dtime = float(mTime.getElapsedSeconds());
-			mScene->simulate(dtime);
-			mScene->fetchResults(true);
+			if (dtime > (1.0f / 10.0f))
+			{
+				dtime = 1.0f / 10.0f;
+			}
+			mElapsedTime += dtime;
+			while (mElapsedTime > STEP_TIME)
+			{
+				mScene->simulate(STEP_TIME);
+				mScene->fetchResults(true);
+				mElapsedTime -= STEP_TIME;
+			}
 			if (mRenderDebugPhysX)
 			{
 				mRenderDebugPhysX->render(dtime, true, true, true, false);
@@ -211,6 +221,7 @@ namespace NV_PHYSX_FRAMEWORK
 		PxMaterial						*mMaterial{ nullptr };
 		PxPvd							*mPvd{ nullptr };
 		physx::shdfnd::Time				mTime;
+		float							mElapsedTime{ 0 };
 	};
 
 PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName)

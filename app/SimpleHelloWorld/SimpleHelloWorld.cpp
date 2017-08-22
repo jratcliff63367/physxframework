@@ -1,6 +1,6 @@
 #include <stdio.h>
+#include <string.h>
 #include "NvRenderDebug.h"
-#include "Nv.h"
 #include "NvPhysXFramework.h"
 
 #ifdef NV_DEBUG
@@ -13,7 +13,7 @@ public:
 	SimpleHelloWorld(void)
 	{
 		const char *dllName = nullptr;
-#if NV_X64
+#if _M_X64
 #if USE_DEBUG
 		dllName = "PhysXFramework64DEBUG.dll";
 #else

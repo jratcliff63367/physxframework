@@ -115,41 +115,7 @@
 	<ItemGroup>
 	</ItemGroup>
 	<ItemGroup>
-		<ClInclude Include="..\..\public\Nv.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvAssert.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvBounds3.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvCTypes.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvFoundationMath.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvIntrinsics.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvMat33.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvMat44.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvMath.h">
-		</ClInclude>
 		<ClInclude Include="..\..\public\NvPhysXFramework.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvPlane.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvPreprocessor.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvQuat.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvSimpleTypes.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvTransform.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvVec2.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvVec3.h">
-		</ClInclude>
-		<ClInclude Include="..\..\public\NvVec4.h">
 		</ClInclude>
 		<ClCompile Include="..\..\public\NvPhysXFrameworkBinding.cpp">
 		</ClCompile>
