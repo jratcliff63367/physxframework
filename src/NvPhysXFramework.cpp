@@ -90,11 +90,25 @@ namespace NV_PHYSX_FRAMEWORK
 		}
 
 		// Create a simulated actor based on the collection of convex meshes
-		virtual void createActor(void) final
+		virtual void createActor(const float centerOfMass[3],float mass) final
 		{
 			if (mActor)
 			{
+				PxVec3 com(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
+				PxTransform p(com);
+				mActor->setCMassLocalPose(p);
+				mActor->setMass(mass);
 				mScene->addActor(*mActor);
+			}
+		}
+
+		virtual void getXform(float xform[16])
+		{
+			if (mActor)
+			{
+				PxTransform p = mActor->getGlobalPose();
+				PxMat44 m(p);
+				memcpy(xform, m.front(), sizeof(float)*16);
 			}
 		}
 
@@ -250,10 +264,6 @@ namespace NV_PHYSX_FRAMEWORK
 				mScene->fetchResults(true);
 				mElapsedTime -= STEP_TIME;
 			}
-			if (mRenderDebugPhysX)
-			{
-				mRenderDebugPhysX->render(dtime, true, true, true, false);
-			}
 			return dtime;
 		}
 
@@ -269,9 +279,14 @@ namespace NV_PHYSX_FRAMEWORK
 			mFoundation->release();
 		}
 
-		virtual float simulate(void) final
+		virtual float simulate(bool showPhysics) final
 		{
 			float dtime = stepPhysics(true);
+
+			if (mRenderDebugPhysX )
+			{
+				mRenderDebugPhysX->render(dtime, showPhysics, showPhysics, showPhysics, false);
+			}
 			if (mRenderDebug )
 			{
 				mRenderDebug->render(dtime, nullptr);
