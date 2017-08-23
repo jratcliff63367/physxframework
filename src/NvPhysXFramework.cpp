@@ -17,6 +17,98 @@ using namespace physx;
 
 namespace NV_PHYSX_FRAMEWORK
 {
+
+	class ConvexMeshImp : public PhysXFramework::ConvexMesh
+	{
+	public:
+		ConvexMeshImp(uint32_t vcount,
+			const float *vertices,
+			uint32_t tcount,
+			const uint32_t *indices,
+			PxCooking *cooking,
+			PxPhysics *physics)
+		{
+
+			PxConvexMeshDesc desc;
+			desc.points.data = vertices;
+			desc.points.count = vcount;
+			desc.points.stride = sizeof(float) * 3;
+			desc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
+
+			mConvexMesh = cooking->createConvexMesh(desc, physics->getPhysicsInsertionCallback());
+
+		}
+		virtual ~ConvexMeshImp(void)
+		{
+			if (mConvexMesh)
+			{
+				mConvexMesh->release();
+			}
+		}
+
+		virtual void release(void) final
+		{
+			delete this;
+		};
+
+		PxConvexMesh	*mConvexMesh{ nullptr };
+	}; 
+
+	class CompoundActorImpl : public PhysXFramework::CompoundActor
+	{
+	public:
+		CompoundActorImpl(PxPhysics *p,PxScene *scene,PxMaterial *defaultMaterial) : mPhysics(p), mScene(scene), mDefaultMaterial(defaultMaterial)
+		{
+			mActor = p->createRigidDynamic(PxTransform(PxIdentity));
+		}
+
+		virtual ~CompoundActorImpl(void)
+		{
+			if (mActor)
+			{
+				mActor->release();
+			}
+		}
+
+		virtual void addConvexMesh(PhysXFramework::ConvexMesh *cmesh,
+			float meshPosition[3],
+			float meshScale[3]) final
+		{
+			if (!mActor) return;
+			ConvexMeshImp *cm = static_cast<ConvexMeshImp *>(cmesh);
+			PxConvexMeshGeometry	convex;
+			convex.convexMesh = cm->mConvexMesh;
+			convex.scale = PxVec3(meshScale[0], meshScale[1], meshScale[2]);
+			PxTransform localPose(PxIdentity);
+			localPose.p = PxVec3(meshPosition[0], meshPosition[1], meshPosition[2]);
+			PxShape *shape = mPhysics->createShape(convex, *mDefaultMaterial, true);
+			if (shape)
+			{
+				shape->setLocalPose(localPose);
+				mActor->attachShape(*shape);
+			}
+		}
+
+		// Create a simulated actor based on the collection of convex meshes
+		virtual void createActor(void) final
+		{
+			if (mActor)
+			{
+				mScene->addActor(*mActor);
+			}
+		}
+
+		virtual void release(void) final
+		{
+			delete this;
+		}
+
+		PxPhysics			*mPhysics;
+		PxScene				*mScene;
+		PxMaterial			*mDefaultMaterial;
+		PxRigidDynamic		*mActor;
+	};
+
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
 	{
 	public:
@@ -118,6 +210,7 @@ namespace NV_PHYSX_FRAMEWORK
 			mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
 			mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(), true, mPvd);
+			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
 
 			PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
@@ -169,6 +262,7 @@ namespace NV_PHYSX_FRAMEWORK
 			mScene->release();
 			mDispatcher->release();
 			mPhysics->release();
+			mCooking->release();
 			PxPvdTransport* transport = mPvd->getTransport();
 			mPvd->release();
 			transport->release();
@@ -216,15 +310,15 @@ namespace NV_PHYSX_FRAMEWORK
 			uint32_t tcount,
 			const uint32_t *indices) final
 		{
-			ConvexMesh *ret = nullptr;
-			return ret;
+			ConvexMeshImp *c = new ConvexMeshImp(vcount, vertices, tcount, indices,mCooking,mPhysics);
+			return static_cast<ConvexMesh *>(c);
 		}
 
 		// Create a physically simulated compound actor comprised of a collection of convex meshes
 		virtual CompoundActor *createCompoundActor(void) final
 		{
-			CompoundActor *ret = nullptr;
-			return ret;
+			CompoundActorImpl *c = new CompoundActorImpl(mPhysics, mScene, mMaterial);
+			return static_cast<CompoundActor *>(c);
 		}
 
 
@@ -236,6 +330,7 @@ namespace NV_PHYSX_FRAMEWORK
 		PxDefaultErrorCallback			mErrorCallback;
 		PxFoundation					*mFoundation{ nullptr };
 		PxPhysics						*mPhysics{ nullptr };
+		PxCooking						*mCooking{ nullptr };
 		PxDefaultCpuDispatcher			*mDispatcher{ nullptr };
 		PxScene							*mScene{ nullptr };
 		PxMaterial						*mMaterial{ nullptr };
