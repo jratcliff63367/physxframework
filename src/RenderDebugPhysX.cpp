@@ -60,6 +60,11 @@
 #endif
 #include <vector>
 
+#define SPHERE_VELOCITY 20
+#define SPHERE_MASS 50
+#define SPHERE_RADIUS 0.2f
+#define DRAG_FORCE 0.01f
+
 namespace NV_PHYSX_FRAMEWORK
 {
 
@@ -1995,7 +2000,7 @@ public:
 			const float *eyePos = mSimpleCamera->getEyePosition();
 			physx::PxVec3 p(eyePos[0], eyePos[1], eyePos[2]);
 			physx::PxVec3 dir(eyeDir[0], eyeDir[1], eyeDir[2]);
-			shootSphere(1.0f, p, dir);
+			shootSphere(SPHERE_RADIUS, p, dir);
 		}
 
 		for (DebugSceneVector::iterator i=mDebugScenes.begin(); i!=mDebugScenes.end(); ++i)
@@ -2204,7 +2209,7 @@ public:
 		renderDebug->popRenderState();
 
 		physx::PxVec3 force = mDragTo - mDragStartLocation;
-		force*=(10.0f/2.0f);
+		force *= DRAG_FORCE;
 		force*=mass;
 		physx::PxRigidBodyExt::addForceAtLocalPos(*actor,force,mLocalDragStartLocation,physx::PxForceMode::eIMPULSE);
 
@@ -2264,7 +2269,7 @@ public:
 
 		physx::PxTransform pose(p);
 		physx::PxRigidDynamic *rd = mPhysics->createRigidDynamic(pose);
-		rd->setMass(500);
+		rd->setMass(SPHERE_MASS);
 		physx::PxShape *shape=NULL;
 		physx::PxSphereGeometry geom;
 		geom.radius = radius;
@@ -2276,7 +2281,7 @@ public:
 			shape->setSimulationFilterData(mSimulationFilterData);
 			shape->setQueryFilterData(mQueryFilterData);
 		}
-		physx::PxVec3 linearVelocity = dir*100;
+		physx::PxVec3 linearVelocity = dir*SPHERE_VELOCITY;
 		rd->setLinearVelocity(linearVelocity);
 		physx::PxVec3 rotationalVelocity(10,10,10);
 		rd->setAngularVelocity(rotationalVelocity);

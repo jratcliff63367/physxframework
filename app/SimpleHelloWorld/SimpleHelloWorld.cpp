@@ -3,9 +3,10 @@
 #include "NvRenderDebug.h"
 #include "NvPhysXFramework.h"
 
-#ifdef NV_DEBUG
-#define USE_DEBUG 1
-#endif
+#define USE_DEBUG 0
+
+#define TEST_BOX 1
+#define BOX_SIZE 20
 
 class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
 {
@@ -30,7 +31,19 @@ public:
 		if (mPhysXFramework)
 		{
 			mPhysXFramework->setCommandCallback(this);
+#if TEST_BOX
+			float boxSize[3];
+			boxSize[0] = BOX_SIZE;
+			boxSize[1] = BOX_SIZE;
+			boxSize[2] = BOX_SIZE;
+			float boxPosition[3];
+			boxPosition[0] = 0;
+			boxPosition[1] = BOX_SIZE*0.5f;
+			boxPosition[2] = 0;
+			mPhysXFramework->createBox(boxSize, boxPosition);
+#else
 			mPhysXFramework->createDefaultStacks();
+#endif
 		}
 	}
 
@@ -46,7 +59,7 @@ public:
 	{
 		if (mPhysXFramework)
 		{
-			mPhysXFramework->simulate();
+			mPhysXFramework->simulate(true);
 		}
 		return !mExit;
 	}

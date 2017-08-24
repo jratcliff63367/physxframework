@@ -4,6 +4,7 @@
 
 #include "Nv.h"
 #include "PxPhysicsAPI.h"
+#include "NvBounds3.h"
 #include "NvRenderDebugTyped.h"
 #include "PsTime.h"
 
@@ -12,6 +13,7 @@ using namespace physx;
 #define HOST_NAME "localhost"
 #define PVD_HOST "localhost"
 #define USE_DEBUG 0
+#define USE_BOXES 0	// if true, create boxes instead of convex hulls for simulation behavior testing
 
 #pragma warning(disable:4100)
 
@@ -37,6 +39,15 @@ namespace NV_PHYSX_FRAMEWORK
 
 			mConvexMesh = cooking->createConvexMesh(desc, physics->getPhysicsInsertionCallback());
 
+			mBounds.setEmpty();
+			for (uint32_t i = 0; i < vcount; i++)
+			{
+				const float *p = &vertices[i * 3];
+				PxVec3 v(p[0], p[1], p[2]);
+				mBounds.include(v);
+			}
+
+
 		}
 		virtual ~ConvexMeshImp(void)
 		{
@@ -51,6 +62,7 @@ namespace NV_PHYSX_FRAMEWORK
 			delete this;
 		};
 
+		PxBounds3				mBounds;
 		PxConvexMesh	*mConvexMesh{ nullptr };
 	}; 
 
@@ -76,6 +88,21 @@ namespace NV_PHYSX_FRAMEWORK
 		{
 			if (!mActor) return;
 			ConvexMeshImp *cm = static_cast<ConvexMeshImp *>(cmesh);
+#if USE_BOXES
+			PxBoxGeometry	box;
+			PxVec3 dimensions = cm->mBounds.getDimensions();
+			box.halfExtents.x = dimensions.x*0.5f*meshScale[0];
+			box.halfExtents.y = dimensions.x*0.5f*meshScale[1];
+			box.halfExtents.z = dimensions.x*0.5f*meshScale[2];
+			PxTransform localPose(PxIdentity);
+			localPose.p = PxVec3(meshPosition[0], meshPosition[1], meshPosition[2]);
+			PxShape *shape = mPhysics->createShape(box, *mDefaultMaterial, true);
+			if (shape)
+			{
+				shape->setLocalPose(localPose);
+				mActor->attachShape(*shape);
+			}
+#else
 			PxConvexMeshGeometry	convex;
 			convex.convexMesh = cm->mConvexMesh;
 			convex.scale = PxVec3(meshScale[0], meshScale[1], meshScale[2]);
@@ -87,6 +114,7 @@ namespace NV_PHYSX_FRAMEWORK
 				shape->setLocalPose(localPose);
 				mActor->attachShape(*shape);
 			}
+#endif
 		}
 
 		// Create a simulated actor based on the collection of convex meshes
@@ -117,10 +145,10 @@ namespace NV_PHYSX_FRAMEWORK
 			delete this;
 		}
 
-		PxPhysics			*mPhysics;
-		PxScene				*mScene;
-		PxMaterial			*mDefaultMaterial;
-		PxRigidDynamic		*mActor;
+		PxPhysics			*mPhysics{ nullptr };
+		PxScene				*mScene{ nullptr };
+		PxMaterial			*mDefaultMaterial{ nullptr };
+		PxRigidDynamic		*mActor{ nullptr };
 	};
 
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
@@ -215,6 +243,12 @@ namespace NV_PHYSX_FRAMEWORK
 			shape->release();
 		}
 
+		PxTolerancesScale getTolerancesScale(void)
+		{
+			PxTolerancesScale s;
+			return s;
+		}
+
 		void initPhysics(void)
 		{
 			mFoundation = PxCreateFoundation(PX_FOUNDATION_VERSION, mAllocator, mErrorCallback);
@@ -223,13 +257,14 @@ namespace NV_PHYSX_FRAMEWORK
 			PxPvdTransport* transport = PxDefaultPvdSocketTransportCreate(PVD_HOST, 5425, 10);
 			mPvd->connect(*transport, PxPvdInstrumentationFlag::eALL);
 
-			mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, PxTolerancesScale(), true, mPvd);
-			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(PxTolerancesScale()));
+			mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, getTolerancesScale(), true, mPvd);
+			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(getTolerancesScale()));
 
 			PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 			mDispatcher = PxDefaultCpuDispatcherCreate(2);
 			sceneDesc.cpuDispatcher = mDispatcher;
+//			sceneDesc.flags &= ~PxSceneFlag::eENABLE_PCM;
 			sceneDesc.filterShader = PxDefaultSimulationFilterShader;
 			mScene = mPhysics->createScene(sceneDesc);
 
@@ -336,6 +371,22 @@ namespace NV_PHYSX_FRAMEWORK
 			return static_cast<CompoundActor *>(c);
 		}
 
+		// create a box in the simulated scene
+		virtual void createBox(const float boxSize[3], const float boxPosition[3])
+		{
+			PxVec3 pos(boxPosition[0], boxPosition[1], boxPosition[2]);
+			PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(pos));
+			PxBoxGeometry	box;
+			box.halfExtents.x = boxSize[0] * 0.5f;
+			box.halfExtents.y = boxSize[1] * 0.5f;
+			box.halfExtents.z = boxSize[2] * 0.5f;
+			PxShape *shape = mPhysics->createShape(box, *mMaterial, true);
+			if (shape)
+			{
+				actor->attachShape(*shape);
+				mScene->addActor(*actor);
+			}
+		}
 
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
