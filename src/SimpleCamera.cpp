@@ -39,9 +39,9 @@ SimpleCamera::SimpleCamera(RENDER_DEBUG::RenderDebug *renderDebug) : 	mGamepadPi
 	mCameraSpeed = 4.0f;
 	mLastCommunicationsFrame = 0;
 
-	mEyePosition[0] = 10*4;
-	mEyePosition[1] = 10*4;
-	mEyePosition[2] = -4*4;
+	mEyePosition[0] = 10;
+	mEyePosition[1] = 10;
+	mEyePosition[2] = -4;
 
 	mTargetPitch = -0.697395146f;
 	mTargetYaw = -4.47776270;

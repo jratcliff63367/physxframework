@@ -126,6 +126,7 @@ namespace NV_PHYSX_FRAMEWORK
 				PxTransform p(com);
 				mActor->setCMassLocalPose(p);
 				mActor->setMass(mass);
+				PxRigidBodyExt::setMassAndUpdateInertia(*mActor, mActor->getMass());
 				mScene->addActor(*mActor);
 			}
 		}
@@ -222,6 +223,7 @@ namespace NV_PHYSX_FRAMEWORK
 			PxRigidDynamic* dynamic = PxCreateDynamic(*mPhysics, t, geometry, *mMaterial, 10.0f);
 			dynamic->setAngularDamping(0.5f);
 			dynamic->setLinearVelocity(velocity);
+			PxRigidBodyExt::setMassAndUpdateInertia(*dynamic, dynamic->getMass());
 			mScene->addActor(*dynamic);
 			return dynamic;
 		}
@@ -384,6 +386,7 @@ namespace NV_PHYSX_FRAMEWORK
 			if (shape)
 			{
 				actor->attachShape(*shape);
+				PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
 				mScene->addActor(*actor);
 			}
 		}
