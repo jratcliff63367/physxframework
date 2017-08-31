@@ -7,18 +7,22 @@
 #include "NvBounds3.h"
 #include "NvRenderDebugTyped.h"
 #include "PsTime.h"
+#include <vector>
 
 using namespace physx;
 
 #define HOST_NAME "localhost"
 #define PVD_HOST "localhost"
 #define USE_DEBUG 0
-#define USE_BOXES 0	// if true, create boxes instead of convex hulls for simulation behavior testing
 
 #pragma warning(disable:4100)
 
 namespace NV_PHYSX_FRAMEWORK
 {
+
+typedef	std::vector< PxRigidDynamic * > PxActorVector;
+typedef std::vector< PxShape * > PxShapeVector;
+typedef std::vector< PxJoint * > PxJointVector;
 
 	class ConvexMeshImp : public PhysXFramework::ConvexMesh
 	{
@@ -71,14 +75,17 @@ namespace NV_PHYSX_FRAMEWORK
 	public:
 		CompoundActorImpl(PxPhysics *p,PxScene *scene,PxMaterial *defaultMaterial) : mPhysics(p), mScene(scene), mDefaultMaterial(defaultMaterial)
 		{
-			mActor = p->createRigidDynamic(PxTransform(PxIdentity));
 		}
 
 		virtual ~CompoundActorImpl(void)
 		{
-			if (mActor)
+			for (size_t i = 0; i < mJoints.size(); i++)
 			{
-				mActor->release();
+				mJoints[i]->release();
+			}
+			for (size_t i = 0; i < mActors.size(); i++)
+			{
+				mActors[i]->release();
 			}
 		}
 
@@ -86,23 +93,7 @@ namespace NV_PHYSX_FRAMEWORK
 			float meshPosition[3],
 			float meshScale[3]) final
 		{
-			if (!mActor) return;
 			ConvexMeshImp *cm = static_cast<ConvexMeshImp *>(cmesh);
-#if USE_BOXES
-			PxBoxGeometry	box;
-			PxVec3 dimensions = cm->mBounds.getDimensions();
-			box.halfExtents.x = dimensions.x*0.5f*meshScale[0];
-			box.halfExtents.y = dimensions.x*0.5f*meshScale[1];
-			box.halfExtents.z = dimensions.x*0.5f*meshScale[2];
-			PxTransform localPose(PxIdentity);
-			localPose.p = PxVec3(meshPosition[0], meshPosition[1], meshPosition[2]);
-			PxShape *shape = mPhysics->createShape(box, *mDefaultMaterial, true);
-			if (shape)
-			{
-				shape->setLocalPose(localPose);
-				mActor->attachShape(*shape);
-			}
-#else
 			PxConvexMeshGeometry	convex;
 			convex.convexMesh = cm->mConvexMesh;
 			convex.scale = PxVec3(meshScale[0], meshScale[1], meshScale[2]);
@@ -112,33 +103,97 @@ namespace NV_PHYSX_FRAMEWORK
 			if (shape)
 			{
 				shape->setLocalPose(localPose);
-				mActor->attachShape(*shape);
+				mShapes.push_back(shape);
 			}
-#endif
 		}
 
 		// Create a simulated actor based on the collection of convex meshes
-		virtual void createActor(const float centerOfMass[3],float mass) final
+		virtual void createActor(const float centerOfMass[3],float mass,bool asRagdoll) final
 		{
-			if (mActor)
+			if (asRagdoll)
 			{
+				mass = mass / float(mShapes.size());
+				for (size_t i = 0; i < mShapes.size(); i++)
+				{
+					PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(PxIdentity));
+					mActors.push_back(actor);
+					PxShape *s = mShapes[i];
+					PxFilterData filterData;
+					filterData.word0 = uint32_t(i + 1);
+					s->setSimulationFilterData(filterData);
+					PxTransform actorPose = s->getLocalPose();
+					PxTransform identityPose(PxIdentity);
+					s->setLocalPose(identityPose);
+					actor->setGlobalPose(actorPose);
+					actor->attachShape(*s);
+//					PxVec3 com(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
+//					PxTransform p(com);
+//					actor->setCMassLocalPose(p);
+					actor->setMass(mass);
+					PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
+					mScene->addActor(*actor);
+				}
+			}
+			else
+			{
+				PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(PxIdentity));
+				mActors.push_back(actor);
+				for (size_t i=0; i<mShapes.size(); i++)
+				{
+					PxShape *s = mShapes[i];
+					actor->attachShape(*s);
+				}
 				PxVec3 com(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
 				PxTransform p(com);
-				mActor->setCMassLocalPose(p);
-				mActor->setMass(mass);
-				PxRigidBodyExt::setMassAndUpdateInertia(*mActor, mActor->getMass());
-				mScene->addActor(*mActor);
+				actor->setCMassLocalPose(p);
+				actor->setMass(mass);
+				PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
+				mScene->addActor(*actor);
 			}
 		}
 
-		virtual void getXform(float xform[16])
+		virtual bool getXform(float xform[16],uint32_t index)
 		{
-			if (mActor)
+			bool ret = false;
+			if (index < uint32_t(mActors.size()))
 			{
-				PxTransform p = mActor->getGlobalPose();
+				PxRigidDynamic *a = mActors[index];
+				PxTransform p = a->getGlobalPose();
 				PxMat44 m(p);
 				memcpy(xform, m.front(), sizeof(float)*16);
+				ret = true;
 			}
+			return ret;
+		}
+
+		// fixed, breakable joint
+		PxJoint* createFixedJoint(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1)
+		{
+			PxFixedJoint* j = PxFixedJointCreate(*mPhysics, a0, t0, a1, t1);
+			return j;
+		}
+
+		// Creates a fixed constraint between these two bodies
+		virtual bool createConstraint(uint32_t bodyA, uint32_t bodyB)
+		{
+			bool ret = false;
+			uint32_t actorCount = uint32_t(mActors.size());
+			if (bodyA < actorCount && bodyB < actorCount)
+			{
+				PxRigidDynamic *a1 = mActors[bodyA];
+				PxRigidDynamic *a2 = mActors[bodyB];
+				PxTransform id(PxIdentity);
+
+				PxTransform inverse = a2->getGlobalPose().getInverse();
+				PxTransform other = inverse * a1->getGlobalPose();
+
+				PxJoint *joint = createFixedJoint(a1, id, a2, other);
+				if (joint)
+				{
+					mJoints.push_back(joint);
+				}
+			}
+			return ret;
 		}
 
 		virtual void release(void) final
@@ -149,8 +204,36 @@ namespace NV_PHYSX_FRAMEWORK
 		PxPhysics			*mPhysics{ nullptr };
 		PxScene				*mScene{ nullptr };
 		PxMaterial			*mDefaultMaterial{ nullptr };
-		PxRigidDynamic		*mActor{ nullptr };
+
+		PxActorVector		mActors;
+		PxShapeVector		mShapes;
+		PxJointVector		mJoints;
 	};
+
+	PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+		PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+		PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+	{
+		PX_UNUSED(attributes0);
+		PX_UNUSED(attributes1);
+		PX_UNUSED(filterData0);
+		PX_UNUSED(filterData1);
+		PX_UNUSED(constantBlockSize);
+		PX_UNUSED(constantBlock);
+
+		if (filterData0.word0 && filterData1.word0)
+		{
+			return PxFilterFlag::eKILL;
+		}
+
+		// all initial and persisting reports for everything, with per-point data
+		pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
+			| PxPairFlag::eNOTIFY_TOUCH_FOUND
+			| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
+			| PxPairFlag::eNOTIFY_CONTACT_POINTS;
+		return PxFilterFlag::eDEFAULT;
+	}
+
 
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
 	{
@@ -266,8 +349,7 @@ namespace NV_PHYSX_FRAMEWORK
 			sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 			mDispatcher = PxDefaultCpuDispatcherCreate(2);
 			sceneDesc.cpuDispatcher = mDispatcher;
-//			sceneDesc.flags &= ~PxSceneFlag::eENABLE_PCM;
-			sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+			sceneDesc.filterShader = contactReportFilterShader;
 			mScene = mPhysics->createScene(sceneDesc);
 
 			PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();
