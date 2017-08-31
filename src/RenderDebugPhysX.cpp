@@ -63,7 +63,7 @@
 #define SPHERE_VELOCITY 20
 #define SPHERE_MASS 50
 #define SPHERE_RADIUS 0.2f
-#define DRAG_FORCE 0.01f
+#define DRAG_FORCE 0.1f
 
 namespace NV_PHYSX_FRAMEWORK
 {
@@ -1637,6 +1637,14 @@ public:
 
 		mRenderDebug->sendRemoteCommand("EndGroup");
 
+		mRenderDebug->sendRemoteCommand("BeginGroup \"Joint Visualization\"");
+
+		mRenderDebug->sendRemoteCommand("CheckBox JOINT_LOCAL_FRAMES \"physxvis eJOINT_LOCAL_FRAMES\"");
+		mRenderDebug->sendRemoteCommand("CheckBox JOINT_LIMITS \"physxvis eJOINT_LIMITS\"");
+
+		mRenderDebug->sendRemoteCommand("EndGroup");
+
+
 		mRenderDebug->sendRemoteCommand("BeginGroup \"Particle System Visualization\"");
 
 		mRenderDebug->sendRemoteCommand("CheckBox PARTICLE_SYSTEM_POSITION \"physxvis ePARTICLE_SYSTEM_POSITION\"");
@@ -1648,6 +1656,7 @@ public:
 		mRenderDebug->sendRemoteCommand("CheckBox PARTICLE_SYSTEM_MAX_MOTION_DISTANCE \"physxvis ePARTICLE_SYSTEM_MAX_MOTION_DISTANCE\"");
 
 		mRenderDebug->sendRemoteCommand("EndGroup");
+
 
 		mRenderDebug->sendRemoteCommand("BeginGroup \"Cloth Visualization\"");
 
@@ -1852,13 +1861,6 @@ public:
 					}
 				}
 			}
-#if 0
-			else if ( strcmp(cmd,"client_stop") == 0 )
-			{
-				mActive = false;
-				ret = true;
-			}
-#endif
 			else if ( strcmp(cmd,"client_forward_one_frame") == 0 )
 			{
 				mOneFrameAdvance = true;

@@ -166,15 +166,45 @@ typedef std::vector< PxJoint * > PxJointVector;
 			return ret;
 		}
 
-		// fixed, breakable joint
+		// fixed joint
 		PxJoint* createFixedJoint(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1)
 		{
 			PxFixedJoint* j = PxFixedJointCreate(*mPhysics, a0, t0, a1, t1);
+			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+			return j;
+		}
+
+		// spherical joint limited to an angle of at most pi/4 radians (45 degrees)
+		PxJoint* createLimitedSpherical(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1)
+		{
+			PxSphericalJoint* j = PxSphericalJointCreate(*mPhysics, a0, t0, a1, t1);
+			j->setLimitCone(PxJointLimitCone(PxPi / 4, PxPi / 4, 0.05f));
+			j->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
+			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+
+			return j;
+		}
+
+		// D6 joint with a spring maintaining its position
+		PxJoint* createHingeJoint(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1, uint32_t limitRangeDegrees)
+		{
+			PxD6Joint* j = PxD6JointCreate(*mPhysics, a0, t0, a1, t1);
+			j->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
+			j->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLOCKED);
+			j->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLIMITED);
+
+			float lrange = (PxPi * 2) * (float(limitRangeDegrees) / 360.0f);
+
+			PxJointAngularLimitPair limit(-lrange, lrange);
+			j->setTwistLimit(limit);
+			j->setDrive(PxD6Drive::eSLERP, PxD6JointDrive(0, 1000, FLT_MAX, true));
+			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
 			return j;
 		}
 
 		// Creates a fixed constraint between these two bodies
-		virtual bool createConstraint(uint32_t bodyA, uint32_t bodyB)
+		virtual bool createConstraint(uint32_t bodyA, uint32_t bodyB, const float worldPos[3],					// World position of the constraint location
+			const float worldOrientation[4], uint32_t limitRangeDegrees) final		// World orientation of the constraint 
 		{
 			bool ret = false;
 			uint32_t actorCount = uint32_t(mActors.size());
@@ -182,12 +212,27 @@ typedef std::vector< PxJoint * > PxJointVector;
 			{
 				PxRigidDynamic *a1 = mActors[bodyA];
 				PxRigidDynamic *a2 = mActors[bodyB];
-				PxTransform id(PxIdentity);
 
-				PxTransform inverse = a2->getGlobalPose().getInverse();
-				PxTransform other = inverse * a1->getGlobalPose();
+				PxTransform constraintWorld;
 
-				PxJoint *joint = createFixedJoint(a1, id, a2, other);
+				constraintWorld.p.x = worldPos[0];
+				constraintWorld.p.y = worldPos[1];
+				constraintWorld.p.z = worldPos[2];
+
+				constraintWorld.q.x = worldOrientation[0];
+				constraintWorld.q.y = worldOrientation[1];
+				constraintWorld.q.z = worldOrientation[2];
+				constraintWorld.q.w = worldOrientation[3];
+
+				PxTransform inverse1 = a1->getGlobalPose().getInverse();
+				PxTransform other1 = inverse1 * constraintWorld;
+
+
+				PxTransform inverse2 = a2->getGlobalPose().getInverse();
+				PxTransform other2 = inverse2 * constraintWorld;
+
+//				PxJoint *joint = createFixedJoint(a1, other1, a2, other2);
+				PxJoint *joint = createHingeJoint(a1, other1, a2, other2,limitRangeDegrees);
 				if (joint)
 				{
 					mJoints.push_back(joint);
