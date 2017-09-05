@@ -126,11 +126,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 					s->setLocalPose(identityPose);
 					actor->setGlobalPose(actorPose);
 					actor->attachShape(*s);
-//					PxVec3 com(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
-//					PxTransform p(com);
-//					actor->setCMassLocalPose(p);
-					actor->setMass(mass);
-					PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
+					PxRigidBodyExt::setMassAndUpdateInertia(*actor, mass);
 					mScene->addActor(*actor);
 				}
 			}
@@ -150,6 +146,29 @@ typedef std::vector< PxJoint * > PxJointVector;
 				PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
 				mScene->addActor(*actor);
 			}
+		}
+
+		virtual bool getConstraintXform(float xform[16], uint32_t constraint)
+		{
+			bool ret = false;
+
+			if (constraint < uint32_t(mJoints.size()))
+			{
+				PxJoint *j = mJoints[constraint];
+				PxTransform p = j->getLocalPose(PxJointActorIndex::eACTOR0);
+				PxRigidActor *a1;
+				PxRigidActor *a2;
+				j->getActors(a1, a2);
+				if (a1)
+				{
+					p = a1->getGlobalPose()*p;
+				}
+				PxMat44 m(p);
+				memcpy(xform, m.front(), sizeof(float) * 16);
+				ret = true;
+			}
+
+			return ret;
 		}
 
 		virtual bool getXform(float xform[16],uint32_t index)

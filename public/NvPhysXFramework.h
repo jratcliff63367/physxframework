@@ -79,6 +79,7 @@ public:
 			uint32_t swing2Limit) = 0;		// Swing 2 limit in degrees (if used)
 
 		virtual bool getXform(float xform[16],uint32_t index) = 0;
+		virtual bool getConstraintXform(float xform[16], uint32_t constraint) = 0;
 
 		virtual void release(void) = 0;
 	};
