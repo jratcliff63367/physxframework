@@ -171,6 +171,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 		{
 			PxFixedJoint* j = PxFixedJointCreate(*mPhysics, a0, t0, a1, t1);
 			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
 			return j;
 		}
 
@@ -181,6 +182,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 			j->setLimitCone(PxJointLimitCone(PxPi / 4, PxPi / 4, 0.05f));
 			j->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
 			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
 
 			return j;
 		}
@@ -192,6 +194,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 			j->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
 			j->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLOCKED);
 			j->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLIMITED);
+			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
 
 			float lrange = (PxPi * 2) * (float(limitRangeDegrees) / 360.0f);
 
@@ -204,7 +207,12 @@ typedef std::vector< PxJoint * > PxJointVector;
 
 		// Creates a fixed constraint between these two bodies
 		virtual bool createConstraint(uint32_t bodyA, uint32_t bodyB, const float worldPos[3],					// World position of the constraint location
-			const float worldOrientation[4], uint32_t limitRangeDegrees) final		// World orientation of the constraint 
+			const float worldOrientation[4],
+			ConstraintType type,			// Type of constraint to use
+			float	distanceLimit,
+			uint32_t twistLimit,			// Twist limit in degrees (if used)
+			uint32_t swing1Limit,			// Swing 1 limit in degrees (if used)
+			uint32_t swing2Limit) final		// Swing 2 limit in degrees (if used)
 		{
 			bool ret = false;
 			uint32_t actorCount = uint32_t(mActors.size());
@@ -231,8 +239,23 @@ typedef std::vector< PxJoint * > PxJointVector;
 				PxTransform inverse2 = a2->getGlobalPose().getInverse();
 				PxTransform other2 = inverse2 * constraintWorld;
 
-//				PxJoint *joint = createFixedJoint(a1, other1, a2, other2);
-				PxJoint *joint = createHingeJoint(a1, other1, a2, other2,limitRangeDegrees);
+				PxJoint *joint = nullptr;
+
+				switch (type)
+				{
+					case CT_FIXED:
+						joint = createFixedJoint(a1, other1, a2, other2);
+						break;
+					case CT_HINGE:
+						joint = createHingeJoint(a1, other1, a2, other2, twistLimit);
+						break;
+					case CT_SPHERICAL:
+						break;
+					case CT_BALL_AND_SOCKET:
+						break;
+					case CT_REVOLUTE:
+						break;
+				}
 				if (joint)
 				{
 					mJoints.push_back(joint);
@@ -389,6 +412,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 
 			mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, getTolerancesScale(), true, mPvd);
 			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(getTolerancesScale()));
+			PxInitExtensions(*mPhysics, mPvd);
 
 			PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
