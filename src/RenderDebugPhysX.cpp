@@ -2403,6 +2403,12 @@ public:
 		}
 	}
 
+	// return pointer to the currently selected/dragging actor
+	virtual physx::PxRigidActor *getSelectedActor(void) const final
+	{
+		return mDraggingActor;
+	}
+
 private:
 	physx::PxFilterData			mSimulationFilterData;
 	physx::PxFilterData			mQueryFilterData;

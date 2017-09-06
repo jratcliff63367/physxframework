@@ -73,7 +73,10 @@ typedef std::vector< PxJoint * > PxJointVector;
 	class CompoundActorImpl : public PhysXFramework::CompoundActor
 	{
 	public:
-		CompoundActorImpl(PxPhysics *p,PxScene *scene,PxMaterial *defaultMaterial) : mPhysics(p), mScene(scene), mDefaultMaterial(defaultMaterial)
+		CompoundActorImpl(PxPhysics *p,
+						PxScene *scene, 
+						PxMaterial *defaultMaterial,
+						RenderDebugPhysX *renderDebugPhysX) : mPhysics(p), mScene(scene), mDefaultMaterial(defaultMaterial), mRenderDebugPhysX(renderDebugPhysX)
 		{
 		}
 
@@ -108,7 +111,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 		}
 
 		// Create a simulated actor based on the collection of convex meshes
-		virtual void createActor(const float centerOfMass[3],float mass,bool asRagdoll) final
+		virtual void createActor(const float centerOfMass[3], float mass, bool asRagdoll) final
 		{
 			if (asRagdoll)
 			{
@@ -134,7 +137,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 			{
 				PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(PxIdentity));
 				mActors.push_back(actor);
-				for (size_t i=0; i<mShapes.size(); i++)
+				for (size_t i = 0; i < mShapes.size(); i++)
 				{
 					PxShape *s = mShapes[i];
 					actor->attachShape(*s);
@@ -147,6 +150,31 @@ typedef std::vector< PxJoint * > PxJointVector;
 				mScene->addActor(*actor);
 			}
 		}
+
+		// If we are mouse dragging and the currently selected object is an actor in this compound
+		// system, then return true and assign 'bodyIndex' to the index number of the body selected.
+		virtual bool getSelectedBody(uint32_t &bodyIndex) final
+		{
+			bool ret = false;
+
+			bodyIndex = 0;
+			PxRigidActor *actor = mRenderDebugPhysX->getSelectedActor();
+			if (actor)
+			{
+				for (size_t i = 0; i < mActors.size(); ++i)
+				{
+					if (actor == mActors[i])
+					{
+						bodyIndex = uint32_t(i);
+						ret = true;
+						break;
+					}
+				}
+			}
+
+			return ret;
+		}
+
 
 		virtual bool getConstraintXform(float xform[16], uint32_t constraint)
 		{
@@ -291,6 +319,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 		PxPhysics			*mPhysics{ nullptr };
 		PxScene				*mScene{ nullptr };
 		PxMaterial			*mDefaultMaterial{ nullptr };
+		RenderDebugPhysX	*mRenderDebugPhysX{ nullptr };
 
 		PxActorVector		mActors;
 		PxShapeVector		mShapes;
@@ -539,7 +568,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 		// Create a physically simulated compound actor comprised of a collection of convex meshes
 		virtual CompoundActor *createCompoundActor(void) final
 		{
-			CompoundActorImpl *c = new CompoundActorImpl(mPhysics, mScene, mMaterial);
+			CompoundActorImpl *c = new CompoundActorImpl(mPhysics, mScene, mMaterial,mRenderDebugPhysX);
 			return static_cast<CompoundActor *>(c);
 		}
 

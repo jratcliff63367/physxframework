@@ -148,6 +148,9 @@ namespace NV_PHYSX_FRAMEWORK
 
 		virtual void notifyModifySamples(physx::PxHeightField *hf, uint32_t subColStart, uint32_t subRowStart, uint32_t nbSubCols, uint32_t nbSubRows) = 0;
 
+		// return pointer to the currently selected/dragging actor
+		virtual physx::PxRigidActor *getSelectedActor(void) const = 0;
+
 		/**
 		*\brief Release the RenderDebugPhysX interface
 		*/
