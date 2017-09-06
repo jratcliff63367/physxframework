@@ -6,8 +6,8 @@
 #define _INTPTR 0
 #endif
 #endif
-#include <stdint.h>
 
+#include <stdint.h>
 
 /*!
 \file
@@ -17,11 +17,11 @@
 /**
 \brief This defines the version number of the API.  If the API changes in anyway, this version number needs to be bumped.
 */
-#define RENDER_DEBUG_VERSION 1009
+#define RENDER_DEBUG_VERSION 1010
 /**
 \brief This defines the version number for the communications layer.  If the format or layout of any packets change in a way that will not be backwards compatible, this needs to be bumped
 */
-#define RENDER_DEBUG_COMM_VERSION 1009
+#define RENDER_DEBUG_COMM_VERSION 1010
 /**
 \brief The default port number for RenderDebug client/server connections.  You can change this if you wish, but you must make sure both your client and server code uses the new port number.
 */

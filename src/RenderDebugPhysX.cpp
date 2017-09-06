@@ -63,7 +63,7 @@
 #define SPHERE_VELOCITY 20
 #define SPHERE_MASS 50
 #define SPHERE_RADIUS 0.2f
-#define DRAG_FORCE 0.1f
+#define DRAG_FORCE 0.8f
 
 namespace NV_PHYSX_FRAMEWORK
 {
