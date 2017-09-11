@@ -85,6 +85,9 @@ public:
 		// system, then return true and assign 'bodyIndex' to the index number of the body selected.
 		virtual bool getSelectedBody(uint32_t &bodyIndex) = 0;
 
+		// Sets the collision filter pairs.
+		virtual void setCollisionFilterPairs(uint32_t pairCount, const uint32_t *collisionPairs) = 0;
+
 		virtual void release(void) = 0;
 	};
 

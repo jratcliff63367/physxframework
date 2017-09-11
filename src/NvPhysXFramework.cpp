@@ -8,6 +8,7 @@
 #include "NvRenderDebugTyped.h"
 #include "PsTime.h"
 #include <vector>
+#include <unordered_set>
 
 using namespace physx;
 
@@ -19,6 +20,42 @@ using namespace physx;
 
 namespace NV_PHYSX_FRAMEWORK
 {
+
+typedef std::unordered_set< uint64_t > CollisionFilterSet;
+
+CollisionFilterSet gCollisionFilters;
+
+PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
+	PxFilterObjectAttributes attributes1, PxFilterData filterData1,
+	PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
+{
+	PX_UNUSED(attributes0);
+	PX_UNUSED(attributes1);
+	PX_UNUSED(filterData0);
+	PX_UNUSED(filterData1);
+	PX_UNUSED(constantBlockSize);
+	PX_UNUSED(constantBlock);
+
+	if (filterData0.word0 && filterData1.word0)
+	{
+		uint64_t c1 = filterData0.word0;
+		uint64_t c2 = filterData1.word0;
+		uint64_t c = (c1 << 32) | c2;
+		const CollisionFilterSet::iterator found = gCollisionFilters.find(c);
+		if (found != gCollisionFilters.end())
+		{
+			return PxFilterFlag::eKILL;
+		}
+	}
+
+	// all initial and persisting reports for everything, with per-point data
+	pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
+		| PxPairFlag::eNOTIFY_TOUCH_FOUND
+		| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
+		| PxPairFlag::eNOTIFY_CONTACT_POINTS;
+	return PxFilterFlag::eDEFAULT;
+}
+
 
 typedef	std::vector< PxRigidDynamic * > PxActorVector;
 typedef std::vector< PxShape * > PxShapeVector;
@@ -151,6 +188,38 @@ typedef std::vector< PxJoint * > PxJointVector;
 			}
 		}
 
+		// Sets the collision filter pairs.
+		virtual void setCollisionFilterPairs(uint32_t pairCount, const uint32_t *collisionPairs)
+		{
+			gCollisionFilters.clear();
+#if 0
+			uint32_t bodyCount = uint32_t(mActors.size());
+			for (uint32_t i = 0; i < bodyCount; i++)
+			{
+				for (uint32_t j = i + 1; j < bodyCount; j++)
+				{
+					uint64_t p1 = i + 1;
+					uint64_t p2 = j + 1;
+					uint64_t c1 = (p1 << 32) | p2;
+					uint64_t c2 = (p2 << 32) | p1;
+					gCollisionFilters.insert(c1);
+					gCollisionFilters.insert(c2);
+				}
+			}
+#else
+			// Add all collision pair filter permutations to the collion filter set
+			for (uint32_t i = 0; i < pairCount; i++)
+			{
+				uint64_t p1 = collisionPairs[i * 2 + 0]+1;
+				uint64_t p2 = collisionPairs[i * 2 + 1]+1;
+				uint64_t c1 = (p1 << 32) | p2;
+				uint64_t c2 = (p2 << 32) | p1;
+				gCollisionFilters.insert(c1);
+				gCollisionFilters.insert(c2);
+			}
+#endif
+		}
+
 		// If we are mouse dragging and the currently selected object is an actor in this compound
 		// system, then return true and assign 'bodyIndex' to the index number of the body selected.
 		virtual bool getSelectedBody(uint32_t &bodyIndex) final
@@ -223,10 +292,14 @@ typedef std::vector< PxJoint * > PxJointVector;
 		}
 
 		// spherical joint limited to an angle of at most pi/4 radians (45 degrees)
-		PxJoint* createLimitedSpherical(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1)
+		PxJoint* createLimitedSpherical(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1,uint32_t swing1Limit,uint32_t swing2Limit)
 		{
 			PxSphericalJoint* j = PxSphericalJointCreate(*mPhysics, a0, t0, a1, t1);
-			j->setLimitCone(PxJointLimitCone(PxPi / 4, PxPi / 4, 0.05f));
+
+			float lrange1 = (PxPi * 2) * (float(swing1Limit) / 360.0f);
+			float lrange2 = (PxPi * 2) * (float(swing2Limit) / 360.0f);
+
+			j->setLimitCone(PxJointLimitCone(lrange1, lrange2));
 			j->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
 			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
 			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
@@ -297,6 +370,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 						joint = createHingeJoint(a1, other1, a2, other2, twistLimit);
 						break;
 					case CT_SPHERICAL:
+						joint = createLimitedSpherical(a1, other1, a2, other2, swing1Limit, swing2Limit);
 						break;
 					case CT_BALL_AND_SOCKET:
 						break;
@@ -326,29 +400,6 @@ typedef std::vector< PxJoint * > PxJointVector;
 		PxJointVector		mJoints;
 	};
 
-	PxFilterFlags contactReportFilterShader(PxFilterObjectAttributes attributes0, PxFilterData filterData0,
-		PxFilterObjectAttributes attributes1, PxFilterData filterData1,
-		PxPairFlags& pairFlags, const void* constantBlock, PxU32 constantBlockSize)
-	{
-		PX_UNUSED(attributes0);
-		PX_UNUSED(attributes1);
-		PX_UNUSED(filterData0);
-		PX_UNUSED(filterData1);
-		PX_UNUSED(constantBlockSize);
-		PX_UNUSED(constantBlock);
-
-		if (filterData0.word0 && filterData1.word0)
-		{
-			return PxFilterFlag::eKILL;
-		}
-
-		// all initial and persisting reports for everything, with per-point data
-		pairFlags = PxPairFlag::eSOLVE_CONTACT | PxPairFlag::eDETECT_DISCRETE_CONTACT
-			| PxPairFlag::eNOTIFY_TOUCH_FOUND
-			| PxPairFlag::eNOTIFY_TOUCH_PERSISTS
-			| PxPairFlag::eNOTIFY_CONTACT_POINTS;
-		return PxFilterFlag::eDEFAULT;
-	}
 
 
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
