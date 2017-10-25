@@ -641,6 +641,14 @@ typedef std::vector< PxJoint * > PxJointVector;
 			}
 		}
 
+		virtual void setDragForce(float force)
+		{
+			if (mRenderDebugPhysX)
+			{
+				mRenderDebugPhysX->setDragForce(force);
+			}
+		}
+
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
 		RENDER_DEBUG::RenderDebugTyped	*mRenderDebugTyped{ nullptr };

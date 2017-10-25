@@ -151,6 +151,8 @@ namespace NV_PHYSX_FRAMEWORK
 		// return pointer to the currently selected/dragging actor
 		virtual physx::PxRigidActor *getSelectedActor(void) const = 0;
 
+		virtual void setDragForce(float dragForce) = 0;
+
 		/**
 		*\brief Release the RenderDebugPhysX interface
 		*/

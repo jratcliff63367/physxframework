@@ -63,7 +63,7 @@
 #define SPHERE_VELOCITY 20
 #define SPHERE_MASS 50
 #define SPHERE_RADIUS 0.2f
-#define DRAG_FORCE 0.8f
+#define DEFAULT_DRAG_FORCE 2.0f
 
 namespace NV_PHYSX_FRAMEWORK
 {
@@ -2211,7 +2211,7 @@ public:
 		renderDebug->popRenderState();
 
 		physx::PxVec3 force = mDragTo - mDragStartLocation;
-		force *= DRAG_FORCE;
+		force *= mDragForce;
 		force*=mass;
 		physx::PxRigidBodyExt::addForceAtLocalPos(*actor,force,mLocalDragStartLocation,physx::PxForceMode::eIMPULSE);
 
@@ -2409,7 +2409,13 @@ public:
 		return mDraggingActor;
 	}
 
+	virtual void setDragForce(float dragForce) final
+	{
+		mDragForce = dragForce;
+	}
+
 private:
+	float						mDragForce{ DEFAULT_DRAG_FORCE };
 	physx::PxFilterData			mSimulationFilterData;
 	physx::PxFilterData			mQueryFilterData;
 	bool						mActive;
