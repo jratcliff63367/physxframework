@@ -59,6 +59,12 @@ public:
 	{
 		if (mPhysXFramework)
 		{
+			static uint32_t gCount = 0;
+			gCount++;
+			if (gCount == 16 )
+			{
+				mPhysXFramework->serializeXML("SimpleHelloWorld.xml");
+			}
 			mPhysXFramework->simulate(true);
 		}
 		return !mExit;

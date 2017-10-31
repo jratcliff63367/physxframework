@@ -537,6 +537,10 @@ typedef std::vector< PxJoint * > PxJointVector;
 
 		float stepPhysics(bool interactive)
 		{
+			if (mPaused)
+			{
+				return 0;
+			}
 			PX_UNUSED(interactive);
 			float STEP_TIME = 1.0f / 60.0f;
 			float dtime = float(mTime.getElapsedSeconds());
@@ -649,6 +653,244 @@ typedef std::vector< PxJoint * > PxJointVector;
 			}
 		}
 
+		/**
+		Creates two example collections:
+		- collection with actors and joints that can be instantiated multiple times in the scene
+		- collection with shared objects
+		*/
+		void createCollections(PxPhysics *physics,
+								PxCollection* &sharedCollection, 
+								PxCollection* &actorCollection, 
+								PxSerializationRegistry& sr)
+		{
+
+			sharedCollection = PxCreateCollection();		// collection for all the shared objects
+			actorCollection = PxCreateCollection();			// collection for all the nonshared objects
+			// Serialize materials
+			{
+				uint32_t count = physics->getNbMaterials();
+				if (count)
+				{
+					physx::PxMaterial **objects = new physx::PxMaterial*[count];
+					physics->getMaterials(objects, count, 0);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						sharedCollection->add(*objects[i]);
+					}
+					delete[]objects;
+				}
+			}
+
+
+			// Serialize shapes
+			{
+				uint32_t count = physics->getNbShapes();
+				if (count)
+				{
+					physx::PxShape **objects = new physx::PxShape*[count];
+					physics->getShapes(objects, count, 0);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						sharedCollection->add(*objects[i]);
+					}
+					delete[]objects;
+				}
+			}
+
+
+			// Serialize triangle meshes
+			{
+				uint32_t count = physics->getNbTriangleMeshes();
+				if (count)
+				{
+					physx::PxTriangleMesh **objects = new physx::PxTriangleMesh*[count];
+					physics->getTriangleMeshes(objects, count, 0);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						sharedCollection->add(*objects[i]);
+					}
+					delete[]objects;
+				}
+			}
+			// Serialize convex hulls
+			{
+				uint32_t count = physics->getNbConvexMeshes();
+				if (count)
+				{
+					physx::PxConvexMesh **objects = new physx::PxConvexMesh*[count];
+					physics->getConvexMeshes(objects, count, 0);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						sharedCollection->add(*objects[i]);
+					}
+					delete[]objects;
+				}
+			}
+			// Serialize heightfields
+			{
+				uint32_t count = physics->getNbHeightFields();
+				if (count)
+				{
+					physx::PxHeightField **objects = new physx::PxHeightField*[count];
+					physics->getHeightFields(objects, count, 0);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						sharedCollection->add(*objects[i]);
+					}
+					delete[]objects;
+				}
+			}
+			// Serialize cloth fabrics
+			{
+				uint32_t count = physics->getNbClothFabrics();
+				if (count)
+				{
+					physx::PxClothFabric **objects = new physx::PxClothFabric*[count];
+					physics->getClothFabrics(objects, count);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						sharedCollection->add(*objects[i]);
+					}
+					delete[]objects;
+				}
+			}
+			// Seralize the contents of each scene
+			{
+				uint32_t count = physics->getNbScenes();
+				if (count)
+				{
+					physx::PxScene **objects = new physx::PxScene*[count];
+					physics->getScenes(objects, count, 0);
+					for (uint32_t i = 0; i < count; i++)
+					{
+						PxScene *scene = objects[i];
+						auto addActors = [this](PxCollection *actorCollection,PxScene *scene, PxActorTypeFlags type)
+						{
+							PxU32 acount = scene->getNbActors(type);
+							PxActor **actors = new PxActor*[acount];
+							scene->getActors(type, actors, acount, 0);
+							for (uint32_t j = 0; j < acount; j++)
+							{
+								actorCollection->add(*actors[j]);
+							}
+							delete[]actors;
+						};
+						addActors(actorCollection, scene, PxActorTypeFlag::eRIGID_STATIC);
+						addActors(actorCollection, scene, PxActorTypeFlag::eRIGID_DYNAMIC);
+						addActors(actorCollection, scene, PxActorTypeFlag::eCLOTH);
+						addActors(actorCollection, scene, PxActorTypeFlag::ePARTICLE_FLUID);
+						addActors(actorCollection, scene, PxActorTypeFlag::ePARTICLE_SYSTEM);
+						// Add all of the constraints
+						{
+							uint32_t jcount = scene->getNbConstraints();
+							if (jcount)
+							{
+								PxConstraint **constraints = new PxConstraint *[jcount];
+								scene->getConstraints(constraints, jcount, 0);
+								for (uint32_t j = 0; j < jcount; j++)
+								{
+									actorCollection->add(*constraints[j]);
+								}
+								delete[]constraints;
+							}
+						}
+						// Add all of the articulations
+						{
+							uint32_t jcount = scene->getNbArticulations();
+							if (jcount)
+							{
+								PxArticulation **articulations = new PxArticulation *[jcount];
+								scene->getArticulations(articulations, jcount, 0);
+								for (uint32_t j = 0; j < jcount; j++)
+								{
+									actorCollection->add(*articulations[j]);
+								}
+								delete[]articulations;
+							}
+						}
+						// Add all of the aggregates
+						{
+							uint32_t jcount = scene->getNbAggregates();
+							if (jcount)
+							{
+								PxAggregate **aggregates = new PxAggregate *[jcount];
+								scene->getAggregates(aggregates, jcount, 0);
+								for (uint32_t j = 0; j < jcount; j++)
+								{
+									actorCollection->add(*aggregates[j]);
+								}
+								delete[]aggregates;
+							}
+						}
+					}
+				}
+			}
+			PxSerialization::complete(*sharedCollection, sr);
+			PxSerialization::createSerialObjectIds(*sharedCollection, PxSerialObjectId(1));	// arbitrary choice of base for references to shared objects
+			PxSerialization::complete(*actorCollection, sr, sharedCollection, true);
+		}
+
+
+		/**
+		Create objects, add them to collections and serialize the collections to the steams gSharedStream and gActorStream
+		This function doesn't setup the gPhysics global as the corresponding physics object is only used locally
+		*/
+		void serializeObjects(PxPhysics *physics,PxOutputStream& sharedStream, PxOutputStream& actorStream)
+		{
+			PxSerializationRegistry* sr = PxSerialization::createSerializationRegistry(*physics);
+
+			PxCollection* sharedCollection = NULL;
+			PxCollection* actorCollection = NULL;
+			createCollections(physics,sharedCollection, actorCollection, *sr);
+
+			PxSerialization::serializeCollectionToXml(sharedStream, *sharedCollection, *sr);
+			PxSerialization::serializeCollectionToXml(actorStream, *actorCollection, *sr, NULL, sharedCollection);
+
+			actorCollection->release();
+			sharedCollection->release();
+
+			sr->release();
+		}
+
+
+		// serialize the current state to an XML file
+		virtual void serializeXML(const char *fname, PxPhysics *physics)
+		{
+			// Alternatively PxDefaultFileOutputStream could be used 
+			PxDefaultMemoryOutputStream sharedOutputStream;
+			PxDefaultMemoryOutputStream actorOutputStream;
+			serializeObjects(physics, sharedOutputStream, actorOutputStream);
+			{
+				FILE *fph = fopen(fname, "wb");
+				if (fph)
+				{
+					fwrite(sharedOutputStream.getData(), sharedOutputStream.getSize(), 1, fph);
+					fwrite(actorOutputStream.getData(), actorOutputStream.getSize(), 1, fph);
+					fclose(fph);
+				}
+			}
+		}
+
+
+		// serialize the current state to an XML file
+		virtual void serializeXML(const char *fname) final
+		{
+			serializeXML(fname, mPhysics);
+		}
+
+
+
+		virtual void setPauseState(bool state) final
+		{
+			mPaused = state;
+		}
+
+		virtual bool getPauseState(void) const final
+		{
+			return mPaused;
+		}
+
+		bool							mPaused{ false };
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
 		RENDER_DEBUG::RenderDebugTyped	*mRenderDebugTyped{ nullptr };
