@@ -5,7 +5,8 @@
 
 #define USE_DEBUG 0
 
-#define TEST_BOX 1
+#define TEST_SOME_OF_EVERYTHING 0
+#define TEST_BOX 0
 #define BOX_SIZE 20
 
 class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
@@ -31,7 +32,9 @@ public:
 		if (mPhysXFramework)
 		{
 			mPhysXFramework->setCommandCallback(this);
-#if TEST_BOX
+#if TEST_SOME_OF_EVERYTHING
+			mPhysXFramework->createSomeOfEverything();
+#elif TEST_BOX
 			float boxSize[3];
 			boxSize[0] = BOX_SIZE;
 			boxSize[1] = BOX_SIZE;

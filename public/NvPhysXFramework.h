@@ -29,7 +29,7 @@ enum ConstraintType
 	CT_REVOLUTE,
 };
 
-#define PHYSX_FRAMEWORK_VERSION_NUMBER 101
+#define PHYSX_FRAMEWORK_VERSION_NUMBER 102
 
 // Instantiate the PhysX SDK, create a scene, and a ground plane
 class PhysXFramework
@@ -121,6 +121,10 @@ public:
 
 	// serialize the current state to an XML file
 	virtual void serializeXML(const char *fname) = 0;
+
+	// Create some of everything so we can serialize the scenes and get a detailed
+	// XML output for analysis
+	virtual void createSomeOfEverything(void) = 0;
 
 	// Release the PhysXFramework interface
 	virtual void release(void) = 0;

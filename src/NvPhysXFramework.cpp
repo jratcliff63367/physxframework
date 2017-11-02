@@ -1,5 +1,6 @@
 #include "NvPhysXFramework.h"
 #include "RenderDebugPhysX.h"
+#include "SomeOfEverything.h"
 #include <ctype.h>
 
 #include "Nv.h"
@@ -512,7 +513,6 @@ typedef std::vector< PxJoint * > PxJointVector;
 			mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, getTolerancesScale(), true, mPvd);
 			mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation, PxCookingParams(getTolerancesScale()));
 			PxInitExtensions(*mPhysics, mPvd);
-
 			PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 			sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 			mDispatcher = PxDefaultCpuDispatcherCreate(2);
@@ -532,7 +532,6 @@ typedef std::vector< PxJoint * > PxJointVector;
 			PxRigidStatic* groundPlane = PxCreatePlane(*mPhysics, PxPlane(0, 1, 0, 0), *mMaterial);
 			mScene->addActor(*groundPlane);
 
-
 		}
 
 		float stepPhysics(bool interactive)
@@ -551,8 +550,11 @@ typedef std::vector< PxJoint * > PxJointVector;
 			mElapsedTime += dtime;
 			while (mElapsedTime > STEP_TIME)
 			{
-				mScene->simulate(STEP_TIME);
-				mScene->fetchResults(true);
+				if (mScene)
+				{
+					mScene->simulate(STEP_TIME);
+					mScene->fetchResults(true);
+				}
 				mElapsedTime -= STEP_TIME;
 			}
 			return dtime;
@@ -560,7 +562,14 @@ typedef std::vector< PxJoint * > PxJointVector;
 
 		void cleanupPhysics(void)
 		{
-			mScene->release();
+			if (mSomeOfEverything)
+			{
+				mSomeOfEverything->release();
+			}
+			if (mScene)
+			{
+				mScene->release();
+			}
 			mDispatcher->release();
 			mPhysics->release();
 			mCooking->release();
@@ -890,6 +899,17 @@ typedef std::vector< PxJoint * > PxJointVector;
 			return mPaused;
 		}
 
+		// Create some of everything so we can serialize the scenes and get a detailed
+		// XML output for analysis
+		virtual void createSomeOfEverything(void)
+		{
+			if (mSomeOfEverything)
+			{
+				mSomeOfEverything->release();
+			}
+			mSomeOfEverything = SOME_OF_EVERYTHING::SomeOfEverything::create(mPhysics, mCooking, mScene);
+		}
+
 		bool							mPaused{ false };
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
@@ -906,6 +926,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 		PxPvd							*mPvd{ nullptr };
 		physx::shdfnd::Time				mTime;
 		float							mElapsedTime{ 0 };
+		SOME_OF_EVERYTHING::SomeOfEverything				*mSomeOfEverything{ nullptr };
 	};
 
 PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName)

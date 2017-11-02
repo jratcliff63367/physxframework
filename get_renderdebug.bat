@@ -1,0 +1,13 @@
+@echo off
+cd bin
+cd win64
+copy f:\github\debugviewsrc\bin\win64\NvRenderDebug_x64.dll
+copy f:\github\debugviewsrc\bin\win64\NvRenderDebugDEBUG_x64.dll
+cd ..
+cd ..
+cd ext
+cd NvRenderDebug
+copy F:\github\debugviewsrc\Shared\NvRenderDebug\include\*.h
+copy F:\github\debugviewsrc\Shared\NvRenderDebug\include\*.cpp
+cd ..
+cd ..
