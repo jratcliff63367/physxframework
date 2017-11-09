@@ -30,8 +30,8 @@ namespace PHYSICS_DOM_PHYSX
 			{
 				const PHYSICS_DOM::Scene &s = *i;
 				physx::PxTolerancesScale ts;
-				ts.length = s.physx_tolerancesScale.physx_length;
-				ts.speed = s.physx_tolerancesScale.physx_speed;
+				ts.length = s.physx_sceneDesc.tolerancesScale.length;
+				ts.speed = s.physx_sceneDesc.tolerancesScale.speed;
 				physx::PxSceneDesc desc(ts);
 				desc.gravity = physx::PxVec3(s.gravity.x, s.gravity.y, s.gravity.z);
 				desc.simulationEventCallback = nullptr; // TODO
@@ -41,7 +41,7 @@ namespace PHYSICS_DOM_PHYSX
 				desc.filterShaderDataSize = 0; // TODO
 				desc.filterShader = nullptr; // TODO
 				desc.filterCallback = nullptr; // TODO
-				switch ( s.physx_broadPhaseType )
+				switch ( s.physx_sceneDesc.broadPhaseType )
 				{
 					case PHYSICS_DOM::BPT_SAP:
 						desc.broadPhaseType = physx::PxBroadPhaseType::eSAP;
@@ -56,16 +56,16 @@ namespace PHYSICS_DOM_PHYSX
 
 				desc.broadPhaseCallback = nullptr; // TODO
 
-				desc.limits.maxNbActors = s.physx_sceneLimits.physx_maxNbActors;				//!< Expected maximum number of actors
-				desc.limits.maxNbBodies = s.physx_sceneLimits.physx_maxNbBodies;				//!< Expected maximum number of dynamic rigid bodies
-				desc.limits.maxNbStaticShapes = s.physx_sceneLimits.physx_maxNbStaticShapes;			//!< Expected maximum number of static shapes
-				desc.limits.maxNbDynamicShapes = s.physx_sceneLimits.physx_maxNbDynamicShapes;			//!< Expected maximum number of dynamic shapes
-				desc.limits.maxNbAggregates = s.physx_sceneLimits.physx_maxNbAggregates;			//!< Expected maximum number of aggregates
-				desc.limits.maxNbConstraints = s.physx_sceneLimits.physx_maxNbConstraints;			//!< Expected maximum number of constraint shaders
-				desc.limits.maxNbRegions = s.physx_sceneLimits.physx_maxNbRegions;				//!< Expected maximum number of broad-phase regions
-				desc.limits.maxNbBroadPhaseOverlaps = s.physx_sceneLimits.physx_maxNbBroadPhaseOverlaps;	//!< Expected maximum number of broad-phase overlaps
+				desc.limits.maxNbActors = s.physx_sceneDesc.sceneLimits.maxNbActors;				//!< Expected maximum number of actors
+				desc.limits.maxNbBodies = s.physx_sceneDesc.sceneLimits.maxNbBodies;				//!< Expected maximum number of dynamic rigid bodies
+				desc.limits.maxNbStaticShapes = s.physx_sceneDesc.sceneLimits.maxNbStaticShapes;			//!< Expected maximum number of static shapes
+				desc.limits.maxNbDynamicShapes = s.physx_sceneDesc.sceneLimits.maxNbDynamicShapes;			//!< Expected maximum number of dynamic shapes
+				desc.limits.maxNbAggregates = s.physx_sceneDesc.sceneLimits.maxNbAggregates;			//!< Expected maximum number of aggregates
+				desc.limits.maxNbConstraints = s.physx_sceneDesc.sceneLimits.maxNbConstraints;			//!< Expected maximum number of constraint shaders
+				desc.limits.maxNbRegions = s.physx_sceneDesc.sceneLimits.maxNbRegions;				//!< Expected maximum number of broad-phase regions
+				desc.limits.maxNbBroadPhaseOverlaps = s.physx_sceneDesc.sceneLimits.maxNbBroadPhaseOverlaps;	//!< Expected maximum number of broad-phase overlaps
 
-				switch (s.physx_frictionType)
+				switch (s.physx_sceneDesc.frictionType)
 				{
 					case PHYSICS_DOM::FT_PATCH:
 						desc.frictionType = physx::PxFrictionType::ePATCH;
@@ -78,15 +78,15 @@ namespace PHYSICS_DOM_PHYSX
 						break;
 				}
 
-				desc.bounceThresholdVelocity = s.physx_bounceThresholdVelocity;
-				desc.ccdMaxSeparation = s.physx_ccdMaxSeparation;
-				desc.solverOffsetSlop = s.physx_solverOffsetSlop;
+				desc.bounceThresholdVelocity = s.physx_sceneDesc.bounceThresholdVelocity;
+				desc.ccdMaxSeparation = s.physx_sceneDesc.ccdMaxSeparation;
+				desc.solverOffsetSlop = s.physx_sceneDesc.solverOffsetSlop;
 				desc.flags = (physx::PxSceneFlags)(0);
-				if (s.physx_enableActiveActors)
+				if (s.physx_sceneDesc.enableActiveActors)
 				{
 					desc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS);
 				}
-				if (s.physx_enableActiveTransforms)
+				if (s.physx_sceneDesc.enableActiveTransforms)
 				{
 					desc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS);
 				}
