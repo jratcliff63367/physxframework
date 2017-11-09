@@ -2,6 +2,7 @@
 #include "RenderDebugPhysX.h"
 #include "SomeOfEverything.h"
 #include "PhysicsDOMPhysX.h"
+#include "ImportPhysXDOM.h"
 #include <ctype.h>
 
 #include "Nv.h"
@@ -926,6 +927,17 @@ typedef std::vector< PxJoint * > PxJointVector;
 			}
 			mPhysicsDOMPhysX = PHYSICS_DOM_PHYSX::PhysicsDOMPhysX::create(mPhysics, mCooking);
 			mPhysicsDOMPhysX->loadPhysicsDOM(physicsDOM,mScene);
+
+			return ret;
+		}
+
+		virtual bool importPhysXDOM(const char *fname, PHYSICS_DOM::PhysicsDOM &pdom) final
+		{
+			bool ret = false;
+
+			IMPORT_PHYSX_DOM::ImportPhysXDOM *imp = IMPORT_PHYSX_DOM::ImportPhysXDOM::create();
+			ret = imp->importPhysXDOM(fname, pdom);
+			imp->release();
 
 			return ret;
 		}

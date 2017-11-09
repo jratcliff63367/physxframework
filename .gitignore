@@ -82,3 +82,12 @@
 /compiler/vc14win32/Win32/PhysXFramework/debug
 /compiler/vc14win32/Win32/SimpleHelloWorld/debug
 /*.bak
+/src/*.bak
+/bin/win32/NvRenderDebugDEBUG_x86.dll
+/bin/win32/SimpleHelloWorldDEBUG.exe
+/bin/win64/NvRenderDebugDEBUG_x64.dll
+/compiler/vc14win64/.vs/config
+/compiler/vc14win64/*.opendb
+/compiler/vc14win64/*.xml
+/include/*.bak
+/bin/win64/*.bak

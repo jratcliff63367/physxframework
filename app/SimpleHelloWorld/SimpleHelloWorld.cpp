@@ -6,9 +6,10 @@
 
 #define USE_DEBUG 0
 
-#define TEST_PHYSICS_DOM 1
+#define TEST_IMPORT_XML 0
+#define TEST_PHYSICS_DOM 0
 #define TEST_SOME_OF_EVERYTHING 0
-#define TEST_BOX 0
+#define TEST_BOX 1
 #define BOX_SIZE 20
 
 class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
@@ -48,6 +49,8 @@ public:
 			mPhysXFramework->createBox(boxSize, boxPosition);
 #elif TEST_PHYSICS_DOM
 			testPhysicsDOM();
+#elif TEST_IMPORT_XML
+			testImportXML();
 #else
 			mPhysXFramework->createDefaultStacks();
 #endif
@@ -119,6 +122,13 @@ public:
 		ic->collection = "0";	// Instance node '0' 
 		s->nodes.push_back(ic);
 
+		mPhysXFramework->loadPhysicsDOM(dom);
+	}
+
+	void testImportXML(void)
+	{
+		PHYSICS_DOM::PhysicsDOM dom;
+		mPhysXFramework->importPhysXDOM("f:\\github\\InspectXML\\SimpleHelloWorld.xml", dom);
 		mPhysXFramework->loadPhysicsDOM(dom);
 	}
 

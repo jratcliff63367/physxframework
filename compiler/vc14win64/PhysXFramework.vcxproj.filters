@@ -9,6 +9,12 @@
 		</Filter>
 	</ItemGroup>
 	<ItemGroup>
+		<ClInclude Include="..\..\include\FastXml.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
+		<ClInclude Include="..\..\include\ImportPhysXDOM.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
 		<ClInclude Include="..\..\include\Nv.h">
 			<Filter>PhysXFramework\include</Filter>
 		</ClInclude>
@@ -103,6 +109,12 @@
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>
 		<ClCompile Include="..\..\src\ExtDefaultErrorCallback.cpp">
+			<Filter>PhysXFramework\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\src\FastXml.cpp">
+			<Filter>PhysXFramework\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\src\ImportPhysXDOM.cpp">
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>
 		<ClCompile Include="..\..\src\NvPhysXFramework.cpp">
