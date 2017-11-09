@@ -17,6 +17,11 @@ namespace RENDER_DEBUG
 	class RenderDebug;
 }
 
+namespace PHYSICS_DOM
+{
+	class PhysicsDOM;
+}
+
 namespace NV_PHYSX_FRAMEWORK
 {
 
@@ -29,7 +34,7 @@ enum ConstraintType
 	CT_REVOLUTE,
 };
 
-#define PHYSX_FRAMEWORK_VERSION_NUMBER 102
+#define PHYSX_FRAMEWORK_VERSION_NUMBER 104
 
 // Instantiate the PhysX SDK, create a scene, and a ground plane
 class PhysXFramework
@@ -88,6 +93,7 @@ public:
 		// Sets the collision filter pairs.
 		virtual void setCollisionFilterPairs(uint32_t pairCount, const uint32_t *collisionPairs) = 0;
 
+
 		virtual void release(void) = 0;
 	};
 
@@ -114,6 +120,7 @@ public:
 	// Return the render debug interface if available
 	virtual RENDER_DEBUG::RenderDebug *getRenderDebug(void) = 0;
 
+
 	virtual void setDragForce(float force) = 0;
 
 	virtual void setPauseState(bool state) = 0;
@@ -125,6 +132,9 @@ public:
 	// Create some of everything so we can serialize the scenes and get a detailed
 	// XML output for analysis
 	virtual void createSomeOfEverything(void) = 0;
+
+	// Load this physics DOM
+	virtual bool loadPhysicsDOM(const PHYSICS_DOM::PhysicsDOM &physicsDOM) = 0;
 
 	// Release the PhysXFramework interface
 	virtual void release(void) = 0;

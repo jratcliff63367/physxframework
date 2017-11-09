@@ -1,6 +1,7 @@
 #include "NvPhysXFramework.h"
 #include "RenderDebugPhysX.h"
 #include "SomeOfEverything.h"
+#include "PhysicsDOMPhysX.h"
 #include <ctype.h>
 
 #include "Nv.h"
@@ -445,6 +446,10 @@ typedef std::vector< PxJoint * > PxJointVector;
 
 		virtual ~PhysXFrameworkImpl(void)
 		{
+			if (mPhysicsDOMPhysX)
+			{
+				mPhysicsDOMPhysX->release();
+			}
 			if (mRenderDebugPhysX)
 			{
 				mRenderDebugPhysX->release();
@@ -910,6 +915,21 @@ typedef std::vector< PxJoint * > PxJointVector;
 			mSomeOfEverything = SOME_OF_EVERYTHING::SomeOfEverything::create(mPhysics, mCooking, mScene);
 		}
 
+		// Load this physics DOM
+		virtual bool loadPhysicsDOM(const PHYSICS_DOM::PhysicsDOM &physicsDOM)
+		{
+			bool ret = false;
+
+			if (mPhysicsDOMPhysX)
+			{
+				mPhysicsDOMPhysX->release();
+			}
+			mPhysicsDOMPhysX = PHYSICS_DOM_PHYSX::PhysicsDOMPhysX::create(mPhysics, mCooking);
+			mPhysicsDOMPhysX->loadPhysicsDOM(physicsDOM);
+
+			return ret;
+		}
+
 		bool							mPaused{ false };
 		CommandCallback					*mCommandCallback{ nullptr };
 		RENDER_DEBUG::RenderDebug		*mRenderDebug{ nullptr };
@@ -927,6 +947,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 		physx::shdfnd::Time				mTime;
 		float							mElapsedTime{ 0 };
 		SOME_OF_EVERYTHING::SomeOfEverything				*mSomeOfEverything{ nullptr };
+		PHYSICS_DOM_PHYSX::PhysicsDOMPhysX *mPhysicsDOMPhysX{ nullptr };
 	};
 
 PhysXFramework *createPhysXFramework(uint32_t versionNumber, const char *dllName)

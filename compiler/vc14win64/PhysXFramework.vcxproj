@@ -1,644 +1,647 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="debug|x64">
-      <Configuration>debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="release|x64">
-      <Configuration>release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <ProjectGuid>{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}</ProjectGuid>
-    <RootNamespace>PhysXFramework</RootNamespace>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <OutDir>./../../bin/win64\</OutDir>
-    <IntDir>./x64/PhysXFramework/debug\</IntDir>
-    <TargetExt>.dll</TargetExt>
-    <TargetName>PhysXFramework64DEBUG</TargetName>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules />
-    <CodeAnalysisRuleAssemblies />
-    <SkipCopyingSymbolsToOutputDirectory>true</SkipCopyingSymbolsToOutputDirectory>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <ClCompile>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalOptions>/W4</AdditionalOptions>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./../../include;./../../public;./../../ext/NvRenderDebug;./../../ext/PhysX/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;_DEBUG;_ITERATOR_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>Level3</WarningLevel>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <AdditionalOptions>/DEBUG</AdditionalOptions>
-      <AdditionalDependencies>PhysX3CommonDEBUG_x64.lib;PhysX3CookingDEBUG_x64.lib;PhysX3DEBUG_x64.lib;PhysX3GpuDEBUG_x64.lib;PhysX3ExtensionsDEBUG.lib;PsFastXmlDEBUG_x64.lib;PxCudaContextManagerDEBUG_x64.lib;PxFoundationDEBUG_x64.lib;PxPvdSDKDEBUG_x64.lib;PxTaskDEBUG_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysXFramework64DEBUG.dll</OutputFile>
-      <AdditionalLibraryDirectories>./../../ext/PhysX/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>$(OutDir)/PhysXFramework64DEBUG.dll.pdb</ProgramDatabaseFile>
-      <SubSystem>Console</SubSystem>
-      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <ResourceCompile>
-    </ResourceCompile>
-    <ProjectReference>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <OutDir>./../../bin/win64\</OutDir>
-    <IntDir>./x64/PhysXFramework/release\</IntDir>
-    <TargetExt>.dll</TargetExt>
-    <TargetName>PhysXFramework64</TargetName>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules />
-    <CodeAnalysisRuleAssemblies />
-    <SkipCopyingSymbolsToOutputDirectory>true</SkipCopyingSymbolsToOutputDirectory>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <ClCompile>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalOptions>/W4</AdditionalOptions>
-      <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>./../../include;./../../public;./../../ext/NvRenderDebug;./../../ext/PhysX/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <WarningLevel>Level3</WarningLevel>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>
-      </PrecompiledHeaderFile>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-    </ClCompile>
-    <Link>
-      <AdditionalOptions>/DEBUG</AdditionalOptions>
-      <AdditionalDependencies>PhysX3CommonCHECKED_x64.lib;PhysX3CookingCHECKED_x64.lib;PhysX3CHECKED_x64.lib;PhysX3GpuCHECKED_x64.lib;PhysX3ExtensionsCHECKED.lib;PsFastXmlCHECKED_x64.lib;PxCudaContextManagerCHECKED_x64.lib;PxFoundationCHECKED_x64.lib;PxPvdSDKCHECKED_x64.lib;PxTaskCHECKED_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysXFramework64.dll</OutputFile>
-      <AdditionalLibraryDirectories>./../../ext/PhysX/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ProgramDatabaseFile>$(OutDir)/PhysXFramework64.dll.pdb</ProgramDatabaseFile>
-      <SubSystem>Console</SubSystem>
-      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
-      <TargetMachine>MachineX64</TargetMachine>
-    </Link>
-    <ResourceCompile>
-    </ResourceCompile>
-    <ProjectReference>
-    </ProjectReference>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\include\Nv.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvAssert.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvBounds3.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvCTypes.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvFoundationMath.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvIntrinsics.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvMat33.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvMat44.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvMath.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvPlane.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvPreprocessor.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvQuat.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvSimpleTypes.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvTransform.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvVec2.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvVec3.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\NvVec4.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\Ps.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\PsTime.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\RenderDebugPhysX.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\SimpleCamera.h">
-    </ClInclude>
-    <ClInclude Include="..\..\include\SomeOfEverything.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\public\NvPhysXFramework.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\DLLMain.cpp">
-    </ClCompile>
-    <ClCompile Include="..\..\src\ExtDefaultErrorCallback.cpp">
-    </ClCompile>
-    <ClCompile Include="..\..\src\NvPhysXFramework.cpp">
-    </ClCompile>
-    <ClCompile Include="..\..\src\RenderDebugPhysX.cpp">
-    </ClCompile>
-    <ClCompile Include="..\..\src\SimpleCamera.cpp">
-    </ClCompile>
-    <ClCompile Include="..\..\src\SomeOfEverything.cpp">
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\NvRenderDebug\NvRenderDebug.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\NvRenderDebug\NvRenderDebugTyped.h">
-    </ClInclude>
-    <ClCompile Include="..\..\ext\NvRenderDebug\NvRenderDebugBinding.cpp">
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxBoxController.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxCapsuleController.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxCharacter.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxController.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxControllerBehavior.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxControllerManager.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxControllerObstacles.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxExtended.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\cloth\PxCloth.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothCollisionData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothFabric.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothParticleData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothTypes.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\collision\PxCollisionDefs.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\windows\PxWindowsDelayLoadHook.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxBase.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxCollection.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxCoreUtilityTypes.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxMetaData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxMetaDataFlags.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxPhysicsInsertionCallback.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxPhysXCommonConfig.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxRenderBuffer.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxSerialFramework.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxSerializer.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxStringTable.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxTolerancesScale.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\common\PxTypeInfo.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\PxBVH33MidphaseDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\PxBVH34MidphaseDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\Pxc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\PxConvexMeshDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\PxCooking.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\PxMidphaseDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cooking\PxTriangleMeshDesc.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxCudaContextManager.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxCudaMemoryManager.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxGpuCopyDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxGpuCopyDescQueue.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxBinaryConverter.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxBroadPhaseExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothFabricCooker.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothMeshDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothMeshQuadifier.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothTetherCooker.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxCollectionExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxConstraintExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxConvexMeshExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxD6Joint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultAllocator.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultCpuDispatcher.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultErrorCallback.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultSimulationFilterShader.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultStreams.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDistanceJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxExtensionsAPI.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxFixedJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxJointLimit.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxMassProperties.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxParticleExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxPrismaticJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRaycastCCD.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRepXSerializer.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRepXSimpleType.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRevoluteJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRigidActorExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRigidBodyExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSceneQueryExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSerialization.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxShapeExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSimpleFactory.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSmoothNormals.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSphericalJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxStringTableExt.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\extensions\PxTriangleMeshExt.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\windows\PxWindowsFoundationDelayLoadHook.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\windows\PxWindowsIntrinsics.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\Px.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxAllocatorCallback.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxAssert.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxBitAndData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxBounds3.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxErrorCallback.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxErrors.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxFlags.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxFoundation.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxFoundationVersion.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxIntrinsics.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxIO.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMat33.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMat44.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMath.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMathUtils.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMemory.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxPlane.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxPreprocessor.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxProfiler.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxQuat.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxSimpleTypes.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxStrideIterator.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxTransform.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxUnionCast.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxVec2.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxVec3.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\foundation\PxVec4.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxBoxGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxCapsuleGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxConvexMesh.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxConvexMeshGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxGeometryHelpers.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxGeometryQuery.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightField.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldFlag.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldSample.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxMeshQuery.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxMeshScale.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxPlaneGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxSimpleTriangleMesh.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxSphereGeometry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxTriangle.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxTriangleMesh.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\geometry\PxTriangleMeshGeometry.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\GeomUtils\GuContactBuffer.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\GeomUtils\GuContactPoint.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\gpu\PxGpu.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\gpu\PxParticleGpu.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleBase.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleBaseFlag.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleCreationData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleFlag.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleFluid.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleFluidReadData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleReadData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleSystem.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\pvd\windows\PxWindowsPvdDelayLoadHook.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\pvd\PxPvd.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\pvd\PxPvdSceneClient.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\pvd\PxPvdTransport.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\solver\PxSolverDefs.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\task\PxCpuDispatcher.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\task\PxGpuDispatcher.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\task\PxGpuTask.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\task\PxTask.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\task\PxTaskDefine.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\task\PxTaskManager.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleComponents.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDrive.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDrive4W.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDriveNW.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDriveTank.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleNoDrive.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleSDK.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleShaders.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleTireFriction.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUpdate.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtil.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtilControl.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtilSetup.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtilTelemetry.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleWheels.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxActor.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxAggregate.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxArticulation.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxArticulationJoint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxArticulationLink.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxBatchQuery.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxBatchQueryDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxBroadPhase.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxClient.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxConstraint.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxConstraintDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxContact.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxContactModifyCallback.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxDeletionListener.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxFiltering.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxForceMode.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxImmediateMode.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxLockedData.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxMaterial.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxPhysics.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxPhysicsAPI.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxPhysicsSerialization.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxPhysicsVersion.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxPhysXConfig.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxPruningStructure.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxQueryFiltering.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxQueryReport.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxRigidActor.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxRigidBody.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxRigidDynamic.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxRigidStatic.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxScene.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxSceneDesc.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxSceneLock.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxShape.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxSimulationEventCallback.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxSimulationStatistics.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxSpatialIndex.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxVisualizationParameter.h">
-    </ClInclude>
-    <ClInclude Include="..\..\ext\PhysX\Include\PxVolumeCache.h">
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
-  <ItemGroup>
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="debug|x64">
+			<Configuration>debug</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="release|x64">
+			<Configuration>release</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<ProjectGuid>{AA5F84F5-879B-5784-51C2-E0FEEDC0DF74}</ProjectGuid>
+		<RootNamespace>PhysXFramework</RootNamespace>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'" Label="Configuration">
+		<ConfigurationType>DynamicLibrary</ConfigurationType>
+		<PlatformToolset>v140</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'" Label="Configuration">
+		<ConfigurationType>DynamicLibrary</ConfigurationType>
+		<PlatformToolset>v140</PlatformToolset>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+		<OutDir>./../../bin/win64\</OutDir>
+		<IntDir>./x64/PhysXFramework/debug\</IntDir>
+		<TargetExt>.dll</TargetExt>
+		<TargetName>PhysXFramework64DEBUG</TargetName>
+		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+		<CodeAnalysisRules />
+		<CodeAnalysisRuleAssemblies />
+		<SkipCopyingSymbolsToOutputDirectory>true</SkipCopyingSymbolsToOutputDirectory>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
+		<ClCompile>
+			<TreatWarningAsError>true</TreatWarningAsError>
+			<FloatingPointModel>Fast</FloatingPointModel>
+			<AdditionalOptions>/W4</AdditionalOptions>
+			<Optimization>Disabled</Optimization>
+			<AdditionalIncludeDirectories>./../../include;./../../public;./../../ext/NvRenderDebug;./../../ext/PhysX/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<PreprocessorDefinitions>WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;_DEBUG;_ITERATOR_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<WarningLevel>Level3</WarningLevel>
+			<RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+			<PrecompiledHeader>NotUsing</PrecompiledHeader>
+			<PrecompiledHeaderFile></PrecompiledHeaderFile>
+			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+		</ClCompile>
+		<Link>
+			<AdditionalOptions>/DEBUG</AdditionalOptions>
+			<AdditionalDependencies>PhysX3CommonDEBUG_x64.lib;PhysX3CookingDEBUG_x64.lib;PhysX3DEBUG_x64.lib;PhysX3GpuDEBUG_x64.lib;PhysX3ExtensionsDEBUG.lib;PsFastXmlDEBUG_x64.lib;PxCudaContextManagerDEBUG_x64.lib;PxFoundationDEBUG_x64.lib;PxPvdSDKDEBUG_x64.lib;PxTaskDEBUG_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<OutputFile>$(OutDir)PhysXFramework64DEBUG.dll</OutputFile>
+			<AdditionalLibraryDirectories>./../../ext/PhysX/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<ProgramDatabaseFile>$(OutDir)/PhysXFramework64DEBUG.dll.pdb</ProgramDatabaseFile>
+			<SubSystem>Console</SubSystem>
+			<ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+			<TargetMachine>MachineX64</TargetMachine>
+		</Link>
+		<ResourceCompile>
+		</ResourceCompile>
+		<ProjectReference>
+		</ProjectReference>
+	</ItemDefinitionGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+		<OutDir>./../../bin/win64\</OutDir>
+		<IntDir>./x64/PhysXFramework/release\</IntDir>
+		<TargetExt>.dll</TargetExt>
+		<TargetName>PhysXFramework64</TargetName>
+		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+		<CodeAnalysisRules />
+		<CodeAnalysisRuleAssemblies />
+		<SkipCopyingSymbolsToOutputDirectory>true</SkipCopyingSymbolsToOutputDirectory>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
+		<ClCompile>
+			<TreatWarningAsError>true</TreatWarningAsError>
+			<FloatingPointModel>Fast</FloatingPointModel>
+			<AdditionalOptions>/W4</AdditionalOptions>
+			<Optimization>MaxSpeed</Optimization>
+			<AdditionalIncludeDirectories>./../../include;./../../public;./../../ext/NvRenderDebug;./../../ext/PhysX/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+			<PreprocessorDefinitions>WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<WarningLevel>Level3</WarningLevel>
+			<RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+			<PrecompiledHeader>NotUsing</PrecompiledHeader>
+			<PrecompiledHeaderFile></PrecompiledHeaderFile>
+			<DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+		</ClCompile>
+		<Link>
+			<AdditionalOptions>/DEBUG</AdditionalOptions>
+			<AdditionalDependencies>PhysX3CommonCHECKED_x64.lib;PhysX3CookingCHECKED_x64.lib;PhysX3CHECKED_x64.lib;PhysX3GpuCHECKED_x64.lib;PhysX3ExtensionsCHECKED.lib;PsFastXmlCHECKED_x64.lib;PxCudaContextManagerCHECKED_x64.lib;PxFoundationCHECKED_x64.lib;PxPvdSDKCHECKED_x64.lib;PxTaskCHECKED_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
+			<OutputFile>$(OutDir)PhysXFramework64.dll</OutputFile>
+			<AdditionalLibraryDirectories>./../../ext/PhysX/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+			<ProgramDatabaseFile>$(OutDir)/PhysXFramework64.dll.pdb</ProgramDatabaseFile>
+			<SubSystem>Console</SubSystem>
+			<ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+			<TargetMachine>MachineX64</TargetMachine>
+		</Link>
+		<ResourceCompile>
+		</ResourceCompile>
+		<ProjectReference>
+		</ProjectReference>
+	</ItemDefinitionGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\include\Nv.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvAssert.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvBounds3.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvCTypes.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvFoundationMath.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvIntrinsics.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvMat33.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvMat44.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvMath.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvPlane.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvPreprocessor.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvQuat.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvSimpleTypes.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvTransform.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvVec2.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvVec3.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\NvVec4.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\PhysicsDOMPhysX.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\Ps.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\PsTime.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\RenderDebugPhysX.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\SimpleCamera.h">
+		</ClInclude>
+		<ClInclude Include="..\..\include\SomeOfEverything.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\public\NvPhysXFramework.h">
+		</ClInclude>
+		<ClInclude Include="..\..\public\PhysicsDOM.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClCompile Include="..\..\src\DLLMain.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\ExtDefaultErrorCallback.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\NvPhysXFramework.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\PhysicsDOMPhysX.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\RenderDebugPhysX.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\SimpleCamera.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\SomeOfEverything.cpp">
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\NvRenderDebug\NvRenderDebug.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\NvRenderDebug\NvRenderDebugTyped.h">
+		</ClInclude>
+		<ClCompile Include="..\..\ext\NvRenderDebug\NvRenderDebugBinding.cpp">
+		</ClCompile>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxBoxController.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxCapsuleController.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxCharacter.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxController.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxControllerBehavior.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxControllerManager.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxControllerObstacles.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\characterkinematic\PxExtended.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\cloth\PxCloth.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothCollisionData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothFabric.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothParticleData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cloth\PxClothTypes.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\collision\PxCollisionDefs.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\windows\PxWindowsDelayLoadHook.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxBase.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxCollection.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxCoreUtilityTypes.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxMetaData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxMetaDataFlags.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxPhysicsInsertionCallback.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxPhysXCommonConfig.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxRenderBuffer.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxSerialFramework.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxSerializer.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxStringTable.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxTolerancesScale.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\common\PxTypeInfo.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\PxBVH33MidphaseDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\PxBVH34MidphaseDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\Pxc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\PxConvexMeshDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\PxCooking.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\PxMidphaseDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cooking\PxTriangleMeshDesc.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxCudaContextManager.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxCudaMemoryManager.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxGpuCopyDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\cudamanager\PxGpuCopyDescQueue.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxBinaryConverter.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxBroadPhaseExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothFabricCooker.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothMeshDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothMeshQuadifier.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxClothTetherCooker.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxCollectionExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxConstraintExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxConvexMeshExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxD6Joint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultAllocator.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultCpuDispatcher.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultErrorCallback.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultSimulationFilterShader.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDefaultStreams.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxDistanceJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxExtensionsAPI.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxFixedJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxJointLimit.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxMassProperties.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxParticleExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxPrismaticJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRaycastCCD.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRepXSerializer.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRepXSimpleType.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRevoluteJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRigidActorExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxRigidBodyExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSceneQueryExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSerialization.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxShapeExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSimpleFactory.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSmoothNormals.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxSphericalJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxStringTableExt.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\extensions\PxTriangleMeshExt.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\windows\PxWindowsFoundationDelayLoadHook.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\windows\PxWindowsIntrinsics.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\Px.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxAllocatorCallback.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxAssert.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxBitAndData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxBounds3.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxErrorCallback.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxErrors.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxFlags.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxFoundation.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxFoundationVersion.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxIntrinsics.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxIO.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMat33.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMat44.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMath.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMathUtils.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxMemory.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxPlane.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxPreprocessor.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxProfiler.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxQuat.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxSimpleTypes.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxStrideIterator.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxTransform.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxUnionCast.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxVec2.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxVec3.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\foundation\PxVec4.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxBoxGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxCapsuleGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxConvexMesh.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxConvexMeshGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxGeometryHelpers.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxGeometryQuery.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightField.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldFlag.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxHeightFieldSample.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxMeshQuery.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxMeshScale.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxPlaneGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxSimpleTriangleMesh.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxSphereGeometry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxTriangle.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxTriangleMesh.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\geometry\PxTriangleMeshGeometry.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\GeomUtils\GuContactBuffer.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\GeomUtils\GuContactPoint.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\gpu\PxGpu.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\gpu\PxParticleGpu.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleBase.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleBaseFlag.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleCreationData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleFlag.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleFluid.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleFluidReadData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleReadData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\particles\PxParticleSystem.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\pvd\windows\PxWindowsPvdDelayLoadHook.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\pvd\PxPvd.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\pvd\PxPvdSceneClient.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\pvd\PxPvdTransport.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\solver\PxSolverDefs.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\task\PxCpuDispatcher.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\task\PxGpuDispatcher.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\task\PxGpuTask.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\task\PxTask.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\task\PxTaskDefine.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\task\PxTaskManager.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleComponents.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDrive.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDrive4W.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDriveNW.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleDriveTank.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleNoDrive.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleSDK.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleShaders.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleTireFriction.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUpdate.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtil.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtilControl.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtilSetup.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleUtilTelemetry.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\vehicle\PxVehicleWheels.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxActor.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxAggregate.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxArticulation.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxArticulationJoint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxArticulationLink.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxBatchQuery.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxBatchQueryDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxBroadPhase.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxClient.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxConstraint.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxConstraintDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxContact.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxContactModifyCallback.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxDeletionListener.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxFiltering.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxForceMode.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxImmediateMode.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxLockedData.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxMaterial.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxPhysics.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxPhysicsAPI.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxPhysicsSerialization.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxPhysicsVersion.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxPhysXConfig.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxPruningStructure.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxQueryFiltering.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxQueryReport.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxRigidActor.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxRigidBody.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxRigidDynamic.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxRigidStatic.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxScene.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxSceneDesc.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxSceneLock.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxShape.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxSimulationEventCallback.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxSimulationStatistics.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxSpatialIndex.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxVisualizationParameter.h">
+		</ClInclude>
+		<ClInclude Include="..\..\ext\PhysX\Include\PxVolumeCache.h">
+		</ClInclude>
+	</ItemGroup>
+	<ItemGroup>
+	</ItemGroup>
+	<ItemGroup>
+	</ItemGroup>
+	<ItemGroup>
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets"></ImportGroup>
 </Project>

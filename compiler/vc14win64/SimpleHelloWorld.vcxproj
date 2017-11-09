@@ -117,6 +117,8 @@
 	<ItemGroup>
 		<ClInclude Include="..\..\public\NvPhysXFramework.h">
 		</ClInclude>
+		<ClInclude Include="..\..\public\PhysicsDOM.h">
+		</ClInclude>
 		<ClCompile Include="..\..\public\NvPhysXFrameworkBinding.cpp">
 		</ClCompile>
 	</ItemGroup>
