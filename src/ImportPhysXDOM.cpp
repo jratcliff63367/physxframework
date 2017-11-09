@@ -446,6 +446,8 @@ namespace IMPORT_PHYSX_DOM
 
 #define MAX_STACK 32
 
+	typedef std::unordered_map< uint32_t, PHYSICS_DOM::Node * > NodeIdMap;
+
 	class ImportPhysXDOMImpl : public ImportPhysXDOM, public FAST_XML::FastXml::Callback
 	{
 	public:
@@ -511,6 +513,32 @@ namespace IMPORT_PHYSX_DOM
 			return ret;
 		}
 
+		PHYSICS_DOM::PhysX_CombineMode getCombineMode(const char *str)
+		{
+			PHYSICS_DOM::PhysX_CombineMode ret = PHYSICS_DOM::CM_AVERAGE;
+
+			if (str)
+			{
+				if ( strcmp(str, "eAVERAGE") == 0 )
+				{
+					ret = PHYSICS_DOM::CM_AVERAGE;
+				}
+				else if (strcmp(str, "eMAX") == 0)
+				{
+					ret = PHYSICS_DOM::CM_MAX;
+				}
+				else if (strcmp(str, "eMIN") == 0)
+				{
+					ret = PHYSICS_DOM::CM_MIN;
+				}
+				else if (strcmp(str, "eMULTIPLY") == 0)
+				{
+					ret = PHYSICS_DOM::CM_MULTIPLY;
+				}
+			}
+
+			return ret;
+		}
 
 		// return true to continue processing the XML document, false to skip.
 		virtual bool processElement(
@@ -542,6 +570,9 @@ namespace IMPORT_PHYSX_DOM
 				getAttributeName(atype);
 			}
 
+			float x, y, z, w;
+			STRING_HELPER::getVec4(elementData, nullptr, x, y, z, w);
+
 			switch (mCurrentType)
 			{
 				case ET_ActorFlags:
@@ -568,13 +599,11 @@ namespace IMPORT_PHYSX_DOM
 				case ET_DrivePosition:
 				case ET_DriveType:
 				case ET_DriveVelocity:
-				case ET_DynamicFriction:
 				case ET_ExternalCompliance:
 				case ET_ExternalDriveIterations:
 				case ET_Flags:
 				case ET_ForceLimit:
 				case ET_Format:
-				case ET_FrictionCombineMode:
 				case ET_Geometry:
 				case ET_GlobalPose:
 				case ET_HalfExtents:
@@ -582,7 +611,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_HeightField:
 				case ET_HeightFieldFlags:
 				case ET_HeightScale:
-				case ET_Id:
 				case ET_InternalCompliance:
 				case ET_InternalDriveIterations:
 				case ET_InvInertiaScale0:
@@ -590,7 +618,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_InvMassScale0:
 				case ET_InvMassScale1:
 				case ET_Joint:
-				case ET_Length:
 				case ET_Limit:
 				case ET_LimitCone:
 				case ET_LinearDamping:
@@ -599,7 +626,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_Links:
 				case ET_LocalPose:
 				case ET_Lower:
-				case ET_Mass:
 				case ET_MassSpaceInertiaTensor:
 				case ET_Materials:
 				case ET_MaxAngularVelocity:
@@ -637,7 +663,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_PxFixedJoint:
 				case ET_PxHeightField:
 				case ET_PxHeightFieldGeometry:
-				case ET_PxMaterial:
 				case ET_PxMaterialRef:
 				case ET_PxPlaneGeometry:
 				case ET_PxPrismaticJoint:
@@ -652,21 +677,16 @@ namespace IMPORT_PHYSX_DOM
 				case ET_QueryFilterData:
 				case ET_Radius:
 				case ET_RestOffset:
-				case ET_Restitution:
-				case ET_RestitutionCombineMode:
 				case ET_Rotation:
 				case ET_RowScale:
-				case ET_Scale:
 				case ET_SelfCollision:
 				case ET_SeparationTolerance:
 				case ET_Shapes:
 				case ET_SimulationFilterData:
 				case ET_SleepThreshold:
 				case ET_SolverIterationCounts:
-				case ET_Speed:
 				case ET_SphericalJointFlags:
 				case ET_StabilizationThreshold:
-				case ET_StaticFriction:
 				case ET_Stiffness:
 				case ET_SwingLimit:
 				case ET_SwingLimitContactDistance:
@@ -682,7 +702,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_TwistLimit:
 				case ET_TwistLimitContactDistance:
 				case ET_TwistLimitEnabled:
-				case ET_UpVector:
 				case ET_Upper:
 				case ET_Value:
 				case ET_WakeCounter:
@@ -715,10 +734,101 @@ namespace IMPORT_PHYSX_DOM
 				case ET_zLimit:
 					reportError(lineno, "ElementType(%s) not yet implemented", elementName);
 					break;
+				case ET_UpVector:
+				case ET_Scale:
+				case ET_Length:
+				case ET_Mass:
+				case ET_Speed:
+					// We ignore this element
+					break;
+				case ET_RestitutionCombineMode:
+					if (mPreviousType == ET_PxMaterial)
+					{
+						if (mCurrentMaterial)
+						{
+							mCurrentMaterial->physx_materialSettings.restitutionCombineMode = getCombineMode(elementData);
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+					}
+					break;
+				case ET_FrictionCombineMode:
+					if (mPreviousType == ET_PxMaterial)
+					{
+						if (mCurrentMaterial)
+						{
+							mCurrentMaterial->physx_materialSettings.frictionCombineMode = getCombineMode(elementData);
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+					}
+					break;
+				case ET_Restitution:
+					if (mPreviousType == ET_PxMaterial)
+					{
+						if (mCurrentMaterial)
+						{
+							mCurrentMaterial->restitution = x;
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+					}
+					break;
+				case ET_StaticFriction:
+					if (mPreviousType == ET_PxMaterial)
+					{
+						if (mCurrentMaterial)
+						{
+							mCurrentMaterial->staticFriction = x;
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+					}
+					break;
+				case ET_DynamicFriction:
+					if (mPreviousType == ET_PxMaterial)
+					{
+						if (mCurrentMaterial)
+						{
+							mCurrentMaterial->dynamicFriction = x;
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+					}
+					break;
+				case ET_Id:
+					if (mPreviousType == ET_PxMaterial)
+					{
+						uint32_t id = (uint32_t)atoi(elementData);
+						mNodeIdMap[id] = mCurrentMaterial;
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+					}
+					break;
+				case ET_PxMaterial:
+					{
+						mCurrentMaterial = new PHYSICS_DOM::PhysicsMaterial;
+						mCurrentMaterial->id = getID();
+						mCurrentCollection->nodes.push_back(mCurrentMaterial);
+					}
+					break;
 				case ET_PhysX30Collection:
 					{
-					mCurrentCollection = new PHYSICS_DOM::Collection;
-					mCurrentCollection->id = getID();
+						mCurrentCollection = new PHYSICS_DOM::Collection;
+						mCurrentCollection->id = getID();
+						mImportDOM->collections.push_back(mCurrentCollection);
 					}
 					break;
 				default:
@@ -781,16 +891,9 @@ namespace IMPORT_PHYSX_DOM
 					}
 				}
 			}
-			switch (type)
-			{
-			case ET_PhysX30Collection:
-				if (mCurrentCollection)
-				{
-					mImportDOM->collections.push_back(mCurrentCollection);
-					mCurrentCollection = nullptr;
-				}
-				break;
-			}
+//			switch (type)
+//			{
+//			}
 			return true;
 		}
 
@@ -810,13 +913,15 @@ namespace IMPORT_PHYSX_DOM
 
 	uint32_t		mId{ 0 };
 	// The DOM we are importing
-	PHYSICS_DOM::PhysicsDOM	*mImportDOM{ nullptr };
-	PHYSICS_DOM::Collection	*mCurrentCollection{ nullptr };
-	uint32_t			mStackLocation{ 0 };
-	ElementType			mCurrentType{ ET_LAST };	// The current element type we are processing
-	ElementType			mPreviousType{ ET_LAST };	// The previous element type (parent node type)
-	ElementType			mPreviousPreviousType{ ET_LAST }; // two up the call stack
-	ElementType			mTypeStack[MAX_STACK];
+	PHYSICS_DOM::PhysicsDOM			*mImportDOM{ nullptr };
+	PHYSICS_DOM::PhysicsMaterial	*mCurrentMaterial{ nullptr };
+	PHYSICS_DOM::Collection			*mCurrentCollection{ nullptr };
+	uint32_t						mStackLocation{ 0 };
+	ElementType						mCurrentType{ ET_LAST };	// The current element type we are processing
+	ElementType						mPreviousType{ ET_LAST };	// The previous element type (parent node type)
+	ElementType						mPreviousPreviousType{ ET_LAST }; // two up the call stack
+	ElementType						mTypeStack[MAX_STACK];
+	NodeIdMap						mNodeIdMap; // map XML id's to our Node pointers
 };
 
 ImportPhysXDOM *ImportPhysXDOM::create(void)

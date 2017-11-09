@@ -228,7 +228,7 @@ void	getVec4(const char *str, const char **next, float &x, float &y, float &z,fl
 	w = 0;
 	const char *mynext = nullptr;
 	x = getFloatValue(str, &mynext);
-	if (*mynext)
+	if (mynext && *mynext)
 	{
 		y = getFloatValue(mynext, &mynext);
 		if (mynext)

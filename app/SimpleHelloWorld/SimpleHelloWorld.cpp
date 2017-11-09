@@ -10,7 +10,7 @@
 #define TEST_PHYSICS_DOM 0
 #define TEST_SOME_OF_EVERYTHING 0
 #define TEST_BOX 1
-#define BOX_SIZE 20
+#define BOX_SIZE 1
 
 class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
 {
