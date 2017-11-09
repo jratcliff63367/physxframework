@@ -78,6 +78,9 @@
 		<ClInclude Include="..\..\include\SomeOfEverything.h">
 			<Filter>PhysXFramework\include</Filter>
 		</ClInclude>
+		<ClInclude Include="..\..\include\StringHelper.h">
+			<Filter>PhysXFramework\include</Filter>
+		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="PhysXFramework\public">
@@ -115,6 +118,9 @@
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>
 		<ClCompile Include="..\..\src\SomeOfEverything.cpp">
+			<Filter>PhysXFramework\src</Filter>
+		</ClCompile>
+		<ClCompile Include="..\..\src\StringHelper.cpp">
 			<Filter>PhysXFramework\src</Filter>
 		</ClCompile>
 	</ItemGroup>

@@ -34,7 +34,7 @@ enum ConstraintType
 	CT_REVOLUTE,
 };
 
-#define PHYSX_FRAMEWORK_VERSION_NUMBER 104
+#define PHYSX_FRAMEWORK_VERSION_NUMBER 105
 
 // Instantiate the PhysX SDK, create a scene, and a ground plane
 class PhysXFramework

@@ -4,7 +4,7 @@
 #include "NvPhysXFramework.h"
 #include "PhysicsDOM.h"
 
-#define USE_DEBUG 1
+#define USE_DEBUG 0
 
 #define TEST_PHYSICS_DOM 1
 #define TEST_SOME_OF_EVERYTHING 0
@@ -98,7 +98,7 @@ public:
 
 		PHYSICS_DOM::PhysicsDOM dom;
 		PHYSICS_DOM::Collection *c = new PHYSICS_DOM::Collection;
-
+		c->id = "0";
 		PHYSICS_DOM::PhysicsMaterial *pm = new PHYSICS_DOM::PhysicsMaterial;
 		pm->id = "1";
 		c->nodes.push_back(pm);
@@ -115,8 +115,8 @@ public:
 		dom.scenes.push_back(s);
 
 		PHYSICS_DOM::InstanceCollection *ic = new PHYSICS_DOM::InstanceCollection;
-		ic->id = "3";
-		ic->collection = "1";
+		ic->id = "3";			// Node '3'
+		ic->collection = "0";	// Instance node '0' 
 		s->nodes.push_back(ic);
 
 		mPhysXFramework->loadPhysicsDOM(dom);

@@ -157,6 +157,8 @@
 		</ClInclude>
 		<ClInclude Include="..\..\include\SomeOfEverything.h">
 		</ClInclude>
+		<ClInclude Include="..\..\include\StringHelper.h">
+		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
 		<ClInclude Include="..\..\public\NvPhysXFramework.h">
@@ -178,6 +180,8 @@
 		<ClCompile Include="..\..\src\SimpleCamera.cpp">
 		</ClCompile>
 		<ClCompile Include="..\..\src\SomeOfEverything.cpp">
+		</ClCompile>
+		<ClCompile Include="..\..\src\StringHelper.cpp">
 		</ClCompile>
 	</ItemGroup>
 	<ItemGroup>

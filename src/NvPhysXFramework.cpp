@@ -925,7 +925,7 @@ typedef std::vector< PxJoint * > PxJointVector;
 				mPhysicsDOMPhysX->release();
 			}
 			mPhysicsDOMPhysX = PHYSICS_DOM_PHYSX::PhysicsDOMPhysX::create(mPhysics, mCooking);
-			mPhysicsDOMPhysX->loadPhysicsDOM(physicsDOM);
+			mPhysicsDOMPhysX->loadPhysicsDOM(physicsDOM,mScene);
 
 			return ret;
 		}

@@ -28,9 +28,9 @@ public:
 		z = _z;
 	}
 
-	float  		x{ 0 }; 											// 
-	float  		y{ 0 }; 											// 
-	float  		z{ 0 }; 											// 
+	float  		x{ 0 }; 											// x axis component of the vector
+	float  		y{ 0 }; 											// y axis component of the vector
+	float  		z{ 0 }; 											// z axis component of the vector
 };
 
 
@@ -1668,8 +1668,7 @@ public:
 		{
 			Node::operator=(other);
 			collection = other.collection;
-			position = other.position;
-			orientation = other.orientation;
+			pose = other.pose;
 			scale = other.scale;
 		}
 		return *this;
@@ -1689,16 +1688,14 @@ public:
 		{
 			Node::operator=(std::move(other));
 			collection = other.collection;
-			position = other.position;
-			orientation = other.orientation;
+			pose = other.pose;
 			scale = other.scale;
 		}
 		return *this;
 	}
 
 	std::string	collection;										// Name of collection to instance
-	Vec3 		position; 											// Position to instance the collection at
-	Quat 		orientation;											// Orientation of instance
+	Pose 		pose; 												// Pose to instance collection at
 	Vec3 		scale;  												// Scale of instance
 };
 
