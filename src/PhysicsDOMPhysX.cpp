@@ -13,6 +13,8 @@
 
 #pragma warning(disable:4100)
 
+#define USE_PHYSX_SETTINGS 0
+
 namespace PHYSICS_DOM_PHYSX
 {
 
@@ -56,9 +58,9 @@ namespace PHYSICS_DOM_PHYSX
 					// Recursively add all nodes from this collection node
 					{
 						auto c = static_cast<const PHYSICS_DOM::Collection *>(node);
-						for (auto &i : c->nodes)
+						for (uint32_t i = 0; i < c->nodesCount; i++)
 						{
-							buildNodeMap(i);
+							buildNodeMap(c->nodes[i]);
 						}
 					}
 					break;
@@ -76,26 +78,27 @@ namespace PHYSICS_DOM_PHYSX
 			// Build the NodeMap
 			{
 				// Add all of the collections recursively
-				for (const auto &i : p.collections)
+				for (uint32_t i=0; i<p.collectionsCount; i++)
 				{
-					buildNodeMap(i);
+					buildNodeMap(p.collections[i]);
 				}
 				// Add all of the scenes recursively
-				for (const auto &i : p.scenes)
+				for (uint32_t i=0; i<p.scenesCount; i++)
 				{
-					buildNodeMap(i);
+					buildNodeMap(p.scenes[i]);
 				}
 			}
 
-			for (auto &i : p.scenes)
+			for (uint32_t i=0; i<p.scenesCount; i++)
 			{
-				const PHYSICS_DOM::Scene &s = *i;
+				const PHYSICS_DOM::Scene &s = *p.scenes[i];
 
 				if (scene == nullptr)
 				{
 					physx::PxTolerancesScale ts;
-					ts.length = s.physx_sceneDesc.tolerancesScale.length;
-					ts.speed = s.physx_sceneDesc.tolerancesScale.speed;
+// TODO: init based on additional properties fields
+//					ts.length = s.physx_sceneDesc.tolerancesScale.length;
+//					ts.speed = s.physx_sceneDesc.tolerancesScale.speed;
 					physx::PxSceneDesc desc(ts);
 					desc.gravity = physx::PxVec3(s.gravity.x, s.gravity.y, s.gravity.z);
 					desc.simulationEventCallback = nullptr; // TODO
@@ -105,6 +108,8 @@ namespace PHYSICS_DOM_PHYSX
 					desc.filterShaderDataSize = 0; // TODO
 					desc.filterShader = nullptr; // TODO
 					desc.filterCallback = nullptr; // TODO
+// TODO: init based on additional property fields
+#if 0
 					switch (s.physx_sceneDesc.broadPhaseType)
 					{
 					case PHYSICS_DOM::BPT_SAP:
@@ -154,15 +159,17 @@ namespace PHYSICS_DOM_PHYSX
 					{
 						desc.flags.set(physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS);
 					}
+#endif
+
 					scene = mPhysics->createScene(desc);
 					mScenes.push_back(scene);
 				}
 				mActiveScene = scene;
 				PHYSICS_DOM::Pose pose;
 				PHYSICS_DOM::Vec3 scale(1, 1, 1);
-				for (auto &j : s.nodes)
+				for (uint32_t j=0; j<s.nodesCount; j++)
 				{
-					processNode(j, pose, scale);
+					processNode(s.nodes[j], pose, scale);
 				}
 
 			}
@@ -233,27 +240,28 @@ namespace PHYSICS_DOM_PHYSX
 							ractor = static_cast<physx::PxRigidActor *>(pstatic);
 						}
 						// let's create the shapes and add them...
-						for (auto &j : rb->geometryInstances)
+						for (uint32_t j=0; j<rb->geometryInstancesCount; j++)
 						{
+							PHYSICS_DOM::GeometryInstance *gi = rb->geometryInstances[j];
 							std::vector< physx::PxMaterial *> materials;
-							if (j->materials.empty())
+							if (gi->materialsCount == 0 )
 							{
 								materials.push_back(mDefaultMaterial);
 							}
 							else
 							{
-								for (auto &k : j->materials)
+								for (uint32_t k=0; k<gi->materialsCount; k++)
 								{
-									materials.push_back(locateMaterial(k));
+									materials.push_back(locateMaterial(gi->materials[k]));
 								}
 							}
 							physx::PxBoxGeometry box;
 							physx::PxGeometry *geometry = nullptr;
-							switch (j->geometry->type )
+							switch (gi->geometry->type )
 							{
 								case PHYSICS_DOM::GT_BOX_GEOMETRY:
 									{
-										auto boxGeom = static_cast<const PHYSICS_DOM::BoxGeometry *>(j->geometry);
+										auto boxGeom = static_cast<const PHYSICS_DOM::BoxGeometry *>(gi->geometry);
 										geometry = static_cast<physx::PxGeometry *>(&box);
 										box.halfExtents = physx::PxVec3(boxGeom->dimensions.x*0.5f, boxGeom->dimensions.y*0.5f, boxGeom->dimensions.z*0.5f);
 									}
@@ -267,7 +275,7 @@ namespace PHYSICS_DOM_PHYSX
 								physx::PxShape *shape = ractor->createShape(*geometry, &materials[0], uint16_t(materials.size()));
 								if (shape)
 								{
-									shape->setLocalPose(getTransform(j->localPose));
+									shape->setLocalPose(getTransform(gi->localPose));
 								}
 							}
 						}
@@ -304,7 +312,7 @@ namespace PHYSICS_DOM_PHYSX
 						auto j = mNodeMap.find(i->collection);
 						if (j == mNodeMap.end())
 						{
-							reportWarning("Failed to locate Node(%s) to instance.", i->collection.c_str());
+							reportWarning("Failed to locate Node(%s) to instance.", i->collection);
 						}
 						else
 						{
@@ -317,7 +325,7 @@ namespace PHYSICS_DOM_PHYSX
 							}
 							else
 							{
-								reportWarning("Node(%s) is not of type Collection or InstanceCollection.", i->collection.c_str());
+								reportWarning("Node(%s) is not of type Collection or InstanceCollection.", i->collection);
 							}
 						}
 					}
@@ -326,9 +334,9 @@ namespace PHYSICS_DOM_PHYSX
 				case PHYSICS_DOM::NT_SCENE:
 					{
 						auto i = static_cast<const PHYSICS_DOM::Collection *>(n);
-						for (auto &j : i->nodes)
+						for (uint32_t j=0; j<i->nodesCount; j++)
 						{
-							processNode(j,pose,scale);
+							processNode(i->nodes[j],pose,scale);
 						}
 					}
 					break;

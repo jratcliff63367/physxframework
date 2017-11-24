@@ -8,6 +8,8 @@
 
 #pragma warning(disable:4100)
 
+#define USE_PHYSX_SETTINGS 0
+
 namespace IMPORT_PHYSX_DOM
 {
 	// 170 unique element types
@@ -493,8 +495,8 @@ namespace IMPORT_PHYSX_DOM
 			FAST_XML::FastXml *f = FAST_XML::FastXml::create();
 			f->processXml(xmlName, this);
 			f->release();
-
-			if (!dom.collections.empty())
+#if 0 // TODO TODO
+			if (dom.collectionsCount)
 			{
 				// Create a scene which instances the collections
 				PHYSICS_DOM::Scene *scene = new PHYSICS_DOM::Scene;
@@ -508,34 +510,8 @@ namespace IMPORT_PHYSX_DOM
 				}
 				dom.scenes.push_back(scene);
 			}
+#endif
 			mImportDOM = nullptr;
-
-			return ret;
-		}
-
-		PHYSICS_DOM::PhysX_CombineMode getCombineMode(const char *str)
-		{
-			PHYSICS_DOM::PhysX_CombineMode ret = PHYSICS_DOM::CM_AVERAGE;
-
-			if (str)
-			{
-				if ( strcmp(str, "eAVERAGE") == 0 )
-				{
-					ret = PHYSICS_DOM::CM_AVERAGE;
-				}
-				else if (strcmp(str, "eMAX") == 0)
-				{
-					ret = PHYSICS_DOM::CM_MAX;
-				}
-				else if (strcmp(str, "eMIN") == 0)
-				{
-					ret = PHYSICS_DOM::CM_MIN;
-				}
-				else if (strcmp(str, "eMULTIPLY") == 0)
-				{
-					ret = PHYSICS_DOM::CM_MULTIPLY;
-				}
-			}
 
 			return ret;
 		}
@@ -572,7 +548,8 @@ namespace IMPORT_PHYSX_DOM
 
 			float x, y, z, w;
 			STRING_HELPER::getVec4(elementData, nullptr, x, y, z, w);
-
+// TODO
+#if 0
 			switch (mCurrentType)
 			{
 				case ET_ActorFlags:
@@ -835,6 +812,7 @@ namespace IMPORT_PHYSX_DOM
 					reportError(lineno, "Unknown elementType(%s)", elementName);
 					break;
 			}
+#endif
 			return true;
 		}
 

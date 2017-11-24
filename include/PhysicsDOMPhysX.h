@@ -19,7 +19,9 @@ namespace PHYSICS_DOM_PHYSX
 	class PhysicsDOMPhysX
 	{
 	public:
+
 		static PhysicsDOMPhysX *create(physx::PxPhysics *p, physx::PxCooking *c);
+
 		// Instantiate the contents of this PhysicsDOM into the PhysX SDK
 		// If no PxScene is provided, then one will be created.
 		// If a PxScene is provided, then objects will be instantiated into it.

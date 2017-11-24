@@ -2,14 +2,14 @@
 #include <string.h>
 #include "NvRenderDebug.h"
 #include "NvPhysXFramework.h"
-#include "PhysicsDOM.h"
+#include "PhysicsDOMImpl.h"
 
-#define USE_DEBUG 0
+#define USE_DEBUG 1
 
 #define TEST_IMPORT_XML 0
-#define TEST_PHYSICS_DOM 0
+#define TEST_PHYSICS_DOM 1
 #define TEST_SOME_OF_EVERYTHING 0
-#define TEST_BOX 1
+#define TEST_BOX 0
 #define BOX_SIZE 1
 
 class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
@@ -99,30 +99,32 @@ public:
 	void testPhysicsDOM(void)
 	{
 
-		PHYSICS_DOM::PhysicsDOM dom;
-		PHYSICS_DOM::Collection *c = new PHYSICS_DOM::Collection;
-		c->id = "0";
-		PHYSICS_DOM::PhysicsMaterial *pm = new PHYSICS_DOM::PhysicsMaterial;
-		pm->id = "1";
-		c->nodes.push_back(pm);
-		PHYSICS_DOM::BoxGeometry *box = new PHYSICS_DOM::BoxGeometry;
-		PHYSICS_DOM::GeometryInstance *box_instance = new PHYSICS_DOM::GeometryInstance;
-		box_instance->geometry = box;
-		box_instance->materials.push_back("1");
-		PHYSICS_DOM::RigidDynamic *rd = new PHYSICS_DOM::RigidDynamic;
-		rd->id = "2";
-		rd->geometryInstances.push_back(box_instance);
-		c->nodes.push_back(rd);
-		PHYSICS_DOM::Scene *s = new PHYSICS_DOM::Scene;
-		dom.collections.push_back(c);
-		dom.scenes.push_back(s);
+		PHYSICS_DOM::PhysicsDOMImpl dom;
+		PHYSICS_DOM::CollectionImpl *c = new PHYSICS_DOM::CollectionImpl;
+		c->mId = "0";
+		PHYSICS_DOM::PhysicsMaterialImpl *pm = new PHYSICS_DOM::PhysicsMaterialImpl;
+		pm->mId = "1";
+		c->mNodes.push_back(pm);
+		PHYSICS_DOM::BoxGeometryImpl *box = new PHYSICS_DOM::BoxGeometryImpl;
+		PHYSICS_DOM::GeometryInstanceImpl *box_instance = new PHYSICS_DOM::GeometryInstanceImpl;
+		box_instance->mGeometry = box;
+		box_instance->mMaterials.push_back("1");
+		PHYSICS_DOM::RigidDynamicImpl *rd = new PHYSICS_DOM::RigidDynamicImpl;
+		rd->mId = "2";
+		rd->mGeometryInstances.push_back(box_instance);
+		c->mNodes.push_back(rd);
+		PHYSICS_DOM::SceneImpl *s = new PHYSICS_DOM::SceneImpl;
+		dom.mCollections.push_back(c);
+		dom.mScenes.push_back(s);
 
-		PHYSICS_DOM::InstanceCollection *ic = new PHYSICS_DOM::InstanceCollection;
-		ic->id = "3";			// Node '3'
-		ic->collection = "0";	// Instance node '0' 
-		s->nodes.push_back(ic);
+		PHYSICS_DOM::InstanceCollectionImpl *ic = new PHYSICS_DOM::InstanceCollectionImpl;
+		ic->mId = "3";			// Node '3'
+		ic->mCollection = "0";	// Instance node '0' 
+		s->mNodes.push_back(ic);
 
-		mPhysXFramework->loadPhysicsDOM(dom);
+		dom.initDOM();
+		PHYSICS_DOM::PhysicsDOM *pdom = dom.getDOM();
+		mPhysXFramework->loadPhysicsDOM(*pdom);
 	}
 
 	void testImportXML(void)

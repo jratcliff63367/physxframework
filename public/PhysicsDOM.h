@@ -6,7 +6,6 @@
 // The Google DOCs Schema Spreadsheet for this source came from: https://docs.google.com/spreadsheets/d/118I5kdu2XT-6wfCG044937xfEKDyX2oNg04G8Wqi6o0/edit?usp=sharing
 
 #include <stdint.h>
-#include <vector>
 
 
 namespace PHYSICS_DOM
@@ -133,6 +132,7 @@ enum NodeType
 	NT_REVOLUTE_JOINT,   				// A revolute joint
 	NT_PRISMATIC_JOINT,					// A prismatic joint
 	NT_DISTANCE_JOINT,   				// A distance joint
+	NT_BALL_AND_SOCKET_JOINT,  			// A ball and socket joint
 	NT_D6_JOINT, 						// A six degree of freedom joint
 	NT_INSTANCE_COLLECTION,				// Instantiates a collection of nodes
 	NT_COLLECTION,   					// Defines a collection of nodes
@@ -144,9 +144,28 @@ enum NodeType
 class VisualBinding
 {
 public:
-	std::string	visualName;										// Name of associated visual mesh
+	const char * visualName{ nullptr };							// Name of associated visual mesh
 	Pose 		localPose;  											// Local relative pose of visual mesh to corresponding physics node
 	Vec3 		localScale;   										// Local relative scale of visual mesh to corresponding physics node
+};
+
+
+// Describes a key-value pair for custom properties on a node
+class KeyValuePair
+{
+public:
+	const char * key{ nullptr }; 								// They 'key' identifier; what this property is
+	const char * value{ nullptr };   							// The value of this property; up to each the user to figure out how to interpret each property relative to the keyword
+};
+
+
+// A collection of key/value pair properties relative to a particular category
+class AdditionalProperties
+{
+public:
+	const char * category{ nullptr };  							// The category this set of key/value pairs is associated with (example 'physx', 'mujoco', etc.
+	uint32_t 	keyValuePairsCount { 0 };
+	KeyValuePair*  keyValuePairs{ nullptr }; 					// The array of key/value pairs associated with this category
 };
 
 
@@ -154,13 +173,12 @@ public:
 class Node
 {
 public:
-	// Declare the clone method
-	virtual Node *clone() const = 0;
-
-	std::string	id;												// Unique Id for this object
-	std::string	name;  											// Optional name for this object
+	const char * id{ nullptr };									// Unique Id for this object
+	const char * name{ nullptr };  								// Optional name for this object
 	NodeType 	type{ NT_NODE };   								// The type of node
-	VisualBinding  visual;   									// 
+	VisualBinding  visual;   									// Optional visual bindings for this node; for exaple some physics components have a corresponding named graphics component
+	uint32_t 	additionalPropertiesCount { 0 };
+	AdditionalProperties* additionalProperties{ nullptr };   	// An optional set of properties for this node; a set of key-value pairs for each application/engine specific category
 };
 
 
@@ -173,25 +191,6 @@ public:
 };
 
 
-// Enumerated type defines how friction between two materials is computed
-enum PhysX_CombineMode
-{
-	CM_AVERAGE,							// Average: (a + b)/2
-	CM_MIN,								// Minimum: minimum(a,b)
-	CM_MULTIPLY, 						// Multiply: a*b
-	CM_MAX,								// Maximum: maximum(a,b)
-};
-
-
-// PhysX SDK specific material settings
-class PhysX_MaterialSettings
-{
-public:
-	PhysX_CombineMode frictionCombineMode{ CM_AVERAGE }; 		// Friction combine mode to set for this material
-	PhysX_CombineMode restitutionCombineMode{ CM_AVERAGE };		// Restitution combine mode to set for this material
-};
-
-
 // Defines the physical material properties of a surface
 class PhysicsMaterial : public Node
 {
@@ -200,65 +199,6 @@ public:
 	PhysicsMaterial()
 	{
 		Node::type = NT_PHYSICS_MATERIAL;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~PhysicsMaterial()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PhysicsMaterial(const PhysicsMaterial &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new PhysicsMaterial(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	PhysicsMaterial& operator=(const PhysicsMaterial& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			disableFriction = other.disableFriction;
-			disableStrongFriction = other.disableStrongFriction;
-			dynamicFriction = other.dynamicFriction;
-			staticFriction = other.staticFriction;
-			restitution = other.restitution;
-			physx_materialSettings = other.physx_materialSettings;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	PhysicsMaterial(PhysicsMaterial &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	PhysicsMaterial& operator=(PhysicsMaterial&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			disableFriction = other.disableFriction;
-			disableStrongFriction = other.disableStrongFriction;
-			dynamicFriction = other.dynamicFriction;
-			staticFriction = other.staticFriction;
-			restitution = other.restitution;
-			physx_materialSettings = other.physx_materialSettings;
-		}
-		return *this;
 	}
 
 	bool 		disableFriction{ false }; 							// If true, then friction is disabled for the material
@@ -266,10 +206,8 @@ public:
 	float  		dynamicFriction{ 0.5f };  							// The coefficient of dynamic friction.
 	float  		staticFriction{ 0.5f }; 							// The coefficient of static friction
 	float  		restitution{ 0.5f };  								// The coefficient of resitution.
-	PhysX_MaterialSettings physx_materialSettings;   			// PhysX SDK specific material settings
 };
 
-typedef std::vector< Vec3 > Vec3Vector; // Forward declare the 'Vec3' vector
 
 // Describes the data for a convex hull
 class ConvexHull : public Node
@@ -279,61 +217,12 @@ public:
 	ConvexHull()
 	{
 		Node::type = NT_CONVEXHULL;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~ConvexHull()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	ConvexHull(const ConvexHull &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new ConvexHull(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	ConvexHull& operator=(const ConvexHull& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			points = other.points;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	ConvexHull(ConvexHull &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	ConvexHull& operator=(ConvexHull&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			points = other.points;
-		}
-		return *this;
-	}
-
-	Vec3Vector   points; 										// Array of data points describing the convex hull
+	uint32_t 	pointsCount { 0 };
+	Vec3*  		points{ nullptr };									// Array of data points describing the convex hull
 };
 
-typedef std::vector< uint32_t > U32Vector; // Forward declare the 'U32' vector
 
 // Describes the data for a triangle mesh
 class TriangleMesh : public Node
@@ -343,64 +232,14 @@ public:
 	TriangleMesh()
 	{
 		Node::type = NT_TRIANGLEMESH;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~TriangleMesh()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	TriangleMesh(const TriangleMesh &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new TriangleMesh(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	TriangleMesh& operator=(const TriangleMesh& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			points = other.points;
-			triangles = other.triangles;
-			materialIndices = other.materialIndices;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	TriangleMesh(TriangleMesh &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	TriangleMesh& operator=(TriangleMesh&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			points = other.points;
-			triangles = other.triangles;
-			materialIndices = other.materialIndices;
-		}
-		return *this;
-	}
-
-	Vec3Vector   points; 										// Array of vertices for the triangle mesh
-	U32Vector  	triangles;   									// Array of triangle indices
-	U32Vector  	materialIndices; 								// Optional material indices; one for each triangle
+	uint32_t 	pointsCount { 0 };
+	Vec3*  		points{ nullptr };									// Array of vertices for the triangle mesh
+	uint32_t 	trianglesCount { 0 };
+	uint32_t*  	triangles{ nullptr };  							// Array of triangle indices
+	uint32_t 	materialIndicesCount { 0 };
+	uint8_t* 	materialIndices{ nullptr };  						// Optional per-triangle material index
 };
 
 
@@ -412,67 +251,14 @@ public:
 	HeightField()
 	{
 		Node::type = NT_HEIGHTFIELD;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~HeightField()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	HeightField(const HeightField &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new HeightField(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	HeightField& operator=(const HeightField& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			rowCount = other.rowCount;
-			columnCount = other.columnCount;
-			samples = other.samples;
-			physx_convexEdgeThreshold = other.physx_convexEdgeThreshold;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	HeightField(HeightField &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	HeightField& operator=(HeightField&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			rowCount = other.rowCount;
-			columnCount = other.columnCount;
-			samples = other.samples;
-			physx_convexEdgeThreshold = other.physx_convexEdgeThreshold;
-		}
-		return *this;
-	}
-
-	uint32_t 	rowCount;											// Number of sample rows in the height field samples array.
-	uint32_t 	columnCount;   									// Number of sample columns in the height field samples array.
-	U32Vector  	samples; 										// Heigfield 32 bit samples; low 16 bits is height; high 16 bits determines material index and holes
-	float  		physx_convexEdgeThreshold{ 0 }; 					// This threshold is used by the collision detection to determine if a height field edge is convex and can generate contact points.
+	uint32_t 	rowCount{ 0 }; 									// Number of sample rows in the height field samples array.
+	uint32_t 	columnCount{ 0 };									// Number of sample columns in the height field samples array.
+	uint32_t 	samplesCount { 0 };
+	uint16_t*  	samples{ nullptr };								// Heightfield sample data
+	uint32_t 	metaDataCount { 0 };
+	uint16_t*  	metaData{ nullptr }; 							// Optional meta data for each sample; determines per sample material, winding order, and whether or not to treat it as a hole
 };
 
 
@@ -493,9 +279,6 @@ enum GeometryType
 class Geometry
 {
 public:
-	// Declare the clone method
-	virtual Geometry *clone() const = 0;
-
 	GeometryType type;   										// 
 };
 
@@ -508,55 +291,6 @@ public:
 	BoxGeometry()
 	{
 		Geometry::type = GT_BOX_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~BoxGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	BoxGeometry(const BoxGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new BoxGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	BoxGeometry& operator=(const BoxGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			dimensions = other.dimensions;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	BoxGeometry(BoxGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	BoxGeometry& operator=(BoxGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			dimensions = other.dimensions;
-		}
-		return *this;
 	}
 
 	Vec3 		dimensions{ 1,1,1 };									// Dimensions of the box
@@ -571,55 +305,6 @@ public:
 	SphereGeometry()
 	{
 		Geometry::type = GT_SPHERE_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~SphereGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	SphereGeometry(const SphereGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new SphereGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	SphereGeometry& operator=(const SphereGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			radius = other.radius;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	SphereGeometry(SphereGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	SphereGeometry& operator=(SphereGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			radius = other.radius;
-		}
-		return *this;
 	}
 
 	float  		radius{ 1 };  										// The radius of the sphere
@@ -634,57 +319,6 @@ public:
 	CapsuleGeometry()
 	{
 		Geometry::type = GT_CAPSULE_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~CapsuleGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	CapsuleGeometry(const CapsuleGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new CapsuleGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	CapsuleGeometry& operator=(const CapsuleGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			radius = other.radius;
-			height = other.height;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	CapsuleGeometry(CapsuleGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	CapsuleGeometry& operator=(CapsuleGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			radius = other.radius;
-			height = other.height;
-		}
-		return *this;
 	}
 
 	float  		radius{ 1 };  										// The radius of the capsule
@@ -700,57 +334,6 @@ public:
 	CylinderGeometry()
 	{
 		Geometry::type = GT_CYLINDER_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~CylinderGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	CylinderGeometry(const CylinderGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new CylinderGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	CylinderGeometry& operator=(const CylinderGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			radius = other.radius;
-			height = other.height;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	CylinderGeometry(CylinderGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	CylinderGeometry& operator=(CylinderGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			radius = other.radius;
-			height = other.height;
-		}
-		return *this;
 	}
 
 	float  		radius{ 1 };  										// The radius of the cylinder
@@ -766,67 +349,10 @@ public:
 	ConvexHullGeometry()
 	{
 		Geometry::type = GT_CONVEXHULL_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~ConvexHullGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	ConvexHullGeometry(const ConvexHullGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new ConvexHullGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	ConvexHullGeometry& operator=(const ConvexHullGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			scale = other.scale;
-			convexMesh = other.convexMesh;
-			physx_maxMargin = other.physx_maxMargin;
-			physx_tightBounds = other.physx_tightBounds;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	ConvexHullGeometry(ConvexHullGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	ConvexHullGeometry& operator=(ConvexHullGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			scale = other.scale;
-			convexMesh = other.convexMesh;
-			physx_maxMargin = other.physx_maxMargin;
-			physx_tightBounds = other.physx_tightBounds;
-		}
-		return *this;
 	}
 
 	MeshScale  	scale;   										// The scale to apply to this convex mesh
-	std::string	convexMesh;										// The name of the convex mesh asset
-	float  		physx_maxMargin{ 3.40E+38f };   					// The maximum margin. Used to limit how much PCM shrinks the geometry by in collision detection.
-	bool 		physx_tightBounds{ false };   						// Use tighter (but more expensive to compute) bounds around the convex geometry.
+	const char * convexMesh{ nullptr };							// The name of the convex mesh asset
 };
 
 
@@ -838,63 +364,10 @@ public:
 	TriangleMeshGeometry()
 	{
 		Geometry::type = GT_TRIANGLEMESH_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~TriangleMeshGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	TriangleMeshGeometry(const TriangleMeshGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new TriangleMeshGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	TriangleMeshGeometry& operator=(const TriangleMeshGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			scale = other.scale;
-			TriangleMesh = other.TriangleMesh;
-			doubleSided = other.doubleSided;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	TriangleMeshGeometry(TriangleMeshGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	TriangleMeshGeometry& operator=(TriangleMeshGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			scale = other.scale;
-			TriangleMesh = other.TriangleMesh;
-			doubleSided = other.doubleSided;
-		}
-		return *this;
 	}
 
 	MeshScale  	scale;   										// The scale of the triangle mesh
-	std::string	TriangleMesh;  									// The name of the triangle mesh asset
+	const char * triangleMesh{ nullptr };  						// The name of the triangle mesh asset
 	bool 		doubleSided{ false }; 								// Whether or not this triangle mesh should be treated as double sided for collision detection
 };
 
@@ -907,69 +380,12 @@ public:
 	HeightFieldGeometry()
 	{
 		Geometry::type = GT_HEIGHTFIELD_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~HeightFieldGeometry()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	HeightFieldGeometry(const HeightFieldGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new HeightFieldGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	HeightFieldGeometry& operator=(const HeightFieldGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-			heightField = other.heightField;
-			heightScale = other.heightScale;
-			rowScale = other.rowScale;
-			columnScale = other.columnScale;
-			doubleSided = other.doubleSided;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	HeightFieldGeometry(HeightFieldGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	HeightFieldGeometry& operator=(HeightFieldGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-			heightField = other.heightField;
-			heightScale = other.heightScale;
-			rowScale = other.rowScale;
-			columnScale = other.columnScale;
-			doubleSided = other.doubleSided;
-		}
-		return *this;
-	}
-
-	std::string	heightField; 									// The id of the heightfield data asset
-	float  		heightScale;  										// The scaling factor for the height field in vertical direction (y direction in local space).
-	float  		rowScale;   										// The scaling factor for the height field in the row direction (x direction in local space).
-	float  		columnScale;  										// The scaling factor for the height field in the column direction (z direction in local space).
+	const char * heightField{ nullptr }; 						// The id of the heightfield data asset
+	float  		heightScale{ 1 };   								// The scaling factor for the height field in vertical direction (y direction in local space).
+	float  		rowScale{ 1 };										// The scaling factor for the height field in the row direction (x direction in local space).
+	float  		columnScale{ 1 };   								// The scaling factor for the height field in the column direction (z direction in local space).
 	bool 		doubleSided{ false }; 								// Whether or not this heighfield should be treated as double sided for collision detection
 };
 
@@ -982,165 +398,22 @@ public:
 	PlaneGeometry()
 	{
 		Geometry::type = GT_PLANE_GEOMETRY;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~PlaneGeometry()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PlaneGeometry(const PlaneGeometry &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Geometry* clone() const override
-	{
-		return new PlaneGeometry(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	PlaneGeometry& operator=(const PlaneGeometry& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(other);
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	PlaneGeometry(PlaneGeometry &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	PlaneGeometry& operator=(PlaneGeometry&& other)
-	{
-		if (this != &other )
-		{
-			Geometry::operator=(std::move(other));
-		}
-		return *this;
 	}
 
 };
 
-
-// PhysX SDK specific Geometry Instance settings
-class PhysX_GeometryInstanceSettings
-{
-public:
-	std::string	simulationFilterData;  							// Collision filtering state for simulation
-	std::string	queryFilterData; 								// Collision filtering state for queries
-	float  		contactOffset{ 0.02f }; 							// Contact offset for this shape
-	float  		restOffset{ 0 };  									// Two shapes will come to rest at a distance equal to the sum of their restOffset values. If the restOffset is 0, they should converge to touching  exactly.  Having a restOffset greater than zero is useful to have objects slide smoothly, so that they do not get hung up on irregularities of  each others' surfaces.
-	bool 		simulationShape{ true };								// The shape will partake in collision in the physical simulation.
-	bool 		sceneQueryShape{ true };								// The shape will partake in scene queries (ray casts, overlap tests, sweeps, ...).
-	bool 		triggerShape{ true }; 								// The shape is a trigger which can send reports whenever other shapes enter/leave its volume.
-	bool 		visualization{ true };  								// Enable debug renderer for this shape
-	bool 		particleDrain{ false };   							// Sets the shape to be a particle drain.
-};
-
-typedef std::vector< std::string > StringVector; // Forward declare the 'String' vector
 
 // Defines a single instance of a geometry
 class GeometryInstance
 {
 public:
-
-	// Declare the constructor.
-	GeometryInstance() { }
-
-
-	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~GeometryInstance()
-	{
-		delete geometry; // Delete this object
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	GeometryInstance(const GeometryInstance &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual GeometryInstance* clone() const
-	{
-		return new GeometryInstance(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	GeometryInstance& operator=(const GeometryInstance& other)
-	{
-		if (this != &other )
-		{
-			delete geometry; // delete any previous pointer.
-			geometry = nullptr; // set the pointer to null.
-			if ( other.geometry )
-			{
-				geometry = static_cast<Geometry *>(other.geometry->clone()); // perform the deep copy and assignment here
-			}
-			materials = other.materials;
-			localPose = other.localPose;
-			collisionFilterSettings = other.collisionFilterSettings;
-			physx_geometryInstanceSettings = other.physx_geometryInstanceSettings;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	GeometryInstance(GeometryInstance &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	GeometryInstance& operator=(GeometryInstance&& other)
-	{
-		if (this != &other )
-		{
-			geometry = other.geometry;
-			other.geometry = nullptr; // Set 'other' pointer to null since we have moved it
-			materials = other.materials;
-			localPose = other.localPose;
-			collisionFilterSettings = other.collisionFilterSettings;
-			physx_geometryInstanceSettings = other.physx_geometryInstanceSettings;
-		}
-		return *this;
-	}
-
 	Geometry 	*geometry{ nullptr };								// The geometry associated with this instance
-	StringVector materials;										// Array of material id associated with this geometry instance
+	uint32_t 	materialsCount { 0 };
+	const char **  materials{ nullptr }; 						// Id of physical material(s) associated with this geometry instance (usually one material; but for heightifields and triangle meshes can be more than one)
 	Pose 		localPose;  											// The local pose for this geometry instance
-	std::string	collisionFilterSettings; 						// Describes collision filtering settings; what other types of objects this object will collide with
-	PhysX_GeometryInstanceSettings physx_geometryInstanceSettings;   // PhysX SDK specific settings
+	const char * collisionFilterSettings{ nullptr }; 			// Describes collision filtering settings; what other types of objects this object will collide with
 };
 
-
-// PhysX SDK specific rigid body settings
-class PhysX_RigidBodySettings
-{
-public:
-	uint8_t		dominanceGroup{ 0 };  								// Assigns dynamic actors a dominance group identifier.
-	uint8_t		ownerClient{ 0 };   								// the owner client of an actor.
-	bool 		visualization{ true };  								// Enables debug visualization for this object
-	bool 		sendSleepNotifies{ true };  							// Enables the sending of PxSimulationEventCallback::onWake() and PxSimulationEventCallback::onSleep() notify events
-	bool 		disableSimulation{ false };   						// Disables simulation for the actor.
-};
-
-typedef std::vector< GeometryInstance *> GeometryInstanceVector; // Forward declare the 'GeometryInstance' vector
 
 // Defines the common properties for a rigid body
 class RigidBody : public Node
@@ -1150,68 +423,11 @@ public:
 	RigidBody()
 	{
 		Node::type = NT_RIGID_BODY;
-	};
-
-
-	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~RigidBody()
-	{
-		for (auto &i:geometryInstances) delete i; // Delete all of the object pointers in this array
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RigidBody(const RigidBody &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new RigidBody(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	RigidBody& operator=(const RigidBody& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			for (auto &i:geometryInstances) delete i; // Delete all of the object pointers in this array
-			geometryInstances.clear(); // Clear the current array
-			for (auto &i:other.geometryInstances) geometryInstances.push_back( static_cast< GeometryInstance *>(i->clone())); // Deep copy object pointers into the array
-			globalPose = other.globalPose;
-			physx_rigidBodySettings = other.physx_rigidBodySettings;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	RigidBody(RigidBody &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	RigidBody& operator=(RigidBody&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			geometryInstances = other.geometryInstances;
-			other.geometryInstances.clear(); // Clear the 'other' array now that we have moved it
-			globalPose = other.globalPose;
-			physx_rigidBodySettings = other.physx_rigidBodySettings;
-		}
-		return *this;
-	}
-
-	GeometryInstanceVector geometryInstances;  					// The set of geometries to instance with this actor
+	uint32_t 	geometryInstancesCount { 0 };
+	GeometryInstance** geometryInstances{ nullptr }; 			// The set of geometries to instance with this actor
 	Pose 		globalPose;   										// The global pose for this actor
-	PhysX_RigidBodySettings physx_rigidBodySettings; 			// PhysX SDK specific rigid body settings
 };
 
 
@@ -1223,82 +439,8 @@ public:
 	RigidStatic()
 	{
 		Node::type = NT_RIGID_STATIC;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~RigidStatic()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RigidStatic(const RigidStatic &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual RigidBody* clone() const override
-	{
-		return new RigidStatic(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	RigidStatic& operator=(const RigidStatic& other)
-	{
-		if (this != &other )
-		{
-			RigidBody::operator=(other);
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	RigidStatic(RigidStatic &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	RigidStatic& operator=(RigidStatic&& other)
-	{
-		if (this != &other )
-		{
-			RigidBody::operator=(std::move(other));
-		}
-		return *this;
-	}
-
-};
-
-
-// PhysX SDK RigidDynamic specific settings
-class PhysX_RigidDynamicSettings
-{
-public:
-	float  		sleepThreshold{ 5.00E-05f };  						// Sets the mass-normalized kinetic energy threshold below which an actor may go to sleep.
-	float  		wakeCounter{ 0.4f };  								// Sets the wake counter for the actor.
-	float  		stabilizationThreshold{ 1.00E-05f };  				// Sets the mass-normalized kinetic energy threshold below which an actor may participate in stabilization.
-	bool 		kinematicTargetForSceneQueries{ true };   			// Use the kinematic target transform for scene queries.
-	bool 		enableCCD{ false };   								// Enables swept integration for the actor.
-	bool 		enableCCDFriction{ false };   						// Enabled CCD in swept integration for the actor.
-	bool 		poseIntegrationPreview{ false };						// Register a rigid body for reporting pose changes by the simulation at an early stage.
-	bool 		speculativeCCD{ false };								// Register a rigid body to dynamicly adjust contact offset based on velocity. This can be used to achieve a CCD effect.
-	bool 		enableCCDMaxContactImpulse{ false };					// Permit CCD to limit maxContactImpulse. This is useful for use-cases like a destruction system but can cause visual artefacts so is not enabled by default.
-	float  		minCCDAdvanceCoefficient;   						// 
-	bool 		lockLinearX{ false }; 								// Lock linear movement on the X-axis
-	bool 		lockLinearY{ false }; 								// Lock linear movement on the Y-axis
-	bool 		lockLinearZ{ false }; 								// Lock linear movement on the Z-axis
-	bool 		lockAngularX{ false };  								// Local angular roation on the X-axis
-	bool 		lockAngularY{ false };  								// Local angular roation on the Y-axis
-	bool 		lockAngularZ{ false };  								// Local angular roation on the Z-axis
-	float  		maxContactImpulse{ 1.00E+32f }; 					// 
-	float  		contactReportThreshold{ FLT_MAX };					// Sets the force threshold for contact reports.
-	uint32_t 	minPositionIters{ 4 }; 							// Sets the solver iteration counts for the body. 
-	uint32_t 	minVelocityIters{ 1 }; 							// Sets the solver iteration counts for the body. 
 };
 
 
@@ -1310,109 +452,18 @@ public:
 	RigidDynamic()
 	{
 		Node::type = NT_RIGID_DYNAMIC;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~RigidDynamic()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RigidDynamic(const RigidDynamic &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual RigidBody* clone() const override
-	{
-		return new RigidDynamic(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	RigidDynamic& operator=(const RigidDynamic& other)
-	{
-		if (this != &other )
-		{
-			RigidBody::operator=(other);
-			disableGravity = other.disableGravity;
-			centerOfMassLocalPose = other.centerOfMassLocalPose;
-			mass = other.mass;
-			massSpaceInertiaTensor = other.massSpaceInertiaTensor;
-			linearVelocity = other.linearVelocity;
-			angularVelocity = other.angularVelocity;
-			linearDamping = other.linearDamping;
-			angularDamping = other.angularDamping;
-			maxAngularVelocity = other.maxAngularVelocity;
-			kinematic = other.kinematic;
-			physx_rigidDynamicSettings = other.physx_rigidDynamicSettings;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	RigidDynamic(RigidDynamic &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	RigidDynamic& operator=(RigidDynamic&& other)
-	{
-		if (this != &other )
-		{
-			RigidBody::operator=(std::move(other));
-			disableGravity = other.disableGravity;
-			centerOfMassLocalPose = other.centerOfMassLocalPose;
-			mass = other.mass;
-			massSpaceInertiaTensor = other.massSpaceInertiaTensor;
-			linearVelocity = other.linearVelocity;
-			angularVelocity = other.angularVelocity;
-			linearDamping = other.linearDamping;
-			angularDamping = other.angularDamping;
-			maxAngularVelocity = other.maxAngularVelocity;
-			kinematic = other.kinematic;
-			physx_rigidDynamicSettings = other.physx_rigidDynamicSettings;
-		}
-		return *this;
-	}
-
-	bool 		disableGravity;   									// Disables scene gravity for this actor
+	bool 		disableGravity{ false };								// Disables scene gravity for this actor
 	Pose 		centerOfMassLocalPose;  								// Center of mass and local pose
-	float  		mass;   											// Sets the mass of a dynamic actor.
-	Vec3 		massSpaceInertiaTensor;   							// Sets the inertia tensor, using a parameter specified in mass space coordinates.
-	Vec3 		linearVelocity;   									// Sets the linear velocity of the actor.
-	Vec3 		angularVelocity;										// Sets the angular velocity of the actor.
+	float  		mass{ 1 };											// Sets the mass of a dynamic actor.
+	Vec3 		massSpaceInertiaTensor{ 1,1,1 };						// Sets the inertia tensor, using a parameter specified in mass space coordinates.
+	Vec3 		linearVelocity{ 0,0,0 };								// Sets the linear velocity of the actor.
+	Vec3 		angularVelocity{ 0,0,0 }; 							// Sets the angular velocity of the actor.
 	float  		linearDamping{ 0 }; 								// Sets the linear damping coefficient.
 	float  		angularDamping{ 0.05f };  							// Sets the angular damping coefficient.
 	float  		maxAngularVelocity{ 7 };  							// set the maximum angular velocity permitted for this actor.
 	bool 		kinematic{ false };   								// If true this is a dynamic object; but currently kinematically controlled
-	PhysX_RigidDynamicSettings physx_rigidDynamicSettings;   	// PhysX SDK specific RigidDynamic settings
-};
-
-
-// PhysX SDK specific Joint settings
-class PhysX_JointSettings
-{
-public:
-	float  		breakForce; 										// 
-	float  		breakTorque;  										// 
-	float  		inverseMassScale0;									// 
-	float  		inverseInertiaScale0;   							// 
-	float  		inverseMassScale1;									// 
-	float  		inverseInertiaScale1;   							// 
-	bool 		broken{ false };										// 
-	bool 		projectToBody0{ false };								// 
-	bool 		projectToBody1{ false };								// 
-	bool 		visualization{ true };  								// 
-	bool 		driveLimitsAreForces{ false };  						// 
-	bool 		improvedSlerp{ false };   							// 
-	bool 		disablePreprocessing{ true }; 						// 
-	bool 		gpuCompatible{ false };   							// 
 };
 
 
@@ -1424,76 +475,18 @@ public:
 	Joint()
 	{
 		Node::type = NT_JOINT;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~Joint()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	Joint(const Joint &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new Joint(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	Joint& operator=(const Joint& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			body0 = other.body0;
-			body1 = other.body1;
-			localpose0 = other.localpose0;
-			localpose1 = other.localpose1;
-			collisionEnabled = other.collisionEnabled;
-			physx_jointSettings = other.physx_jointSettings;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	Joint(Joint &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	Joint& operator=(Joint&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			body0 = other.body0;
-			body1 = other.body1;
-			localpose0 = other.localpose0;
-			localpose1 = other.localpose1;
-			collisionEnabled = other.collisionEnabled;
-			physx_jointSettings = other.physx_jointSettings;
-		}
-		return *this;
-	}
-
-	std::string	body0;   										// Id of first rigid body joint is constrained to; if empty string; then constaint to the world
-	std::string	body1;   										// Id of the second rigid body the joint is constrainted to
+	const char * body0{ nullptr };   							// Id of first rigid body joint is constrained to; if empty string; then constaint to the world
+	const char * body1{ nullptr };   							// Id of the second rigid body the joint is constrainted to
 	Pose 		localpose0;   										// The parent relative pose; relative to body0
 	Pose 		localpose1;   										// The parent relative pose; relative to body1
 	bool 		collisionEnabled{ false };  							// 
-	PhysX_JointSettings physx_jointSettings; 					// PhysX SDK specific joint settings
 };
 
 
+// Defines the properties specific to a fixed joint 
+// Not all properties yet defined!
 class FixedJoint : public Joint
 {
 public:
@@ -1501,61 +494,92 @@ public:
 	FixedJoint()
 	{
 		Joint::type = NT_FIXED_JOINT;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~FixedJoint()
-	{
 	}
 
+};
 
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	FixedJoint(const FixedJoint &other)
+
+// Defines the properties specific to a spherical joint 
+// Not all properties yet defined!
+class SphericalJoint : public Joint
+{
+public:
+	// Declare the constructor.
+	SphericalJoint()
 	{
-		*this = other;
+		Joint::type = NT_SPHERICAL_JOINT;
 	}
 
+};
 
-	// Declare the virtual clone method using a deep copy
-	virtual Joint* clone() const override
+
+// Defines the properties specific to a revolute joint 
+// Not all properties yet defined!
+class RevoluteJoint : public Joint
+{
+public:
+	// Declare the constructor.
+	RevoluteJoint()
 	{
-		return new FixedJoint(*this);
+		Joint::type = NT_REVOLUTE_JOINT;
 	}
 
-	// Declare and implement the deep copy assignment operator
-	FixedJoint& operator=(const FixedJoint& other)
+};
+
+
+// Defines the properties specific to a prismatic joint 
+// Not all properties yet defined!
+class PrismaticJoint : public Joint
+{
+public:
+	// Declare the constructor.
+	PrismaticJoint()
 	{
-		if (this != &other )
-		{
-			Joint::operator=(other);
-			projectionLinearTolerance = other.projectionLinearTolerance;
-			projectionAngularTolerance = other.projectionAngularTolerance;
-		}
-		return *this;
+		Joint::type = NT_PRISMATIC_JOINT;
 	}
 
+};
 
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	FixedJoint(FixedJoint &&other)
+
+// Defines the properties specific to a distance joint 
+// Not all properties yet defined!
+class DistanceJoint : public Joint
+{
+public:
+	// Declare the constructor.
+	DistanceJoint()
 	{
-		*this = std::move(other);
+		Joint::type = NT_DISTANCE_JOINT;
 	}
 
-	// Declare and implement the move assignment operator
-	FixedJoint& operator=(FixedJoint&& other)
+};
+
+
+// Defines the properties specific to a ball and socket joint 
+// Not all properties yet defined!
+class BallAndSocketJoint : public Joint
+{
+public:
+	// Declare the constructor.
+	BallAndSocketJoint()
 	{
-		if (this != &other )
-		{
-			Joint::operator=(std::move(other));
-			projectionLinearTolerance = other.projectionLinearTolerance;
-			projectionAngularTolerance = other.projectionAngularTolerance;
-		}
-		return *this;
+		Joint::type = NT_BALL_AND_SOCKET_JOINT;
 	}
 
-	float  		projectionLinearTolerance;							// 
-	float  		projectionAngularTolerance; 						// 
+};
+
+
+// Defines the properties specific to a six degree of freedom joint 
+// Not all properties yet defined!
+class D6Joint : public Joint
+{
+public:
+	// Declare the constructor.
+	D6Joint()
+	{
+		Joint::type = NT_D6_JOINT;
+	}
+
 };
 
 
@@ -1563,11 +587,10 @@ public:
 class BodyPairFilter
 {
 public:
-	std::string	bodyA;   										// Id of first body
-	std::string	bodyB ;											// Id of second body
+	const char * bodyA{ nullptr };   							// Id of first body
+	const char * bodyB { nullptr };								// Id of second body
 };
 
-typedef std::vector< BodyPairFilter > BodyPairFilterVector; // Forward declare the 'BodyPairFilter' vector
 
 // A collection of body pair filters
 class BodyPairFilters : public Node
@@ -1577,58 +600,10 @@ public:
 	BodyPairFilters()
 	{
 		Node::type = NT_BODY_PAIR_FILTERS;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~BodyPairFilters()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	BodyPairFilters(const BodyPairFilters &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new BodyPairFilters(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	BodyPairFilters& operator=(const BodyPairFilters& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			bodyPairs = other.bodyPairs;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	BodyPairFilters(BodyPairFilters &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	BodyPairFilters& operator=(BodyPairFilters&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			bodyPairs = other.bodyPairs;
-		}
-		return *this;
-	}
-
-	BodyPairFilterVector bodyPairs;								// Array of body pair filters
+	uint32_t 	bodyPairsCount { 0 };
+	BodyPairFilter* bodyPairs{ nullptr };  						// Array of body pair filters
 };
 
 
@@ -1639,67 +614,13 @@ public:
 	InstanceCollection()
 	{
 		Node::type = NT_INSTANCE_COLLECTION;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~InstanceCollection()
-	{
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	InstanceCollection(const InstanceCollection &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new InstanceCollection(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	InstanceCollection& operator=(const InstanceCollection& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			collection = other.collection;
-			pose = other.pose;
-			scale = other.scale;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	InstanceCollection(InstanceCollection &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	InstanceCollection& operator=(InstanceCollection&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			collection = other.collection;
-			pose = other.pose;
-			scale = other.scale;
-		}
-		return *this;
-	}
-
-	std::string	collection;										// Name of collection to instance
+	const char * collection{ nullptr };							// Name of collection to instance
 	Pose 		pose; 												// Pose to instance collection at
 	Vec3 		scale;  												// Scale of instance
 };
 
-typedef std::vector< Node *> NodeVector; // Forward declare the 'Node' vector
 
 // A collection of nodes
 class Collection : public Node
@@ -1709,347 +630,41 @@ public:
 	Collection()
 	{
 		Node::type = NT_COLLECTION;
-	};
-
-
-	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~Collection()
-	{
-		for (auto &i:nodes) delete i; // Delete all of the object pointers in this array
 	}
 
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	Collection(const Collection &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Node* clone() const override
-	{
-		return new Collection(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	Collection& operator=(const Collection& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(other);
-			for (auto &i:nodes) delete i; // Delete all of the object pointers in this array
-			nodes.clear(); // Clear the current array
-			for (auto &i:other.nodes) nodes.push_back( static_cast< Node *>(i->clone())); // Deep copy object pointers into the array
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	Collection(Collection &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	Collection& operator=(Collection&& other)
-	{
-		if (this != &other )
-		{
-			Node::operator=(std::move(other));
-			nodes = other.nodes;
-			other.nodes.clear(); // Clear the 'other' array now that we have moved it
-		}
-		return *this;
-	}
-
-	NodeVector   nodes;											// Array of nodes in this collection
-};
-
-
-// Optional maximum limits on various object types in the scene; if zero; then no limit is enforced
-class PhysX_SceneLimits
-{
-public:
-	uint32_t 	maxNbActors{ 0 };									// Expected maximum number of actors
-	uint32_t 	maxNbBodies{ 0 };									// Expected maximum number of dynamic rigid bodies
-	uint32_t 	maxNbStaticShapes{ 0 };  							// Expected maximum number of static shapes
-	uint32_t 	maxNbDynamicShapes{ 0 };   						// Expected maximum number of dynamic shapes
-	uint32_t 	maxNbAggregates{ 0 };								// Expected maximum number of aggregates
-	uint32_t 	maxNbConstraints{ 0 }; 							// Expected maximum number of constraint shaders
-	uint32_t 	maxNbRegions{ 0 }; 								// Expected maximum number of broad-phase regions
-	uint32_t 	maxNbBroadPhaseOverlaps{ 0 };						// Expected maximum number of broad-phase overlaps
-};
-
-
-// Size of pre-allocated buffers to use for GPU dynamics
-class PhysX_GPU_DynamicsMemoryConfig
-{
-public:
-	uint32_t 	constraintBufferCapacity{ 32 * 1024 * 1024 };		// Capacity of constraint buffer allocated in GPU global memory
-	uint32_t 	contactBufferCapacity{ 24 * 1024 * 1024 }; 		// Capacity of contact buffer allocated in GPU global memory
-	uint32_t 	tempBufferCapacity{ 16 * 1024 * 1024 };  			// Capacity of temp buffer allocated in pinned host memory.
-	uint32_t 	contactStreamSize{ 1024 * 512 };   				// Size of contact stream buffer allocated in pinned host memory. This is double-buffered so total allocation size = 2* contactStreamCapacity * sizeof(PxContact).
-	uint32_t 	patchStreamSize{ 1024 * 80 };						// Size of the contact patch stream buffer allocated in pinned host memory. This is double-buffered so total allocation size = 2 * patchStreamCapacity * sizeof(PxContactPatch).
-	uint32_t 	forceStreamCapacity{ 1 * 1024 * 1024 };  			// Capacity of force buffer allocated in pinned host memory.
-	uint32_t 	heapCapacity{ 64 * 1024 * 1024 };					// Initial capacity of the GPU and pinned host memory heaps. Additional memory will be allocated if more memory is required.
-	uint32_t 	foundLostPairsCapacity{ 256 * 1024 };				// Capacity of found and lost buffers allocated in GPU global memory. This is used for the found/lost pair reports in the BP. 
-};
-
-
-// Broad phase algorithm used in the simulation
-enum PhysX_BroadPhaseType
-{
-	BPT_SAP, 							// 3-axes sweep-and-prune
-	BPT_MBP, 							// Multi box pruning
-	BPT_GPU, 							// GPU broadphase
-};
-
-
-// Caps class for broad phase.
-class PhysX_BroadPhaseCaps
-{
-public:
-	uint32_t 	maxNbRegions;										// Max number of regions supported by the broad-phase
-	uint32_t 	maxNbObjects;										// Max number of objects supported by the broad-phase
-	bool 		needsPredefinedBounds;  								// If true, broad-phase needs 'regions' to work
-};
-
-
-// Region of interest
-class PhysX_BroadPhaseRegion
-{
-public:
-	Bounds3		bounds; 											// Region's bounds
-	std::string	userData;  										// Region's user-provided data
-};
-
-
-// Specifies the dominance behavior of contacts between two actors with two certain dominance groups.
-class PhysX_DominanceGroupPair
-{
-public:
-	uint8_t		dominanceGroupA;  									// First group
-	uint8_t		dominanceGroupB;  									// Second group
-};
-
-
-// Enum for selecting the friction algorithm used for simulation.
-enum PhysX_FrictionType
-{
-	FT_PATCH,  							// Select default patch-friction model.
-	FT_ONE_DIRECTIONAL,					// Select one directional per-contact friction model.
-	FT_TWO_DIRECTIONAL,					// Select two directional per-contact friction model.
-};
-
-
-enum PhysX_PruningStructureType
-{
-	PST_NONE,  							// Using a simple data structure
-	PST_DYNAMIC_AABB_TREE,   			// Using a dynamic AABB tree
-	PST_STATIC_AABB_TREE,  				// Using a static AABB tree
-};
-
-
-// Class to define the scale at which simulation runs. Most simulation tolerances are calculated in terms of the values here. 
-class PhysX_TolerancesScale
-{
-public:
-	float  		length{ 1 };  										// The approximate size of objects in the simulation.
-	float  		speed{ 10 };  										// The typical magnitude of velocities of objects in simulation.
-};
-
-typedef std::vector< PhysX_DominanceGroupPair > PhysX_DominanceGroupPairVector; // Forward declare the 'PhysX_DominanceGroupPair' vector
-typedef std::vector< PhysX_BroadPhaseRegion > PhysX_BroadPhaseRegionVector; // Forward declare the 'PhysX_BroadPhaseRegion' vector
-
-// PhysX SDK Scene Description settings
-class PhysX_SceneDesc
-{
-public:
-	PhysX_TolerancesScale tolerancesScale;   					// Scene default tolerances scale
-	float  		bounceThresholdVelocity{ 0.2f };  					// Set the bounce threshold velocity.  Collision speeds below this threshold will not cause a bounce.
-	float  		frictionOffsetThreshold{ 0.04f };   				// A threshold of contact separation distance used to decide if a contact point will experience friction forces.
-	float  		ccdMaxSeparation{ 0.04f };							// A threshold for speculative CCD. Used to control whether bias, restitution or a combination of the two are used to resolve the contacts.
-	float  		solverOffsetSlop{ 0 };								// A slop value used to zero contact offsets from the body's COM on an axis if the offset along that axis is smaller than this threshold. Can be used to compensate for small numerical errors in contact generation.
-	PhysX_PruningStructureType staticStructure{ PST_DYNAMIC_AABB_TREE }; // Defines the structure used to store static objects.
-	PhysX_PruningStructureType dynamicStructure{ PST_DYNAMIC_AABB_TREE }; // Defines the structure used to store dynamic objects.
-	uint32_t 	dynamicTreeRebuildRateHint{ 100 }; 				// Hint for how much work should be done per simulation frame to rebuild the pruning structure.
-	uint32_t 	solverBatchSize{ 128 };  							// Defines the number of actors required to spawn a separate rigid body solver island task chain.
-	uint32_t 	nbContactDataBlocks{ 0 };							// Setting to define the number of 16K blocks that will be initially reserved to store contact, friction, and contact cache data.
-	uint32_t 	maxNbContactDataBlocks{ 65536 };   				// Setting to define the maximum number of 16K blocks that can be allocated to store contact, friction, and contact cache data.
-	float  		maxBiasCoefficient{ FLT_MAX };						// The maximum bias coefficient used in the constraint solver
-	uint32_t 	contactReportStreamBufferSize{ 8192 }; 			// Size of the contact report stream (in bytes).
-	float  		wakeCounterResetValue{ 0.4f };						// The wake counter reset value
-	Bounds3		sanityBounds{ Vec3(-FLT_MAX,-FLT_MAX,-FLT_MAX),Vec3(FLT_MAX,FLT_MAX,FLT_MAX) }; // The bounds used to sanity check user-set positions of actors and articulation links
-	PhysX_GPU_DynamicsMemoryConfig gpuDynamicsMemoryConfig;		// Size of pre-allocated buffers to use for GPU dynamics
-	uint32_t 	gpuMaxNumPartitions{ 8 };							// Limitation for the partitions in the GPU dynamics pipeline.
-	uint32_t 	ccdMaxPasses{ 1 }; 								// Maximum number of CCD passes
-	PhysX_FrictionType frictionType{ FT_PATCH }; 				// Selects the friction algorithm to use for simulation.
-	PhysX_DominanceGroupPairVector dominanceGroups;				// The array of dominance group pairs
-	PhysX_BroadPhaseType broadPhaseType{ BPT_SAP };				// Default to CPU sweep and prune broadphase
-	PhysX_BroadPhaseCaps broadPhaseCaps; 						// Caps for broad phase
-	PhysX_BroadPhaseRegionVector broadPhaseRegions;				// Array of user defined broadphase regions
-	PhysX_SceneLimits sceneLimits;   							// Optional object limits for this scene
-	bool 		enableActiveActors{ false };							// Enable Active Actors Notification.
-	bool 		enableActiveTransforms{ false };						// 
-	bool 		enableCCD{ false };   								// Enables a second broad phase check after integration that makes it possible to prevent objects from tunneling through each other.
-	bool 		disableCCDResweep{ false };   						// Enables a simplified swept integration strategy, which sacrifices some accuracy for improved performance.
-	bool 		adaptiveForce{ false };   							// Enable adaptive forces to accelerate convergence of the solver. 
-	bool 		enableKinematicStaticPairs{ false };					// Enable contact pair filtering between kinematic and static rigid bodies.
-	bool 		enableKinematicPairs{ false };  						// Enable contact pair filtering between kinematic rigid bodies.
-	bool 		enablePCM{ true };  									// Enable GJK-based distance collision detection system.
-	bool 		diasbleContactReportBufferResize{ false };  			// Disable contact report buffer resize. Once the contact buffer is full, the rest of the contact reports will not be buffered and sent.
-	bool 		disableContactCache{ false }; 						// Disable contact cache.
-	bool 		requireRWLock{ false };   							// Require scene-level locking
-	bool 		enableStabilization{ false }; 						// Enables additional stabilization pass in solver
-	bool 		enableAveragePoint{ false };							// Enables average points in contact manifolds
-	bool 		excludeKinematicsFromActiveActors{ false };   		// Do not report kinematics in list of active actors/transforms.
-	bool 		suppressEagerSceneQueryRefit{ false };  				// Lazily refit the dynamic scene query tree, instead of eagerly refitting in fetchResults
-	bool 		enableGPUDynamics{ false };   						// Enables the GPU dynamics pipeline
-	bool 		enhancedDeterminism{ false }; 						// Provides improved determinism at the expense of performance.
+	uint32_t 	nodesCount { 0 };
+	Node**   	nodes{ nullptr };									// Array of nodes in this collection
 };
 
 
 // A special type of 'collection' which is instantiated on startup
-class Scene : public Collection
+class Scene : public Node
 {
 public:
 	// Declare the constructor.
 	Scene()
 	{
 		Node::type = NT_SCENE;
-	};
-
-
-	// Declare the virtual destructor.
-	virtual ~Scene()
-	{
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	Scene(const Scene &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual Collection* clone() const override
-	{
-		return new Scene(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	Scene& operator=(const Scene& other)
-	{
-		if (this != &other )
-		{
-			Collection::operator=(other);
-			gravity = other.gravity;
-			physx_sceneDesc = other.physx_sceneDesc;
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	Scene(Scene &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	Scene& operator=(Scene&& other)
-	{
-		if (this != &other )
-		{
-			Collection::operator=(std::move(other));
-			gravity = other.gravity;
-			physx_sceneDesc = other.physx_sceneDesc;
-		}
-		return *this;
 	}
 
 	Vec3 		gravity{ 0.0f,-9.8f,0.0f };   						// Gravity
-	PhysX_SceneDesc physx_sceneDesc; 							// PhysX SDK Scene description settings
+	uint32_t 	nodesCount { 0 };
+	Node**   	nodes{ nullptr };									// Array of nodes in this collection
 };
 
-typedef std::vector< Collection *> CollectionVector; // Forward declare the 'Collection' vector
-typedef std::vector< Scene *> SceneVector; // Forward declare the 'Scene' vector
 
 // The root node container
 class PhysicsDOM
 {
 public:
-
-	// Declare the constructor.
-	PhysicsDOM() { }
-
-
-	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~PhysicsDOM()
-	{
-		for (auto &i:collections) delete i; // Delete all of the object pointers in this array
-		for (auto &i:scenes) delete i; // Delete all of the object pointers in this array
-	}
-
-
-	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PhysicsDOM(const PhysicsDOM &other)
-	{
-		*this = other;
-	}
-
-
-	// Declare the virtual clone method using a deep copy
-	virtual PhysicsDOM* clone() const
-	{
-		return new PhysicsDOM(*this);
-	}
-
-	// Declare and implement the deep copy assignment operator
-	PhysicsDOM& operator=(const PhysicsDOM& other)
-	{
-		if (this != &other )
-		{
-			for (auto &i:collections) delete i; // Delete all of the object pointers in this array
-			collections.clear(); // Clear the current array
-			for (auto &i:other.collections) collections.push_back( static_cast< Collection *>(i->clone())); // Deep copy object pointers into the array
-			for (auto &i:scenes) delete i; // Delete all of the object pointers in this array
-			scenes.clear(); // Clear the current array
-			for (auto &i:other.scenes) scenes.push_back( static_cast< Scene *>(i->clone())); // Deep copy object pointers into the array
-		}
-		return *this;
-	}
-
-
-	// Declare the move constructor; handles copying pointers and pointer arrays
-	PhysicsDOM(PhysicsDOM &&other)
-	{
-		*this = std::move(other);
-	}
-
-	// Declare and implement the move assignment operator
-	PhysicsDOM& operator=(PhysicsDOM&& other)
-	{
-		if (this != &other )
-		{
-			collections = other.collections;
-			other.collections.clear(); // Clear the 'other' array now that we have moved it
-			scenes = other.scenes;
-			other.scenes.clear(); // Clear the 'other' array now that we have moved it
-		}
-		return *this;
-	}
-
-	CollectionVector collections;  								// The array of top level collections
-	SceneVector	scenes;											// The array of top level scenes; a scene is instantiated into the physics simulation
+	uint32_t 	collectionsCount { 0 };
+	Collection** collections{ nullptr }; 						// The array of top level collections
+	uint32_t 	scenesCount { 0 };
+	Scene**		scenes{ nullptr };									// The array of top level scenes; a scene is instantiated into the physics simulation
 };
 
 
 
 } // End of PHYSICS_DOM namespace
 
-#endif // End of PHYSICSDOM_H
+#endif // End of Scene
