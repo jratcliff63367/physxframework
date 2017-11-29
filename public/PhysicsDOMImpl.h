@@ -2260,6 +2260,8 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(other);
+			mLimitY = other.mLimitY;
+			mLimitZ = other.mLimitZ;
 		}
 		return *this;
 	}
@@ -2275,6 +2277,8 @@ public:
 			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
+		mDOM.limitY = mLimitY; // Simple member variable assignment to the DOM reflection: limitY
+		mDOM.limitZ = mLimitZ; // Simple member variable assignment to the DOM reflection: limitZ
 	}
 
 
@@ -2290,10 +2294,14 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(std::move(other));
+			mLimitY = other.mLimitY;
+			mLimitZ = other.mLimitZ;
 		}
 		return *this;
 	}
 
+	float  		mLimitY{ 0 };   									// The limit angle (in radians) for the y rotation axis
+	float  		mLimitZ{ 0 };   									// The limit angle (in radians) for the z rotation axis
 private:
 	SphericalJoint   mDOM; // Declare the DOM version.
 };
@@ -2301,24 +2309,24 @@ private:
 
 // Defines the properties specific to a revolute joint 
 // Not all properties yet defined!
-class RevoluteJointImpl : public JointImpl
+class HingeJointImpl : public JointImpl
 {
 public:
 	// Declare the constructor.
-	RevoluteJointImpl()
+	HingeJointImpl()
 	{
-		JointImpl::mType = NT_REVOLUTE_JOINT;
+		JointImpl::mType = NT_HINGE_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~RevoluteJointImpl()
+	virtual ~HingeJointImpl()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RevoluteJointImpl(const RevoluteJointImpl &other)
+	HingeJointImpl(const HingeJointImpl &other)
 	{
 		*this = other;
 	}
@@ -2330,7 +2338,7 @@ public:
 	}
 
 
-	RevoluteJoint * getRevoluteJoint(void) // Declare virtual method to return the DOM version
+	HingeJoint * getHingeJoint(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2339,15 +2347,17 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new RevoluteJointImpl(*this);
+		return new HingeJointImpl(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	RevoluteJointImpl& operator=(const RevoluteJointImpl& other)
+	HingeJointImpl& operator=(const HingeJointImpl& other)
 	{
 		if (this != &other )
 		{
 			JointImpl::operator=(other);
+			mLimtLow = other.mLimtLow;
+			mLimitHigh = other.mLimitHigh;
 		}
 		return *this;
 	}
@@ -2363,27 +2373,33 @@ public:
 			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
+		mDOM.limtLow = mLimtLow; // Simple member variable assignment to the DOM reflection: limtLow
+		mDOM.limitHigh = mLimitHigh; // Simple member variable assignment to the DOM reflection: limitHigh
 	}
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	RevoluteJointImpl(RevoluteJointImpl &&other)
+	HingeJointImpl(HingeJointImpl &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	RevoluteJointImpl& operator=(RevoluteJointImpl&& other)
+	HingeJointImpl& operator=(HingeJointImpl&& other)
 	{
 		if (this != &other )
 		{
 			JointImpl::operator=(std::move(other));
+			mLimtLow = other.mLimtLow;
+			mLimitHigh = other.mLimitHigh;
 		}
 		return *this;
 	}
 
+	float  		mLimtLow{ 0 };										// The lower limit of the hinge joint in radians
+	float  		mLimitHigh{ 0 };  									// The upper limit of the hinge joint in radians
 private:
-	RevoluteJoint  mDOM; // Declare the DOM version.
+	HingeJoint   mDOM; // Declare the DOM version.
 };
 
 
@@ -2436,6 +2452,8 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(other);
+			mLimitLow = other.mLimitLow;
+			mLimitHigh = other.mLimitHigh;
 		}
 		return *this;
 	}
@@ -2451,6 +2469,8 @@ public:
 			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
+		mDOM.limitLow = mLimitLow; // Simple member variable assignment to the DOM reflection: limitLow
+		mDOM.limitHigh = mLimitHigh; // Simple member variable assignment to the DOM reflection: limitHigh
 	}
 
 
@@ -2466,10 +2486,14 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(std::move(other));
+			mLimitLow = other.mLimitLow;
+			mLimitHigh = other.mLimitHigh;
 		}
 		return *this;
 	}
 
+	float  		mLimitLow{ 0 }; 									// The lower linear limit distance
+	float  		mLimitHigh; 										// The upper linear limit distance
 private:
 	PrismaticJoint   mDOM; // Declare the DOM version.
 };
@@ -2524,6 +2548,8 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(other);
+			mDistanceLow = other.mDistanceLow;
+			mDistanceHigh = other.mDistanceHigh;
 		}
 		return *this;
 	}
@@ -2539,6 +2565,8 @@ public:
 			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
+		mDOM.distanceLow = mDistanceLow; // Simple member variable assignment to the DOM reflection: distanceLow
+		mDOM.distanceHigh = mDistanceHigh; // Simple member variable assignment to the DOM reflection: distanceHigh
 	}
 
 
@@ -2554,10 +2582,14 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(std::move(other));
+			mDistanceLow = other.mDistanceLow;
+			mDistanceHigh = other.mDistanceHigh;
 		}
 		return *this;
 	}
 
+	float  		mDistanceLow{ 0 };									// The minimum distance allowed between the two bodies
+	float  		mDistanceHigh{ 0 }; 								// The maximum distance allowed between the two bodies
 private:
 	DistanceJoint  mDOM; // Declare the DOM version.
 };
@@ -2612,6 +2644,10 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(other);
+			mLimitXLow = other.mLimitXLow;
+			mLimitXHigh = other.mLimitXHigh;
+			mLimitY = other.mLimitY;
+			mLimitZ = other.mLimitZ;
 		}
 		return *this;
 	}
@@ -2627,6 +2663,10 @@ public:
 			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
+		mDOM.limitXLow = mLimitXLow; // Simple member variable assignment to the DOM reflection: limitXLow
+		mDOM.limitXHigh = mLimitXHigh; // Simple member variable assignment to the DOM reflection: limitXHigh
+		mDOM.limitY = mLimitY; // Simple member variable assignment to the DOM reflection: limitY
+		mDOM.limitZ = mLimitZ; // Simple member variable assignment to the DOM reflection: limitZ
 	}
 
 
@@ -2642,10 +2682,18 @@ public:
 		if (this != &other )
 		{
 			JointImpl::operator=(std::move(other));
+			mLimitXLow = other.mLimitXLow;
+			mLimitXHigh = other.mLimitXHigh;
+			mLimitY = other.mLimitY;
+			mLimitZ = other.mLimitZ;
 		}
 		return *this;
 	}
 
+	float  		mLimitXLow{ 0 };  									// The lower angle limit, in radians, for the X rotation axis
+	float  		mLimitXHigh{ 0 };   								// The upper angle limit, in radians, for the X rotation axis
+	float  		mLimitY{ 0 };   									// The limit angle (in radians) for the y rotation axis
+	float  		mLimitZ{ 0 };   									// The limit angle (in radians) for the z rotation axis
 private:
 	BallAndSocketJoint mDOM; // Declare the DOM version.
 };

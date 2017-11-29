@@ -12,12 +12,6 @@ namespace PHYSICS_DOM
 {
 
 
-class ExportXML
-{
-public:
-};
-
-
 // Defines a basic 3d vector type
 class Vec3
 {
@@ -135,7 +129,7 @@ enum NodeType
 	NT_JOINT,  							// Base class for a joint
 	NT_FIXED_JOINT,						// A fixed joint
 	NT_SPHERICAL_JOINT,					// A spherical joint
-	NT_REVOLUTE_JOINT,   				// A revolute joint
+	NT_HINGE_JOINT,						// A hinge joint
 	NT_PRISMATIC_JOINT,					// A prismatic joint
 	NT_DISTANCE_JOINT,   				// A distance joint
 	NT_BALL_AND_SOCKET_JOINT,  			// A ball and socket joint
@@ -516,20 +510,24 @@ public:
 		Joint::type = NT_SPHERICAL_JOINT;
 	}
 
+	float  		limitY{ 0 };  										// The limit angle (in radians) for the y rotation axis
+	float  		limitZ{ 0 };  										// The limit angle (in radians) for the z rotation axis
 };
 
 
 // Defines the properties specific to a revolute joint 
 // Not all properties yet defined!
-class RevoluteJoint : public Joint
+class HingeJoint : public Joint
 {
 public:
 	// Declare the constructor.
-	RevoluteJoint()
+	HingeJoint()
 	{
-		Joint::type = NT_REVOLUTE_JOINT;
+		Joint::type = NT_HINGE_JOINT;
 	}
 
+	float  		limtLow{ 0 };   									// The lower limit of the hinge joint in radians
+	float  		limitHigh{ 0 }; 									// The upper limit of the hinge joint in radians
 };
 
 
@@ -544,6 +542,8 @@ public:
 		Joint::type = NT_PRISMATIC_JOINT;
 	}
 
+	float  		limitLow{ 0 };										// The lower linear limit distance
+	float  		limitHigh;											// The upper linear limit distance
 };
 
 
@@ -558,6 +558,8 @@ public:
 		Joint::type = NT_DISTANCE_JOINT;
 	}
 
+	float  		distanceLow{ 0 };   								// The minimum distance allowed between the two bodies
+	float  		distanceHigh{ 0 };									// The maximum distance allowed between the two bodies
 };
 
 
@@ -572,6 +574,10 @@ public:
 		Joint::type = NT_BALL_AND_SOCKET_JOINT;
 	}
 
+	float  		limitXLow{ 0 }; 									// The lower angle limit, in radians, for the X rotation axis
+	float  		limitXHigh{ 0 };  									// The upper angle limit, in radians, for the X rotation axis
+	float  		limitY{ 0 };  										// The limit angle (in radians) for the y rotation axis
+	float  		limitZ{ 0 };  										// The limit angle (in radians) for the z rotation axis
 };
 
 

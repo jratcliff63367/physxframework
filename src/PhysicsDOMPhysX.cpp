@@ -294,7 +294,7 @@ namespace PHYSICS_DOM_PHYSX
 				case PHYSICS_DOM::NT_SPHERICAL_JOINT:				// A spherical joint
 					reportWarning("Node type not yet implemented");
 					break;
-				case PHYSICS_DOM::NT_REVOLUTE_JOINT:   				// A revolute joint
+				case PHYSICS_DOM::NT_HINGE_JOINT:   				// A hinge joint
 					reportWarning("Node type not yet implemented");
 					break;
 				case PHYSICS_DOM::NT_PRISMATIC_JOINT:					// A prismatic joint
