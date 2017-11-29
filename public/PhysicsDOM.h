@@ -12,6 +12,12 @@ namespace PHYSICS_DOM
 {
 
 
+class ExportXML
+{
+public:
+};
+
+
 // Defines a basic 3d vector type
 class Vec3
 {

@@ -4,7 +4,7 @@
 #include "NvPhysXFramework.h"
 #include "PhysicsDOMImpl.h"
 
-#define USE_DEBUG 1
+#define USE_DEBUG 0
 
 #define TEST_IMPORT_XML 0
 #define TEST_PHYSICS_DOM 1
@@ -122,8 +122,29 @@ public:
 		ic->mCollection = "0";	// Instance node '0' 
 		s->mNodes.push_back(ic);
 
+
 		dom.initDOM();
-		PHYSICS_DOM::PhysicsDOM *pdom = dom.getDOM();
+		PHYSICS_DOM::PhysicsDOM *pdom = dom.getPhysicsDOM();
+
+		//
+		if (pdom->scenesCount)
+		{
+			PHYSICS_DOM::Scene *ss = pdom->scenes[0];
+			if (ss->nodesCount)
+			{
+				PHYSICS_DOM::Node *n = ss->nodes[0];
+				if (n->type == PHYSICS_DOM::NT_INSTANCE_COLLECTION)
+				{
+					PHYSICS_DOM::InstanceCollection *icd = static_cast<PHYSICS_DOM::InstanceCollection *>(n);
+					if (icd)
+					{
+						printf("%s", icd->collection);
+					}
+				}
+			}
+		}
+		//
+
 		mPhysXFramework->loadPhysicsDOM(*pdom);
 	}
 
