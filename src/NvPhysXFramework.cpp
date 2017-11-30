@@ -338,17 +338,14 @@ typedef std::vector< PxJoint * > PxJointVector;
 		// D6 joint with a spring maintaining its position
 		PxJoint* createHingeJoint(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1, uint32_t limitRangeDegrees)
 		{
-			PxD6Joint* j = PxD6JointCreate(*mPhysics, a0, t0, a1, t1);
-			j->setMotion(PxD6Axis::eSWING1, PxD6Motion::eLOCKED);
-			j->setMotion(PxD6Axis::eSWING2, PxD6Motion::eLOCKED);
-			j->setMotion(PxD6Axis::eTWIST, PxD6Motion::eLIMITED);
+			PxRevoluteJoint* j = PxRevoluteJointCreate(*mPhysics, a0, t0, a1, t1);
 			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
 
 			float lrange = (PxPi * 2) * (float(limitRangeDegrees) / 360.0f);
-
 			PxJointAngularLimitPair limit(-lrange, lrange);
-			j->setTwistLimit(limit);
-			j->setDrive(PxD6Drive::eSLERP, PxD6JointDrive(0, 1000, FLT_MAX, true));
+			j->setLimit(limit);
+			j->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
+
 			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
 			return j;
 		}

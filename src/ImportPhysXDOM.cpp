@@ -184,6 +184,7 @@ namespace IMPORT_PHYSX_DOM
 		ET_upper,
 		ET_yLimit,
 		ET_zLimit,
+		ET_RevoluteJointFlags,
 		ET_LAST
 	};
 
@@ -371,6 +372,7 @@ namespace IMPORT_PHYSX_DOM
 		ET_upper, "upper",
 		ET_yLimit, "yLimit",
 		ET_zLimit, "zLimit",
+		ET_RevoluteJointFlags, "RevoluteJointFlags",
 	};
 
 	struct AttributeStruct
@@ -547,19 +549,13 @@ namespace IMPORT_PHYSX_DOM
 
 			switch (mCurrentType)
 			{
-				case ET_BounceThreshold:
 				case ET_ChildPose:
 				case ET_ColumnScale:
-				case ET_ContactDistance:
 				case ET_ConvexEdgeThreshold:
-				case ET_Damping:
 				case ET_DistanceJointFlags:
 				case ET_Drive:
-				case ET_DriveForceLimit:
-				case ET_DriveGearRatio:
 				case ET_DrivePosition:
 				case ET_DriveType:
-				case ET_DriveVelocity:
 				case ET_ExternalCompliance:
 				case ET_ExternalDriveIterations:
 				case ET_ForceLimit:
@@ -572,11 +568,9 @@ namespace IMPORT_PHYSX_DOM
 				case ET_InternalCompliance:
 				case ET_InternalDriveIterations:
 				case ET_Joint:
-				case ET_Limit:
 				case ET_LimitCone:
 				case ET_LinearLimit:
 				case ET_Links:
-				case ET_Lower:
 				case ET_MaxDistance:
 				case ET_MaxNbActors:
 				case ET_MaxProjectionIterations:
@@ -601,7 +595,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_PxHeightField:
 				case ET_PxHeightFieldGeometry:
 				case ET_PxPrismaticJoint:
-				case ET_PxRevoluteJoint:
 				case ET_PxShapeRef:
 				case ET_PxSphereGeometry:
 				case ET_PxSphericalJoint:
@@ -611,7 +604,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_SelfCollision:
 				case ET_SeparationTolerance:
 				case ET_SphericalJointFlags:
-				case ET_Stiffness:
 				case ET_SwingLimit:
 				case ET_SwingLimitContactDistance:
 				case ET_SwingLimitEnabled:
@@ -626,7 +618,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_TwistLimit:
 				case ET_TwistLimitContactDistance:
 				case ET_TwistLimitEnabled:
-				case ET_Upper:
 				case ET_Value:
 				case ET_YAngle:
 				case ET_ZAngle:
@@ -686,8 +677,38 @@ namespace IMPORT_PHYSX_DOM
 				case ET_InvInertiaScale1:
 				case ET_ProjectionAngularTolerance:
 				case ET_ProjectionLinearTolerance:
+				case ET_Limit:
+				case ET_BounceThreshold:
+				case ET_Stiffness:
+				case ET_Damping:
+				case ET_ContactDistance:
+				case ET_DriveVelocity:
+				case ET_DriveForceLimit:
+				case ET_DriveGearRatio:
+				case ET_RevoluteJointFlags:
 					// We ignore these elements currently; may need to add support for some of them
 					// later as custom properties.  Many are just safely ignored however.
+					break;
+				case ET_Upper:
+				case ET_Lower:
+					if (mPreviousType == ET_Limit && mPreviousPreviousType == ET_PxRevoluteJoint )
+					{
+						if (mCurrentHingeJoint)
+						{
+							if (mCurrentType == ET_Upper)
+							{
+								mCurrentHingeJoint->mLimitHigh = STRING_HELPER::getFloatValue(elementData, nullptr);
+							}
+							else
+							{
+								mCurrentHingeJoint->mLimtLow = STRING_HELPER::getFloatValue(elementData, nullptr);
+							}
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_Limit, mPreviousType);
+					}
 					break;
 				case ET_Mass:
 					if (mPreviousType == ET_PxRigidDynamic)
@@ -914,6 +935,7 @@ namespace IMPORT_PHYSX_DOM
 								}
 								break;
 							case ET_PxFixedJoint:
+							case ET_PxRevoluteJoint:
 							case ET_LocalPose:
 								if (mCurrentJoint)
 								{
@@ -956,6 +978,20 @@ namespace IMPORT_PHYSX_DOM
 					if (mCurrentNode && elementData )
 					{
 						mCurrentNode->mName = std::string(elementData);
+					}
+					break;
+				case ET_PxRevoluteJoint:
+					if (mPreviousType == ET_PhysX30Collection)
+					{
+						mCurrentHingeJoint = new PHYSICS_DOM::HingeJointDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentHingeJoint);
+						mCurrentJoint = static_cast<PHYSICS_DOM::JointDef *>(mCurrentHingeJoint);
+						mCurrentHingeJoint->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentHingeJoint);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
 					}
 					break;
 				case ET_PxFixedJoint:
@@ -1051,6 +1087,10 @@ namespace IMPORT_PHYSX_DOM
 							mCurrentMaterial->mRestitution = STRING_HELPER::getFloatValue(elementData, nullptr);
 						}
 					}
+					else if (mPreviousType == ET_Limit)
+					{
+						// TODO: process custom property
+					}
 					else
 					{
 						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
@@ -1090,6 +1130,7 @@ namespace IMPORT_PHYSX_DOM
 						case ET_PxRigidStatic:
 						case ET_PxRigidDynamic:
 						case ET_PxFixedJoint:
+						case ET_PxRevoluteJoint:
 							if (mCurrentNode)
 							{
 								mNodeIdMap[std::string(elementData)] = mCurrentNode;
@@ -1248,6 +1289,7 @@ namespace IMPORT_PHYSX_DOM
 	PHYSICS_DOM::ConvexHullGeometryDef	*mCurrentConvexHullGeometry{ nullptr };
 	PHYSICS_DOM::JointDef			*mCurrentJoint{ nullptr };
 	PHYSICS_DOM::FixedJointDef		*mCurrentFixedJoint{ nullptr };
+	PHYSICS_DOM::HingeJointDef		*mCurrentHingeJoint{ nullptr };
 	uint32_t						mStackLocation{ 0 };
 	ElementType						mCurrentType{ ET_LAST };	// The current element type we are processing
 	ElementType						mPreviousType{ ET_LAST };	// The previous element type (parent node type)

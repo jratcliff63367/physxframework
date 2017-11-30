@@ -222,6 +222,23 @@ namespace PHYSICS_DOM_PHYSX
 			return j;
 		}
 
+		// D6 joint with a spring maintaining its position
+		physx::PxJoint* createHingeJoint(physx::PxRigidActor* a0, 
+										const physx::PxTransform& t0, 
+										physx::PxRigidActor* a1,
+										const physx::PxTransform& t1, 
+										float limitLow,
+										float limitHigh)
+		{
+			physx::PxRevoluteJoint* j = physx::PxRevoluteJointCreate(*mPhysics, a0, t0, a1, t1);
+			j->setConstraintFlag(physx::PxConstraintFlag::eDISABLE_PREPROCESSING, true);
+
+			physx::PxJointAngularLimitPair limit(limitLow, limitHigh);
+			j->setLimit(limit);
+			j->setRevoluteJointFlag(physx::PxRevoluteJointFlag::eLIMIT_ENABLED, true);
+			j->setConstraintFlag(physx::PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+			return j;
+		}
 
 		void processNode(const PHYSICS_DOM::Node *n,		// Node to process
 						 const PHYSICS_DOM::Pose &pose,		// Parent relative pose
@@ -386,11 +403,7 @@ namespace PHYSICS_DOM_PHYSX
 							physx::PxActor *actor1 = found1->second;
 							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
 							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
-							physx::PxJoint *j = createFixedJoint(ractor0, t0, ractor1, t1);
-							if (j)
-							{
-							//
-							}
+							createFixedJoint(ractor0, t0, ractor1, t1);
 						}
 					}
 					break;
@@ -398,7 +411,21 @@ namespace PHYSICS_DOM_PHYSX
 					reportWarning("Node type not yet implemented");
 					break;
 				case PHYSICS_DOM::NT_HINGE_JOINT:   				// A hinge joint
-					reportWarning("Node type not yet implemented");
+					{
+						auto hj = static_cast<const PHYSICS_DOM::HingeJoint *>(n);
+						physx::PxTransform t0 = getTransform(hj->localpose0);
+						physx::PxTransform t1 = getTransform(hj->localpose1);
+						auto found0 = mActors.find(std::string(hj->body0));
+						auto found1 = mActors.find(std::string(hj->body1));
+						if (found0 != mActors.end() && found1 != mActors.end())
+						{
+							physx::PxActor *actor0 = found0->second;
+							physx::PxActor *actor1 = found1->second;
+							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
+							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
+							createHingeJoint(ractor0, t0, ractor1, t1, hj->limtLow, hj->limitHigh);
+						}
+					}
 					break;
 				case PHYSICS_DOM::NT_PRISMATIC_JOINT:					// A prismatic joint
 					reportWarning("Node type not yet implemented");
