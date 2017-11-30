@@ -150,9 +150,12 @@ public:
 
 	void testImportXML(void)
 	{
-		PHYSICS_DOM::PhysicsDOM dom;
-		mPhysXFramework->importPhysXDOM("f:\\github\\InspectXML\\SimpleHelloWorld.xml", dom);
-		mPhysXFramework->loadPhysicsDOM(dom);
+		NV_PHYSX_FRAMEWORK::PhysicsDOMContainer *pcontain = mPhysXFramework->importPhysXDOM("ConvexDecomposition1.xml");
+		if (pcontain)
+		{
+			mPhysXFramework->loadPhysicsDOM(*pcontain->getPhysicsDOM());
+			pcontain->release();
+		}
 	}
 
 	bool								mExit{ false };

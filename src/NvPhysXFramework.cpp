@@ -3,6 +3,7 @@
 #include "SomeOfEverything.h"
 #include "PhysicsDOMPhysX.h"
 #include "ImportPhysXDOM.h"
+#include "PhysicsDOMDef.h"
 #include <ctype.h>
 
 #include "Nv.h"
@@ -23,6 +24,30 @@ using namespace physx;
 
 namespace NV_PHYSX_FRAMEWORK
 {
+
+	class PhysicsDOMContainerImpl : public PhysicsDOMContainer
+	{
+	public:
+		PhysicsDOMContainerImpl(void)
+		{
+		}
+		virtual ~PhysicsDOMContainerImpl(void)
+		{
+		}
+
+		virtual const PHYSICS_DOM::PhysicsDOM *getPhysicsDOM(void)
+		{
+			mDOM.initDOM();
+			return mDOM.getPhysicsDOM();
+		}
+
+		virtual void release(void)
+		{
+			delete this;
+		}
+
+		PHYSICS_DOM::PhysicsDOMDef	mDOM;
+	};
 
 typedef std::unordered_set< uint64_t > CollisionFilterSet;
 
@@ -931,16 +956,29 @@ typedef std::vector< PxJoint * > PxJointVector;
 			return ret;
 		}
 
-		virtual bool importPhysXDOM(const char *fname, PHYSICS_DOM::PhysicsDOM &pdom) final
+		virtual PhysicsDOMContainer *importPhysXDOM(const char *fname) final
 		{
-			bool ret = false;
+			PhysicsDOMContainer *ret = nullptr;
 
 			IMPORT_PHYSX_DOM::ImportPhysXDOM *imp = IMPORT_PHYSX_DOM::ImportPhysXDOM::create();
-			ret = imp->importPhysXDOM(fname, pdom);
+
+			PhysicsDOMContainerImpl *pcontain = new PhysicsDOMContainerImpl;
+
+			bool ok = imp->importPhysXDOM(fname, pcontain->mDOM);
+			if (ok)
+			{
+				ret = static_cast<PhysicsDOMContainer *>(pcontain);
+			}
+			else
+			{
+				pcontain->release();
+			}
+
 			imp->release();
 
 			return ret;
 		}
+
 
 		bool							mPaused{ false };
 		CommandCallback					*mCommandCallback{ nullptr };

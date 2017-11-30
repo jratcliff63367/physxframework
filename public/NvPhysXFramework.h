@@ -36,6 +36,13 @@ enum ConstraintType
 
 #define PHYSX_FRAMEWORK_VERSION_NUMBER 106
 
+class PhysicsDOMContainer
+{
+public:
+	virtual const PHYSICS_DOM::PhysicsDOM *getPhysicsDOM(void) = 0;
+	virtual void release(void) = 0;
+};
+
 // Instantiate the PhysX SDK, create a scene, and a ground plane
 class PhysXFramework
 {
@@ -136,7 +143,8 @@ public:
 	// Load this physics DOM
 	virtual bool loadPhysicsDOM(const PHYSICS_DOM::PhysicsDOM &physicsDOM) = 0;
 
-	virtual bool importPhysXDOM(const char *fname, PHYSICS_DOM::PhysicsDOM &pdom) = 0;
+	// Parses a PhysX RepX XML file and loads the contents into a PhysicsDOM container
+	virtual PhysicsDOMContainer *importPhysXDOM(const char *fname) = 0;
 
 	// Release the PhysXFramework interface
 	virtual void release(void) = 0;

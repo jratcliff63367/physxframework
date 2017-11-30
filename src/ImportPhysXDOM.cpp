@@ -1,5 +1,5 @@
 #include "ImportPhysXDOM.h"
-#include "PhysicsDOM.h"
+#include "PhysicsDOMDef.h"
 #include "FastXml.h"
 #include "StringHelper.h"
 #include <unordered_map>
@@ -448,7 +448,7 @@ namespace IMPORT_PHYSX_DOM
 
 #define MAX_STACK 32
 
-	typedef std::unordered_map< uint32_t, PHYSICS_DOM::Node * > NodeIdMap;
+	typedef std::unordered_map< uint32_t, PHYSICS_DOM::NodeDef * > NodeIdMap;
 
 	class ImportPhysXDOMImpl : public ImportPhysXDOM, public FAST_XML::FastXml::Callback
 	{
@@ -484,33 +484,32 @@ namespace IMPORT_PHYSX_DOM
 
 		// Imports an XML serialized asset and converts it into a standardized PhysicsDOM
 		virtual bool importPhysXDOM(const char *xmlName,		// Name of the PhysX XML file
-			PHYSICS_DOM::PhysicsDOM &dom) final	// The DOM to load it into
+			PHYSICS_DOM::PhysicsDOMDef &dom) final	// The DOM to load it into
 		{
 			bool ret = false;
 
-			PHYSICS_DOM::PhysicsDOM c;
+			PHYSICS_DOM::PhysicsDOMDef c;
 			dom = c;	// empty it
 			mImportDOM = &dom;
 
 			FAST_XML::FastXml *f = FAST_XML::FastXml::create();
 			f->processXml(xmlName, this);
 			f->release();
-#if 0 // TODO TODO
-			if (dom.collectionsCount)
+			if (!dom.mCollections.empty())
 			{
 				// Create a scene which instances the collections
-				PHYSICS_DOM::Scene *scene = new PHYSICS_DOM::Scene;
-				scene->id = getID();
-				for (auto &i : dom.collections)
+				PHYSICS_DOM::SceneDef *scene = new PHYSICS_DOM::SceneDef;
+				scene->mId = getID();
+				for (auto &i : dom.mCollections)
 				{
-					PHYSICS_DOM::InstanceCollection *ic = new PHYSICS_DOM::InstanceCollection;
-					ic->id = getID();
-					ic->collection = i->id;
-					scene->nodes.push_back(ic);
+					PHYSICS_DOM::InstanceCollectionDef *ic = new PHYSICS_DOM::InstanceCollectionDef;
+					ic->mId = getID();
+					ic->mCollection = i->mId;
+					scene->mNodes.push_back(ic);
 				}
-				dom.scenes.push_back(scene);
+				dom.mScenes.push_back(scene);
+				ret = true;
 			}
-#endif
 			mImportDOM = nullptr;
 
 			return ret;
@@ -546,30 +545,15 @@ namespace IMPORT_PHYSX_DOM
 				getAttributeName(atype);
 			}
 
-			float x, y, z, w;
-			STRING_HELPER::getVec4(elementData, nullptr, x, y, z, w);
-// TODO
-#if 0
 			switch (mCurrentType)
 			{
-				case ET_ActorFlags:
-				case ET_Actors:
-				case ET_AngularDamping:
-				case ET_AngularVelocity:
 				case ET_BounceThreshold:
-				case ET_BreakForce:
-				case ET_CMassLocalPose:
 				case ET_ChildPose:
 				case ET_ColumnScale:
-				case ET_ConstraintFlags:
 				case ET_ContactDistance:
-				case ET_ContactOffset:
-				case ET_ContactReportThreshold:
 				case ET_ConvexEdgeThreshold:
-				case ET_ConvexMesh:
 				case ET_Damping:
 				case ET_DistanceJointFlags:
-				case ET_DominanceGroup:
 				case ET_Drive:
 				case ET_DriveForceLimit:
 				case ET_DriveGearRatio:
@@ -578,11 +562,8 @@ namespace IMPORT_PHYSX_DOM
 				case ET_DriveVelocity:
 				case ET_ExternalCompliance:
 				case ET_ExternalDriveIterations:
-				case ET_Flags:
 				case ET_ForceLimit:
 				case ET_Format:
-				case ET_Geometry:
-				case ET_GlobalPose:
 				case ET_HalfExtents:
 				case ET_HalfHeight:
 				case ET_HeightField:
@@ -590,41 +571,23 @@ namespace IMPORT_PHYSX_DOM
 				case ET_HeightScale:
 				case ET_InternalCompliance:
 				case ET_InternalDriveIterations:
-				case ET_InvInertiaScale0:
-				case ET_InvInertiaScale1:
-				case ET_InvMassScale0:
-				case ET_InvMassScale1:
 				case ET_Joint:
 				case ET_Limit:
 				case ET_LimitCone:
-				case ET_LinearDamping:
 				case ET_LinearLimit:
-				case ET_LinearVelocity:
 				case ET_Links:
-				case ET_LocalPose:
 				case ET_Lower:
-				case ET_MassSpaceInertiaTensor:
-				case ET_Materials:
-				case ET_MaxAngularVelocity:
-				case ET_MaxContactImpulse:
-				case ET_MaxDepenetrationVelocity:
 				case ET_MaxDistance:
-				case ET_MaxMargin:
 				case ET_MaxNbActors:
 				case ET_MaxProjectionIterations:
-				case ET_MinCCDAdvanceCoefficient:
 				case ET_MinDistance:
 				case ET_Motion:
-				case ET_Name:
 				case ET_NbColumns:
 				case ET_NbRows:
 				case ET_NumActors:
-				case ET_OwnerClient:
 				case ET_Parent:
 				case ET_ParentPose:
 				case ET_Points:
-				case ET_ProjectionAngularTolerance:
-				case ET_ProjectionLinearTolerance:
 				case ET_PxActorRef:
 				case ET_PxAggregate:
 				case ET_PxArticulation:
@@ -633,37 +596,21 @@ namespace IMPORT_PHYSX_DOM
 				case ET_PxBVH33TriangleMesh:
 				case ET_PxBoxGeometry:
 				case ET_PxCapsuleGeometry:
-				case ET_PxConvexMesh:
-				case ET_PxConvexMeshGeometry:
 				case ET_PxD6Joint:
 				case ET_PxDistanceJoint:
-				case ET_PxFixedJoint:
 				case ET_PxHeightField:
 				case ET_PxHeightFieldGeometry:
-				case ET_PxMaterialRef:
-				case ET_PxPlaneGeometry:
 				case ET_PxPrismaticJoint:
 				case ET_PxRevoluteJoint:
-				case ET_PxRigidDynamic:
-				case ET_PxRigidStatic:
-				case ET_PxShape:
 				case ET_PxShapeRef:
 				case ET_PxSphereGeometry:
 				case ET_PxSphericalJoint:
 				case ET_PxTriangleMeshGeometry:
-				case ET_QueryFilterData:
 				case ET_Radius:
-				case ET_RestOffset:
-				case ET_Rotation:
 				case ET_RowScale:
 				case ET_SelfCollision:
 				case ET_SeparationTolerance:
-				case ET_Shapes:
-				case ET_SimulationFilterData:
-				case ET_SleepThreshold:
-				case ET_SolverIterationCounts:
 				case ET_SphericalJointFlags:
-				case ET_StabilizationThreshold:
 				case ET_Stiffness:
 				case ET_SwingLimit:
 				case ET_SwingLimitContactDistance:
@@ -681,14 +628,9 @@ namespace IMPORT_PHYSX_DOM
 				case ET_TwistLimitEnabled:
 				case ET_Upper:
 				case ET_Value:
-				case ET_WakeCounter:
 				case ET_YAngle:
 				case ET_ZAngle:
-				case ET_actor0:
-				case ET_actor1:
 				case ET_angular:
-				case ET_eACTOR0:
-				case ET_eACTOR1:
 				case ET_eSLERP:
 				case ET_eSWING:
 				case ET_eSWING1:
@@ -697,51 +639,395 @@ namespace IMPORT_PHYSX_DOM
 				case ET_eX:
 				case ET_eY:
 				case ET_eZ:
-				case ET_force:
 				case ET_linear:
 				case ET_lower:
 				case ET_materialIndices:
-				case ET_minPositionIters:
-				case ET_minVelocityIters:
-				case ET_points:
 				case ET_samples:
-				case ET_torque:
 				case ET_upper:
 				case ET_yLimit:
 				case ET_zLimit:
 					reportError(lineno, "ElementType(%s) not yet implemented", elementName);
 					break;
 				case ET_UpVector:
-				case ET_Scale:
 				case ET_Length:
 				case ET_Mass:
 				case ET_Speed:
-					// We ignore this element
-					break;
+				case ET_ActorFlags:
+				case ET_DominanceGroup:
+				case ET_OwnerClient:
 				case ET_RestitutionCombineMode:
-					if (mPreviousType == ET_PxMaterial)
+				case ET_FrictionCombineMode:
+				case ET_Shapes:
+				case ET_Geometry:
+				case ET_SimulationFilterData:
+				case ET_QueryFilterData:
+				case ET_Materials:
+				case ET_ContactOffset:
+				case ET_RestOffset:
+				case ET_MaxMargin:
+				case ET_MinCCDAdvanceCoefficient:
+				case ET_MaxDepenetrationVelocity:
+				case ET_MaxContactImpulse:
+				case ET_MaxAngularVelocity:
+				case ET_SleepThreshold:
+				case ET_StabilizationThreshold:
+				case ET_WakeCounter:
+				case ET_SolverIterationCounts:
+				case ET_minPositionIters:
+				case ET_minVelocityIters:
+				case ET_ContactReportThreshold:
+				case ET_Actors:
+				case ET_BreakForce:
+				case ET_force:
+				case ET_torque:
+				case ET_ConstraintFlags:
+				case ET_InvMassScale0:
+				case ET_InvMassScale1:
+				case ET_InvInertiaScale0:
+				case ET_InvInertiaScale1:
+				case ET_ProjectionAngularTolerance:
+				case ET_ProjectionLinearTolerance:
+					// We ignore these elements currently; may need to add support for some of them
+					// later as custom properties.  Many are just safely ignored however.
+					break;
+				case ET_actor0:
+				case ET_actor1:
+					if (mPreviousType == ET_Actors)
 					{
-						if (mCurrentMaterial)
+						uint32_t id = uint32_t(atoi(elementData));
+						auto found = mNodeIdMap.find(id);
+						if (found == mNodeIdMap.end())
 						{
-							mCurrentMaterial->physx_materialSettings.restitutionCombineMode = getCombineMode(elementData);
+							reportError(lineno, "Unable to find node id: %s", elementData);
+						}
+						else
+						{
+							PHYSICS_DOM::NodeDef *n = found->second;
+							if (mCurrentJoint)
+							{
+								if (mCurrentType == ET_actor0)
+								{
+									mCurrentJoint->mBody0 = n->mId;
+								}
+								else
+								{
+									mCurrentJoint->mBody1 = n->mId;
+								}
+							}
 						}
 					}
 					else
 					{
-						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+						nestingError(lineno, mCurrentType, ET_Actors, mPreviousType);
 					}
 					break;
-				case ET_FrictionCombineMode:
-					if (mPreviousType == ET_PxMaterial)
+				case ET_LinearDamping:
+				case ET_AngularDamping:
+					if (mCurrentRigidDynamic)
 					{
-						if (mCurrentMaterial)
+						float v = STRING_HELPER::getFloatValue(elementData, nullptr);
+						switch (mCurrentType)
 						{
-							mCurrentMaterial->physx_materialSettings.frictionCombineMode = getCombineMode(elementData);
+						case ET_LinearDamping:
+							mCurrentRigidDynamic->mLinearDamping = v;
+							break;
+						case ET_AngularDamping:
+							mCurrentRigidDynamic->mAngularDamping = v;
+							break;
+						}
+					}
+					break;
+				case ET_MassSpaceInertiaTensor:
+				case ET_LinearVelocity:
+				case ET_AngularVelocity:
+					if (mCurrentRigidDynamic)
+					{
+						PHYSICS_DOM::Vec3 v;
+						STRING_HELPER::getVec3(elementData, nullptr, v.x, v.y, v.z);
+						switch (mCurrentType)
+						{
+							case ET_MassSpaceInertiaTensor:
+								mCurrentRigidDynamic->mMassSpaceInertiaTensor = v;
+								break;
+							case ET_LinearVelocity:
+								mCurrentRigidDynamic->mLinearVelocity = v;
+								break;
+							case ET_AngularVelocity:
+								mCurrentRigidDynamic->mAngularVelocity = v;
+								break;
+						}
+					}
+					break;
+				case ET_CMassLocalPose:
+					if (mCurrentRigidDynamic)
+					{
+						PHYSICS_DOM::Pose p;
+						const char *scan = elementData;
+						const char *nextScan = nullptr;
+						bool ok = STRING_HELPER::getVec4(scan, &nextScan, p.q.x, p.q.y, p.q.z, p.q.w);
+						if (ok)
+						{
+							scan = nextScan;
+							STRING_HELPER::getVec3(scan, nullptr, p.p.x, p.p.y, p.p.z);
+						}
+						mCurrentRigidDynamic->mCenterOfMassLocalPose = p;
+					}
+					break;
+				case ET_Rotation:
+					if (mPreviousType == ET_Scale && mPreviousPreviousType == ET_PxConvexMeshGeometry)
+					{
+						if (mCurrentConvexHullGeometry)
+						{
+							PHYSICS_DOM::Quat q;
+							STRING_HELPER::getVec4(elementData, nullptr, q.x, q.y, q.z, q.w);
+							mCurrentConvexHullGeometry->mScale.rotation = q;
 						}
 					}
 					else
 					{
-						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+						nestingError(lineno, mCurrentType, ET_PxConvexMeshGeometry, mPreviousType);
+					}
+					break;
+				case ET_Scale:
+					if (mPreviousType == ET_PxConvexMeshGeometry || mPreviousPreviousType == ET_PxConvexMeshGeometry )
+					{
+						if (mCurrentConvexHullGeometry && mPreviousPreviousType == ET_PxConvexMeshGeometry )
+						{
+							PHYSICS_DOM::Vec3 s;
+							STRING_HELPER::getVec3(elementData, nullptr, s.x, s.y, s.z);
+							mCurrentConvexHullGeometry->mScale.scale = s;
+						}
+					}
+					else if (mPreviousType == ET_PhysX30Collection )
+					{
+
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxConvexMeshGeometry, mPreviousType);
+					}
+					break;
+				case ET_Flags:
+					if (mPreviousType == ET_PxShape)
+					{
+
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxShape, mPreviousType);
+					}
+					break;
+				case ET_ConvexMesh:
+					if (mCurrentConvexHullGeometry)
+					{
+						uint32_t id = uint32_t(atoi(elementData));
+						auto found = mNodeIdMap.find(id);
+						if (found == mNodeIdMap.end())
+						{
+							reportError(lineno, "Unable to find node id: %s", elementData);
+						}
+						else
+						{
+							PHYSICS_DOM::NodeDef *n = found->second;
+							mCurrentConvexHullGeometry->mConvexMesh = n->mId;
+						}
+					}
+					break;
+				case ET_PxMaterialRef:
+					if (mCurrentGeometryInstance)
+					{
+						uint32_t id = uint32_t(atoi(elementData));
+						auto found = mNodeIdMap.find(id);
+						if (found == mNodeIdMap.end())
+						{
+							reportError(lineno, "Unable to find node id: %s", elementData);
+						}
+						else
+						{
+							PHYSICS_DOM::NodeDef *n = found->second;
+							mCurrentGeometryInstance->mMaterials.push_back(n->mId);
+						}
+					}
+					break;
+				case ET_PxConvexMeshGeometry:
+					if (mCurrentGeometryInstance)
+					{
+						mCurrentConvexHullGeometry = new PHYSICS_DOM::ConvexHullGeometryDef;
+						mCurrentGeometry = static_cast<PHYSICS_DOM::GeometryDef *>(mCurrentConvexHullGeometry);
+						mCurrentGeometryInstance->mGeometry = mCurrentGeometry;
+					}
+					break;
+				case ET_PxPlaneGeometry:
+					if (mCurrentGeometryInstance)
+					{
+						PHYSICS_DOM::PlaneGeometryDef *plane = new PHYSICS_DOM::PlaneGeometryDef;
+						mCurrentGeometry = static_cast<PHYSICS_DOM::GeometryDef *>(plane);
+						mCurrentGeometryInstance->mGeometry = mCurrentGeometry;
+					}
+					break;
+				case ET_PxShape:
+					if (mCurrentRigidBody)
+					{
+						mCurrentGeometryInstance = new PHYSICS_DOM::GeometryInstanceDef;
+						mCurrentRigidBody->mGeometryInstances.push_back(mCurrentGeometryInstance);
+					}
+					break;
+				case ET_LocalPose:
+				case ET_eACTOR0:
+				case ET_eACTOR1:
+					{
+						PHYSICS_DOM::Pose p;
+						if (elementData)
+						{
+							const char *scan = elementData;
+							const char *nextScan = nullptr;
+							bool ok = STRING_HELPER::getVec4(scan, &nextScan, p.q.x, p.q.y, p.q.z, p.q.w);
+							if (ok)
+							{
+								scan = nextScan;
+								STRING_HELPER::getVec3(scan, nullptr, p.p.x, p.p.y, p.p.z);
+							}
+						}
+						switch (mPreviousType)
+						{
+							case ET_PxShape:
+								if (mCurrentGeometryInstance)
+								{
+									mCurrentGeometryInstance->mLocalPose = p;
+								}
+								else
+								{
+									reportError(lineno, "Missing current geometry instance");
+								}
+								break;
+							case ET_PxFixedJoint:
+							case ET_LocalPose:
+								if (mCurrentJoint)
+								{
+									if (mCurrentType == ET_eACTOR0)
+									{
+										mCurrentJoint->mLocalpose0 = p;
+									}
+									else if (mCurrentType == ET_eACTOR1)
+									{
+										mCurrentJoint->mLocalpose1 = p;
+									}
+								}
+								else
+								{
+									reportError(lineno, "Missing current joint");
+								}
+								break;
+							default:
+								nestingError(lineno, mCurrentType, ET_PxShape, mPreviousType);
+								break;
+						}
+					}
+					break;
+				case ET_GlobalPose:
+					if (mCurrentRigidBody)
+					{
+						PHYSICS_DOM::Pose p;
+						const char *scan = elementData;
+						const char *nextScan = nullptr;
+						bool ok = STRING_HELPER::getVec4(scan, &nextScan, p.q.x, p.q.y, p.q.z, p.q.w);
+						if (ok)
+						{
+							scan = nextScan;
+							STRING_HELPER::getVec3(scan, nullptr, p.p.x, p.p.y, p.p.z);
+						}
+						mCurrentRigidBody->mGlobalPose = p;
+					}
+					break;
+				case ET_Name:
+					if (mCurrentNode && elementData )
+					{
+						mCurrentNode->mName = std::string(elementData);
+					}
+					break;
+				case ET_PxFixedJoint:
+					if (mPreviousType == ET_PhysX30Collection)
+					{
+						mCurrentFixedJoint = new PHYSICS_DOM::FixedJointDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentFixedJoint);
+						mCurrentJoint = static_cast<PHYSICS_DOM::JointDef *>(mCurrentFixedJoint);
+						mCurrentFixedJoint->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentFixedJoint);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
+					}
+					break;
+				case ET_PxRigidDynamic:
+					if (mPreviousType == ET_PhysX30Collection)
+					{
+						mCurrentRigidDynamic = new PHYSICS_DOM::RigidDynamicDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentRigidDynamic);
+						mCurrentRigidBody = static_cast<PHYSICS_DOM::RigidBodyDef *>(mCurrentRigidDynamic);
+						mCurrentRigidDynamic->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentRigidDynamic);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
+					}
+					break;
+				case ET_PxRigidStatic:
+					if (mPreviousType == ET_PhysX30Collection)
+					{
+						mCurrentRigidStatic = new PHYSICS_DOM::RigidStaticDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentRigidStatic);
+						mCurrentRigidBody = static_cast<PHYSICS_DOM::RigidBodyDef *>(mCurrentRigidStatic);
+						mCurrentRigidStatic->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentRigidStatic);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
+					}
+					break;
+				case ET_points:
+					if (mPreviousType == ET_PxConvexMesh)
+					{
+						// ok.. time to build up the array of points...
+						PHYSICS_DOM::Vec3 v;
+						const char *scan = elementData;
+						const char *nextVec = nullptr;
+						bool ok = true;
+						while (ok)
+						{
+							ok = STRING_HELPER::getVec3(scan, &nextVec, v.x, v.y, v.z);
+							if (ok)
+							{
+								mCurrentConvexHull->mPoints.push_back(v);
+								if (nextVec)
+								{
+									scan = nextVec;
+								}
+								else
+								{
+									ok = false;
+								}
+							}
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxConvexMesh, mPreviousType);
+					}
+					break;
+				case ET_PxConvexMesh:
+					if (mPreviousType == ET_PhysX30Collection)
+					{
+						mCurrentConvexHull = new PHYSICS_DOM::ConvexHullDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentConvexHull);
+						mCurrentConvexHull->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentConvexHull);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
 					}
 					break;
 				case ET_Restitution:
@@ -749,7 +1035,7 @@ namespace IMPORT_PHYSX_DOM
 					{
 						if (mCurrentMaterial)
 						{
-							mCurrentMaterial->restitution = x;
+							mCurrentMaterial->mRestitution = STRING_HELPER::getFloatValue(elementData, nullptr);
 						}
 					}
 					else
@@ -762,7 +1048,7 @@ namespace IMPORT_PHYSX_DOM
 					{
 						if (mCurrentMaterial)
 						{
-							mCurrentMaterial->staticFriction = x;
+							mCurrentMaterial->mStaticFriction = STRING_HELPER::getFloatValue(elementData, nullptr);
 						}
 					}
 					else
@@ -775,7 +1061,7 @@ namespace IMPORT_PHYSX_DOM
 					{
 						if (mCurrentMaterial)
 						{
-							mCurrentMaterial->dynamicFriction = x;
+							mCurrentMaterial->mDynamicFriction = STRING_HELPER::getFloatValue(elementData, nullptr);
 						}
 					}
 					else
@@ -784,35 +1070,48 @@ namespace IMPORT_PHYSX_DOM
 					}
 					break;
 				case ET_Id:
-					if (mPreviousType == ET_PxMaterial)
+					switch (mPreviousType)
 					{
-						uint32_t id = (uint32_t)atoi(elementData);
-						mNodeIdMap[id] = mCurrentMaterial;
-					}
-					else
-					{
-						nestingError(lineno, mCurrentType, ET_PxMaterial, mPreviousType);
+						case ET_PxMaterial:
+						case ET_PxConvexMesh:
+						case ET_PxRigidStatic:
+						case ET_PxRigidDynamic:
+						case ET_PxFixedJoint:
+							if (mCurrentNode)
+							{
+								uint32_t id = (uint32_t)atoi(elementData);
+								mNodeIdMap[id] = mCurrentNode;
+							}
+							break;
+						default:
+							reportError(lineno, "Got <id> with for node type (%s) not yet supported.", getElementName(mPreviousType));
+							break;
 					}
 					break;
 				case ET_PxMaterial:
+					if ( mPreviousType == ET_PhysX30Collection )
 					{
-						mCurrentMaterial = new PHYSICS_DOM::PhysicsMaterial;
-						mCurrentMaterial->id = getID();
-						mCurrentCollection->nodes.push_back(mCurrentMaterial);
+						mCurrentMaterial = new PHYSICS_DOM::PhysicsMaterialDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentMaterial);
+						mCurrentMaterial->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentMaterial);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
 					}
 					break;
 				case ET_PhysX30Collection:
 					{
-						mCurrentCollection = new PHYSICS_DOM::Collection;
-						mCurrentCollection->id = getID();
-						mImportDOM->collections.push_back(mCurrentCollection);
+						mCurrentCollection = new PHYSICS_DOM::CollectionDef;
+						mCurrentCollection->mId = getID();
+						mImportDOM->mCollections.push_back(mCurrentCollection);
 					}
 					break;
 				default:
 					reportError(lineno, "Unknown elementType(%s)", elementName);
 					break;
 			}
-#endif
 			return true;
 		}
 
@@ -869,9 +1168,42 @@ namespace IMPORT_PHYSX_DOM
 					}
 				}
 			}
-//			switch (type)
-//			{
-//			}
+			switch (type)
+			{
+			case ET_PhysX30Collection:
+				mCurrentCollection = nullptr;
+				break;
+			case ET_PxPlaneGeometry:
+				mCurrentGeometry = nullptr;
+				break;
+			case ET_PxConvexMeshGeometry:
+				mCurrentGeometry = nullptr;
+				mCurrentConvexHullGeometry = nullptr;
+				break;
+			case ET_PxShape:
+				mCurrentGeometryInstance = nullptr;
+				break;
+			case ET_PxConvexMesh:
+				mCurrentConvexHull = nullptr;
+				mCurrentNode = nullptr;
+				break;
+			case ET_PxRigidStatic:
+				mCurrentRigidStatic = nullptr;
+				mCurrentNode = nullptr;
+				break;
+			case ET_PxRigidDynamic:
+				mCurrentRigidDynamic = nullptr;
+				mCurrentNode = nullptr;
+				break;
+			case ET_PxFixedJoint:
+				mCurrentFixedJoint = nullptr;
+				mCurrentNode = nullptr;
+				break;
+			case ET_PxMaterial:
+				mCurrentMaterial = nullptr;
+				mCurrentNode = nullptr;
+				break;
+			}
 			return true;
 		}
 
@@ -891,9 +1223,19 @@ namespace IMPORT_PHYSX_DOM
 
 	uint32_t		mId{ 0 };
 	// The DOM we are importing
-	PHYSICS_DOM::PhysicsDOM			*mImportDOM{ nullptr };
-	PHYSICS_DOM::PhysicsMaterial	*mCurrentMaterial{ nullptr };
-	PHYSICS_DOM::Collection			*mCurrentCollection{ nullptr };
+	PHYSICS_DOM::PhysicsDOMDef		*mImportDOM{ nullptr };
+	PHYSICS_DOM::PhysicsMaterialDef	*mCurrentMaterial{ nullptr };
+	PHYSICS_DOM::CollectionDef		*mCurrentCollection{ nullptr };
+	PHYSICS_DOM::ConvexHullDef		*mCurrentConvexHull{ nullptr };
+	PHYSICS_DOM::RigidDynamicDef	*mCurrentRigidDynamic{ nullptr };
+	PHYSICS_DOM::RigidStaticDef		*mCurrentRigidStatic{ nullptr };
+	PHYSICS_DOM::RigidBodyDef		*mCurrentRigidBody{ nullptr };
+	PHYSICS_DOM::NodeDef			*mCurrentNode{ nullptr };
+	PHYSICS_DOM::GeometryDef		*mCurrentGeometry{ nullptr };
+	PHYSICS_DOM::GeometryInstanceDef	*mCurrentGeometryInstance{ nullptr };
+	PHYSICS_DOM::ConvexHullGeometryDef	*mCurrentConvexHullGeometry{ nullptr };
+	PHYSICS_DOM::JointDef			*mCurrentJoint{ nullptr };
+	PHYSICS_DOM::FixedJointDef		*mCurrentFixedJoint{ nullptr };
 	uint32_t						mStackLocation{ 0 };
 	ElementType						mCurrentType{ ET_LAST };	// The current element type we are processing
 	ElementType						mPreviousType{ ET_LAST };	// The previous element type (parent node type)

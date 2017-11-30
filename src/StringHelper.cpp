@@ -9,6 +9,62 @@
 namespace STRING_HELPER
 {
 
+
+	static bool isDigit(char c)
+	{
+		return (c >= '0' && c <= '9') || c == '-' || c == '+';
+	}
+
+	static const char *skipDigits(const char *str)
+	{
+		while (*str)
+		{
+			if (isDigit(*str))
+			{
+				str++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		if (*str == 0)
+		{
+			str = nullptr;
+		}
+		return str;
+	}
+
+	static const char *skipNonDigits(const char *str)
+	{
+		if (str == nullptr)
+		{
+			return str;
+		}
+		while (*str == '&')
+		{
+			while (*str && *str != ';') str++;
+			if (*str == ';') str++;
+		}
+		while (*str)
+		{
+			if (isDigit(*str))
+			{
+				break;
+			}
+			else
+			{
+				str++;
+			}
+		}
+		if (*str == 0)
+		{
+			str = nullptr;
+		}
+		return str;
+	}
+
+
 int32_t stringFormatV(char* dst, size_t dstSize, const char* src, va_list arg)
 {
 	return ::vsnprintf(dst, dstSize, src, arg);
@@ -25,7 +81,7 @@ int32_t stringFormat(char* dst, size_t dstSize, const char* format, ...)
 
 static inline bool isWhitespace(char c)
 {
-	if (c == ' ' || c == 9 || c == 13 || c == 10 || c == ',') return true;
+	if (c == ' ' || c == 9 || c == 13 || c == 10 || c == ',' || c == '&' ) return true;
 	return false;
 }
 
@@ -148,6 +204,16 @@ float	getFloatValue(const char *str, const char **next)
 	if (next) *next = nullptr;
 
 	str = skipWhitespace(str);
+	// skip hex crap..
+	if (*str == '&')
+	{
+		while (*str && *str != ';') str++;
+		if (*str == ';')
+		{
+			str++;
+		}
+		str = skipWhitespace(str);
+	}
 
 	char dest[MAXNUM];
 	char *dst = dest;
@@ -199,96 +265,68 @@ float	getFloatValue(const char *str, const char **next)
 	return ret;
 }
 
-void	getVec3(const char *str, const char **next, float &x, float &y, float &z)
+bool	getVec3(const char *str, const char **next, float &x, float &y, float &z)
 {
+	bool ret = false;
+
+
 	x = 0;
 	y = 0;
 	z = 0;
-	const char *mynext = nullptr;
-	x = getFloatValue(str, &mynext);
-	if (*mynext)
+	str = skipNonDigits(str);
+	if (str && isDigit(*str))
 	{
-		y = getFloatValue(mynext, &mynext);
-		if (mynext)
+		const char *mynext = nullptr;
+		x = getFloatValue(str, &mynext);
+		if (*mynext)
 		{
-			z = getFloatValue(mynext, &mynext);
+			y = getFloatValue(mynext, &mynext);
+			if (mynext)
+			{
+				z = getFloatValue(mynext, &mynext);
+				ret = true; // only valid if we find all 3 digits
+			}
+		}
+		if (next)
+		{
+			*next = mynext;
 		}
 	}
-	if (next)
-	{
-		*next = mynext;
-	}
+	return ret;
 }
 
-void	getVec4(const char *str, const char **next, float &x, float &y, float &z,float &w)
+bool	getVec4(const char *str, const char **next, float &x, float &y, float &z,float &w)
 {
+	bool ret = false;
+
 	x = 0;
 	y = 0;
 	z = 0;
 	w = 0;
-	const char *mynext = nullptr;
-	x = getFloatValue(str, &mynext);
-	if (mynext && *mynext)
+	str = skipNonDigits(str);
+	if (str && isDigit(*str))
 	{
-		y = getFloatValue(mynext, &mynext);
-		if (mynext)
+		const char *mynext = nullptr;
+		x = getFloatValue(str, &mynext);
+		if (mynext && *mynext)
 		{
-			z = getFloatValue(mynext, &mynext);
+			y = getFloatValue(mynext, &mynext);
 			if (mynext)
 			{
-				w = getFloatValue(mynext, &mynext);
+				z = getFloatValue(mynext, &mynext);
+				if (mynext)
+				{
+					w = getFloatValue(mynext, &mynext);
+					ret = true;
+				}
 			}
 		}
-	}
-	if (next)
-	{
-		*next = mynext;
-	}
-}
-
-static bool isDigit(char c)
-{
-	return c >= '0' && c <= '9';
-}
-
-static const char *skipDigits(const char *str)
-{
-	while (*str)
-	{
-		if (isDigit(*str))
+		if (next)
 		{
-			str++;
-		}
-		else
-		{
-			break;
+			*next = mynext;
 		}
 	}
-	if (*str == 0)
-	{
-		str = nullptr;
-	}
-	return str;
-}
-
-static const char *skipNonDigits(const char *str)
-{
-	while (*str)
-	{
-		if (isDigit(*str))
-		{
-			break;
-		}
-		else
-		{
-			str++;
-		}
-	}
-	if (*str == 0 )
-	{
-		str = nullptr;
-	}
-	return str;
+	return ret;
 }
 
 uint32_t	getUint32Value(const char *str, const char **next)

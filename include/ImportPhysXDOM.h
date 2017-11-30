@@ -3,7 +3,7 @@
 
 namespace PHYSICS_DOM
 {
-	class PhysicsDOM;
+	class PhysicsDOMDef;
 }
 
 namespace IMPORT_PHYSX_DOM
@@ -16,7 +16,7 @@ public:
 
 	// Imports an XML serialized asset and converts it into a standardized PhysicsDOM
 	virtual bool importPhysXDOM(const char *xmlName,		// Name of the PhysX XML file
-								PHYSICS_DOM::PhysicsDOM &dom) = 0;	// The DOM to load it into
+								PHYSICS_DOM::PhysicsDOMDef &dom) = 0;	// The DOM to load it into
 
 	virtual void release(void) = 0;
 protected:
