@@ -34,16 +34,16 @@ public:
 };
 
 // Defines an optional visual mesh binding to a physics node
-class VisualBindingImpl: public CloneObject
+class VisualBindingDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	VisualBindingImpl() { }
+	VisualBindingDef() { }
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	VisualBindingImpl(const VisualBindingImpl &other)
+	VisualBindingDef(const VisualBindingDef &other)
 	{
 		*this = other;
 	}
@@ -58,11 +58,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new VisualBindingImpl(*this);
+		return new VisualBindingDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	VisualBindingImpl& operator=(const VisualBindingImpl& other)
+	VisualBindingDef& operator=(const VisualBindingDef& other)
 	{
 		if (this != &other )
 		{
@@ -83,13 +83,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	VisualBindingImpl(VisualBindingImpl &&other)
+	VisualBindingDef(VisualBindingDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	VisualBindingImpl& operator=(VisualBindingImpl&& other)
+	VisualBindingDef& operator=(VisualBindingDef&& other)
 	{
 		if (this != &other )
 		{
@@ -109,16 +109,16 @@ private:
 
 
 // Describes a key-value pair for custom properties on a node
-class KeyValuePairImpl: public CloneObject
+class KeyValuePairDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	KeyValuePairImpl() { }
+	KeyValuePairDef() { }
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	KeyValuePairImpl(const KeyValuePairImpl &other)
+	KeyValuePairDef(const KeyValuePairDef &other)
 	{
 		*this = other;
 	}
@@ -133,11 +133,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new KeyValuePairImpl(*this);
+		return new KeyValuePairDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	KeyValuePairImpl& operator=(const KeyValuePairImpl& other)
+	KeyValuePairDef& operator=(const KeyValuePairDef& other)
 	{
 		if (this != &other )
 		{
@@ -156,13 +156,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	KeyValuePairImpl(KeyValuePairImpl &&other)
+	KeyValuePairDef(KeyValuePairDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	KeyValuePairImpl& operator=(KeyValuePairImpl&& other)
+	KeyValuePairDef& operator=(KeyValuePairDef&& other)
 	{
 		if (this != &other )
 		{
@@ -178,20 +178,20 @@ private:
 	KeyValuePair mDOM; // Declare the DOM version.
 };
 
-typedef std::vector< KeyValuePairImpl > KeyValuePairVectorImpl; // Forward declare the 'KeyValuePair' vector
+typedef std::vector< KeyValuePairDef > KeyValuePairVectorDef; // Forward declare the 'KeyValuePair' vector
 typedef std::vector< KeyValuePair > KeyValuePairVectorDOM; // Forward declare the 'KeyValuePair' vector
 
 // A collection of key/value pair properties relative to a particular category
-class AdditionalPropertiesImpl: public CloneObject
+class AdditionalPropertiesDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	AdditionalPropertiesImpl() { }
+	AdditionalPropertiesDef() { }
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	AdditionalPropertiesImpl(const AdditionalPropertiesImpl &other)
+	AdditionalPropertiesDef(const AdditionalPropertiesDef &other)
 	{
 		*this = other;
 	}
@@ -206,11 +206,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new AdditionalPropertiesImpl(*this);
+		return new AdditionalPropertiesDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	AdditionalPropertiesImpl& operator=(const AdditionalPropertiesImpl& other)
+	AdditionalPropertiesDef& operator=(const AdditionalPropertiesDef& other)
 	{
 		if (this != &other )
 		{
@@ -230,13 +230,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	AdditionalPropertiesImpl(AdditionalPropertiesImpl &&other)
+	AdditionalPropertiesDef(AdditionalPropertiesDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	AdditionalPropertiesImpl& operator=(AdditionalPropertiesImpl&& other)
+	AdditionalPropertiesDef& operator=(AdditionalPropertiesDef&& other)
 	{
 		if (this != &other )
 		{
@@ -247,27 +247,27 @@ public:
 	}
 
 	std::string	mCategory;   									// The category this set of key/value pairs is associated with (example 'physx', 'mujoco', etc.
-	KeyValuePairVectorImpl mKeyValuePairs;   					// The array of key/value pairs associated with this category
+	KeyValuePairVectorDef mKeyValuePairs;  						// The array of key/value pairs associated with this category
 private:
 	AdditionalProperties mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
 	KeyValuePairVectorDOM mKeyValuePairsDOM; // Scratch array for const char pointers.
 };
 
-typedef std::vector< AdditionalPropertiesImpl > AdditionalPropertiesVectorImpl; // Forward declare the 'AdditionalProperties' vector
+typedef std::vector< AdditionalPropertiesDef > AdditionalPropertiesVectorDef; // Forward declare the 'AdditionalProperties' vector
 typedef std::vector< AdditionalProperties > AdditionalPropertiesVectorDOM; // Forward declare the 'AdditionalProperties' vector
 
 // Base class that specifies a unique ID and an optional description name field for an object
-class NodeImpl: public CloneObject
+class NodeDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	NodeImpl() { }
+	NodeDef() { }
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	NodeImpl(const NodeImpl &other)
+	NodeDef(const NodeDef &other)
 	{
 		*this = other;
 	}
@@ -282,11 +282,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new NodeImpl(*this);
+		return new NodeDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	NodeImpl& operator=(const NodeImpl& other)
+	NodeDef& operator=(const NodeDef& other)
 	{
 		if (this != &other )
 		{
@@ -306,7 +306,7 @@ public:
 		mDOM.name = mName.c_str(); // Assign the current string pointer.
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		{
-			VisualBindingImpl *impl = static_cast< VisualBindingImpl *>(&mVisual); // static cast to the implementation class.
+			VisualBindingDef *impl = static_cast< VisualBindingDef *>(&mVisual); // static cast to the implementation class.
 			impl->initDOM(); // Initialize DOM components of member variable.
 			mDOM.visual = *impl->getVisualBinding(); // Copy the DOM struct values.
 		}
@@ -316,13 +316,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	NodeImpl(NodeImpl &&other)
+	NodeDef(NodeDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	NodeImpl& operator=(NodeImpl&& other)
+	NodeDef& operator=(NodeDef&& other)
 	{
 		if (this != &other )
 		{
@@ -338,8 +338,8 @@ public:
 	std::string	mId; 											// Unique Id for this object
 	std::string	mName;   										// Optional name for this object
 	NodeType 	mType{ NT_NODE };									// The type of node
-	VisualBindingImpl mVisual;   								// Optional visual bindings for this node; for exaple some physics components have a corresponding named graphics component
-	AdditionalPropertiesVectorImpl mAdditionalProperties;  		// An optional set of properties for this node; a set of key-value pairs for each application/engine specific category
+	VisualBindingDef mVisual;  									// Optional visual bindings for this node; for exaple some physics components have a corresponding named graphics component
+	AdditionalPropertiesVectorDef mAdditionalProperties; 		// An optional set of properties for this node; a set of key-value pairs for each application/engine specific category
 private:
 	Node 		mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
@@ -348,24 +348,24 @@ private:
 
 
 // Defines the physical material properties of a surface
-class PhysicsMaterialImpl : public NodeImpl
+class PhysicsMaterialDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	PhysicsMaterialImpl()
+	PhysicsMaterialDef()
 	{
-		NodeImpl::mType = NT_PHYSICS_MATERIAL;
+		NodeDef::mType = NT_PHYSICS_MATERIAL;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~PhysicsMaterialImpl()
+	virtual ~PhysicsMaterialDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PhysicsMaterialImpl(const PhysicsMaterialImpl &other)
+	PhysicsMaterialDef(const PhysicsMaterialDef &other)
 	{
 		*this = other;
 	}
@@ -386,15 +386,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new PhysicsMaterialImpl(*this);
+		return new PhysicsMaterialDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	PhysicsMaterialImpl& operator=(const PhysicsMaterialImpl& other)
+	PhysicsMaterialDef& operator=(const PhysicsMaterialDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mDisableFriction = other.mDisableFriction;
 			mDisableStrongFriction = other.mDisableStrongFriction;
 			mDynamicFriction = other.mDynamicFriction;
@@ -408,11 +408,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.disableFriction = mDisableFriction; // Simple member variable assignment to the DOM reflection: disableFriction
@@ -424,17 +424,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	PhysicsMaterialImpl(PhysicsMaterialImpl &&other)
+	PhysicsMaterialDef(PhysicsMaterialDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	PhysicsMaterialImpl& operator=(PhysicsMaterialImpl&& other)
+	PhysicsMaterialDef& operator=(PhysicsMaterialDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mDisableFriction = other.mDisableFriction;
 			mDisableStrongFriction = other.mDisableStrongFriction;
 			mDynamicFriction = other.mDynamicFriction;
@@ -453,27 +453,27 @@ private:
 	PhysicsMaterial mDOM; // Declare the DOM version.
 };
 
-typedef std::vector< Vec3 > Vec3VectorImpl; // Forward declare the 'Vec3' vector
+typedef std::vector< Vec3 > Vec3VectorDef; // Forward declare the 'Vec3' vector
 
 // Describes the data for a convex hull
-class ConvexHullImpl : public NodeImpl
+class ConvexHullDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	ConvexHullImpl()
+	ConvexHullDef()
 	{
-		NodeImpl::mType = NT_CONVEXHULL;
+		NodeDef::mType = NT_CONVEXHULL;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~ConvexHullImpl()
+	virtual ~ConvexHullDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	ConvexHullImpl(const ConvexHullImpl &other)
+	ConvexHullDef(const ConvexHullDef &other)
 	{
 		*this = other;
 	}
@@ -494,15 +494,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new ConvexHullImpl(*this);
+		return new ConvexHullDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	ConvexHullImpl& operator=(const ConvexHullImpl& other)
+	ConvexHullDef& operator=(const ConvexHullDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mPoints = other.mPoints;
 		}
 		return *this;
@@ -512,11 +512,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.pointsCount = uint32_t(mPoints.size()); // assign the number of items in the array.
@@ -525,50 +525,50 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	ConvexHullImpl(ConvexHullImpl &&other)
+	ConvexHullDef(ConvexHullDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	ConvexHullImpl& operator=(ConvexHullImpl&& other)
+	ConvexHullDef& operator=(ConvexHullDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mPoints = other.mPoints;
 		}
 		return *this;
 	}
 
-	Vec3VectorImpl   mPoints;  									// Array of data points describing the convex hull
+	Vec3VectorDef  mPoints;										// Array of data points describing the convex hull
 private:
 	ConvexHull   mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
 };
 
-typedef std::vector< uint32_t > U32VectorImpl; // Forward declare the 'U32' vector
-typedef std::vector< uint8_t > U8VectorImpl; // Forward declare the 'U8' vector
+typedef std::vector< uint32_t > U32VectorDef; // Forward declare the 'U32' vector
+typedef std::vector< uint8_t > U8VectorDef; // Forward declare the 'U8' vector
 
 // Describes the data for a triangle mesh
-class TriangleMeshImpl : public NodeImpl
+class TriangleMeshDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	TriangleMeshImpl()
+	TriangleMeshDef()
 	{
-		NodeImpl::mType = NT_TRIANGLEMESH;
+		NodeDef::mType = NT_TRIANGLEMESH;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~TriangleMeshImpl()
+	virtual ~TriangleMeshDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	TriangleMeshImpl(const TriangleMeshImpl &other)
+	TriangleMeshDef(const TriangleMeshDef &other)
 	{
 		*this = other;
 	}
@@ -589,15 +589,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new TriangleMeshImpl(*this);
+		return new TriangleMeshDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	TriangleMeshImpl& operator=(const TriangleMeshImpl& other)
+	TriangleMeshDef& operator=(const TriangleMeshDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mPoints = other.mPoints;
 			mTriangles = other.mTriangles;
 			mMaterialIndices = other.mMaterialIndices;
@@ -609,11 +609,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.pointsCount = uint32_t(mPoints.size()); // assign the number of items in the array.
@@ -626,17 +626,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	TriangleMeshImpl(TriangleMeshImpl &&other)
+	TriangleMeshDef(TriangleMeshDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	TriangleMeshImpl& operator=(TriangleMeshImpl&& other)
+	TriangleMeshDef& operator=(TriangleMeshDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mPoints = other.mPoints;
 			mTriangles = other.mTriangles;
 			mMaterialIndices = other.mMaterialIndices;
@@ -644,35 +644,35 @@ public:
 		return *this;
 	}
 
-	Vec3VectorImpl   mPoints;  									// Array of vertices for the triangle mesh
-	U32VectorImpl  mTriangles;   								// Array of triangle indices
-	U8VectorImpl mMaterialIndices;   							// Optional per-triangle material index
+	Vec3VectorDef  mPoints;										// Array of vertices for the triangle mesh
+	U32VectorDef mTriangles; 									// Array of triangle indices
+	U8VectorDef	mMaterialIndices;  								// Optional per-triangle material index
 private:
 	TriangleMesh mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
 };
 
-typedef std::vector< uint16_t > U16VectorImpl; // Forward declare the 'U16' vector
+typedef std::vector< uint16_t > U16VectorDef; // Forward declare the 'U16' vector
 
 // The data for a heighfield; as 2d array of 32 bit samples; 16 bits for height, 16 bits for material indices, holes, and other metadata
-class HeightFieldImpl : public NodeImpl
+class HeightFieldDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	HeightFieldImpl()
+	HeightFieldDef()
 	{
-		NodeImpl::mType = NT_HEIGHTFIELD;
+		NodeDef::mType = NT_HEIGHTFIELD;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~HeightFieldImpl()
+	virtual ~HeightFieldDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	HeightFieldImpl(const HeightFieldImpl &other)
+	HeightFieldDef(const HeightFieldDef &other)
 	{
 		*this = other;
 	}
@@ -693,15 +693,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new HeightFieldImpl(*this);
+		return new HeightFieldDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	HeightFieldImpl& operator=(const HeightFieldImpl& other)
+	HeightFieldDef& operator=(const HeightFieldDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mRowCount = other.mRowCount;
 			mColumnCount = other.mColumnCount;
 			mSamples = other.mSamples;
@@ -714,11 +714,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.rowCount = mRowCount; // Simple member variable assignment to the DOM reflection: rowCount
@@ -731,17 +731,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	HeightFieldImpl(HeightFieldImpl &&other)
+	HeightFieldDef(HeightFieldDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	HeightFieldImpl& operator=(HeightFieldImpl&& other)
+	HeightFieldDef& operator=(HeightFieldDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mRowCount = other.mRowCount;
 			mColumnCount = other.mColumnCount;
 			mSamples = other.mSamples;
@@ -752,8 +752,8 @@ public:
 
 	uint32_t 	mRowCount{ 0 };  									// Number of sample rows in the height field samples array.
 	uint32_t 	mColumnCount{ 0 }; 								// Number of sample columns in the height field samples array.
-	U16VectorImpl  mSamples; 									// Heightfield sample data
-	U16VectorImpl  mMetaData;  									// Optional meta data for each sample; determines per sample material, winding order, and whether or not to treat it as a hole
+	U16VectorDef mSamples;   									// Heightfield sample data
+	U16VectorDef mMetaData;										// Optional meta data for each sample; determines per sample material, winding order, and whether or not to treat it as a hole
 private:
 	HeightField	mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
@@ -761,16 +761,16 @@ private:
 
 
 // Base class for all geometries
-class GeometryImpl: public CloneObject
+class GeometryDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	GeometryImpl() { }
+	GeometryDef() { }
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	GeometryImpl(const GeometryImpl &other)
+	GeometryDef(const GeometryDef &other)
 	{
 		*this = other;
 	}
@@ -785,11 +785,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new GeometryImpl(*this);
+		return new GeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	GeometryImpl& operator=(const GeometryImpl& other)
+	GeometryDef& operator=(const GeometryDef& other)
 	{
 		if (this != &other )
 		{
@@ -806,13 +806,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	GeometryImpl(GeometryImpl &&other)
+	GeometryDef(GeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	GeometryImpl& operator=(GeometryImpl&& other)
+	GeometryDef& operator=(GeometryDef&& other)
 	{
 		if (this != &other )
 		{
@@ -828,24 +828,24 @@ private:
 
 
 // Defines a box geometry
-class BoxGeometryImpl : public GeometryImpl
+class BoxGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	BoxGeometryImpl()
+	BoxGeometryDef()
 	{
-		GeometryImpl::mType = GT_BOX_GEOMETRY;
+		GeometryDef::mType = GT_BOX_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~BoxGeometryImpl()
+	virtual ~BoxGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	BoxGeometryImpl(const BoxGeometryImpl &other)
+	BoxGeometryDef(const BoxGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -866,15 +866,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new BoxGeometryImpl(*this);
+		return new BoxGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	BoxGeometryImpl& operator=(const BoxGeometryImpl& other)
+	BoxGeometryDef& operator=(const BoxGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mDimensions = other.mDimensions;
 		}
 		return *this;
@@ -884,11 +884,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.dimensions = mDimensions; // Simple member variable assignment to the DOM reflection: dimensions
@@ -896,17 +896,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	BoxGeometryImpl(BoxGeometryImpl &&other)
+	BoxGeometryDef(BoxGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	BoxGeometryImpl& operator=(BoxGeometryImpl&& other)
+	BoxGeometryDef& operator=(BoxGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mDimensions = other.mDimensions;
 		}
 		return *this;
@@ -919,24 +919,24 @@ private:
 
 
 // Defines a sphere geometry
-class SphereGeometryImpl : public GeometryImpl
+class SphereGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	SphereGeometryImpl()
+	SphereGeometryDef()
 	{
-		GeometryImpl::mType = GT_SPHERE_GEOMETRY;
+		GeometryDef::mType = GT_SPHERE_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~SphereGeometryImpl()
+	virtual ~SphereGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	SphereGeometryImpl(const SphereGeometryImpl &other)
+	SphereGeometryDef(const SphereGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -957,15 +957,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new SphereGeometryImpl(*this);
+		return new SphereGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	SphereGeometryImpl& operator=(const SphereGeometryImpl& other)
+	SphereGeometryDef& operator=(const SphereGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mRadius = other.mRadius;
 		}
 		return *this;
@@ -975,11 +975,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.radius = mRadius; // Simple member variable assignment to the DOM reflection: radius
@@ -987,17 +987,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	SphereGeometryImpl(SphereGeometryImpl &&other)
+	SphereGeometryDef(SphereGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	SphereGeometryImpl& operator=(SphereGeometryImpl&& other)
+	SphereGeometryDef& operator=(SphereGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mRadius = other.mRadius;
 		}
 		return *this;
@@ -1010,24 +1010,24 @@ private:
 
 
 // Defines a capsule geometry
-class CapsuleGeometryImpl : public GeometryImpl
+class CapsuleGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	CapsuleGeometryImpl()
+	CapsuleGeometryDef()
 	{
-		GeometryImpl::mType = GT_CAPSULE_GEOMETRY;
+		GeometryDef::mType = GT_CAPSULE_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~CapsuleGeometryImpl()
+	virtual ~CapsuleGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	CapsuleGeometryImpl(const CapsuleGeometryImpl &other)
+	CapsuleGeometryDef(const CapsuleGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -1048,15 +1048,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new CapsuleGeometryImpl(*this);
+		return new CapsuleGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	CapsuleGeometryImpl& operator=(const CapsuleGeometryImpl& other)
+	CapsuleGeometryDef& operator=(const CapsuleGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mRadius = other.mRadius;
 			mHeight = other.mHeight;
 		}
@@ -1067,11 +1067,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.radius = mRadius; // Simple member variable assignment to the DOM reflection: radius
@@ -1080,17 +1080,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	CapsuleGeometryImpl(CapsuleGeometryImpl &&other)
+	CapsuleGeometryDef(CapsuleGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	CapsuleGeometryImpl& operator=(CapsuleGeometryImpl&& other)
+	CapsuleGeometryDef& operator=(CapsuleGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mRadius = other.mRadius;
 			mHeight = other.mHeight;
 		}
@@ -1105,24 +1105,24 @@ private:
 
 
 // Defines a cylinder geometry
-class CylinderGeometryImpl : public GeometryImpl
+class CylinderGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	CylinderGeometryImpl()
+	CylinderGeometryDef()
 	{
-		GeometryImpl::mType = GT_CYLINDER_GEOMETRY;
+		GeometryDef::mType = GT_CYLINDER_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~CylinderGeometryImpl()
+	virtual ~CylinderGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	CylinderGeometryImpl(const CylinderGeometryImpl &other)
+	CylinderGeometryDef(const CylinderGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -1143,15 +1143,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new CylinderGeometryImpl(*this);
+		return new CylinderGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	CylinderGeometryImpl& operator=(const CylinderGeometryImpl& other)
+	CylinderGeometryDef& operator=(const CylinderGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mRadius = other.mRadius;
 			mHeight = other.mHeight;
 		}
@@ -1162,11 +1162,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.radius = mRadius; // Simple member variable assignment to the DOM reflection: radius
@@ -1175,17 +1175,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	CylinderGeometryImpl(CylinderGeometryImpl &&other)
+	CylinderGeometryDef(CylinderGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	CylinderGeometryImpl& operator=(CylinderGeometryImpl&& other)
+	CylinderGeometryDef& operator=(CylinderGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mRadius = other.mRadius;
 			mHeight = other.mHeight;
 		}
@@ -1200,24 +1200,24 @@ private:
 
 
 // Defines a convex mesh geometry
-class ConvexHullGeometryImpl : public GeometryImpl
+class ConvexHullGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	ConvexHullGeometryImpl()
+	ConvexHullGeometryDef()
 	{
-		GeometryImpl::mType = GT_CONVEXHULL_GEOMETRY;
+		GeometryDef::mType = GT_CONVEXHULL_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~ConvexHullGeometryImpl()
+	virtual ~ConvexHullGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	ConvexHullGeometryImpl(const ConvexHullGeometryImpl &other)
+	ConvexHullGeometryDef(const ConvexHullGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -1238,15 +1238,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new ConvexHullGeometryImpl(*this);
+		return new ConvexHullGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	ConvexHullGeometryImpl& operator=(const ConvexHullGeometryImpl& other)
+	ConvexHullGeometryDef& operator=(const ConvexHullGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mScale = other.mScale;
 			mConvexMesh = other.mConvexMesh;
 		}
@@ -1257,11 +1257,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.scale = mScale; // Simple member variable assignment to the DOM reflection: scale
@@ -1270,17 +1270,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	ConvexHullGeometryImpl(ConvexHullGeometryImpl &&other)
+	ConvexHullGeometryDef(ConvexHullGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	ConvexHullGeometryImpl& operator=(ConvexHullGeometryImpl&& other)
+	ConvexHullGeometryDef& operator=(ConvexHullGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mScale = other.mScale;
 			mConvexMesh = other.mConvexMesh;
 		}
@@ -1295,24 +1295,24 @@ private:
 
 
 // Defines a triangle mesh geometry
-class TriangleMeshGeometryImpl : public GeometryImpl
+class TriangleMeshGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	TriangleMeshGeometryImpl()
+	TriangleMeshGeometryDef()
 	{
-		GeometryImpl::mType = GT_TRIANGLEMESH_GEOMETRY;
+		GeometryDef::mType = GT_TRIANGLEMESH_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~TriangleMeshGeometryImpl()
+	virtual ~TriangleMeshGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	TriangleMeshGeometryImpl(const TriangleMeshGeometryImpl &other)
+	TriangleMeshGeometryDef(const TriangleMeshGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -1333,15 +1333,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new TriangleMeshGeometryImpl(*this);
+		return new TriangleMeshGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	TriangleMeshGeometryImpl& operator=(const TriangleMeshGeometryImpl& other)
+	TriangleMeshGeometryDef& operator=(const TriangleMeshGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mScale = other.mScale;
 			mTriangleMesh = other.mTriangleMesh;
 			mDoubleSided = other.mDoubleSided;
@@ -1353,11 +1353,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.scale = mScale; // Simple member variable assignment to the DOM reflection: scale
@@ -1367,17 +1367,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	TriangleMeshGeometryImpl(TriangleMeshGeometryImpl &&other)
+	TriangleMeshGeometryDef(TriangleMeshGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	TriangleMeshGeometryImpl& operator=(TriangleMeshGeometryImpl&& other)
+	TriangleMeshGeometryDef& operator=(TriangleMeshGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mScale = other.mScale;
 			mTriangleMesh = other.mTriangleMesh;
 			mDoubleSided = other.mDoubleSided;
@@ -1394,24 +1394,24 @@ private:
 
 
 // Defines a heightfield geometry
-class HeightFieldGeometryImpl : public GeometryImpl
+class HeightFieldGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	HeightFieldGeometryImpl()
+	HeightFieldGeometryDef()
 	{
-		GeometryImpl::mType = GT_HEIGHTFIELD_GEOMETRY;
+		GeometryDef::mType = GT_HEIGHTFIELD_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~HeightFieldGeometryImpl()
+	virtual ~HeightFieldGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	HeightFieldGeometryImpl(const HeightFieldGeometryImpl &other)
+	HeightFieldGeometryDef(const HeightFieldGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -1432,15 +1432,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new HeightFieldGeometryImpl(*this);
+		return new HeightFieldGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	HeightFieldGeometryImpl& operator=(const HeightFieldGeometryImpl& other)
+	HeightFieldGeometryDef& operator=(const HeightFieldGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 			mHeightField = other.mHeightField;
 			mHeightScale = other.mHeightScale;
 			mRowScale = other.mRowScale;
@@ -1454,11 +1454,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.heightField = mHeightField.c_str(); // Assign the current string pointer.
@@ -1470,17 +1470,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	HeightFieldGeometryImpl(HeightFieldGeometryImpl &&other)
+	HeightFieldGeometryDef(HeightFieldGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	HeightFieldGeometryImpl& operator=(HeightFieldGeometryImpl&& other)
+	HeightFieldGeometryDef& operator=(HeightFieldGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 			mHeightField = other.mHeightField;
 			mHeightScale = other.mHeightScale;
 			mRowScale = other.mRowScale;
@@ -1501,24 +1501,24 @@ private:
 
 
 // Defines a plane equation geometry (position and orientation of the plane come from the geometry instance)
-class PlaneGeometryImpl : public GeometryImpl
+class PlaneGeometryDef : public GeometryDef
 {
 public:
 	// Declare the constructor.
-	PlaneGeometryImpl()
+	PlaneGeometryDef()
 	{
-		GeometryImpl::mType = GT_PLANE_GEOMETRY;
+		GeometryDef::mType = GT_PLANE_GEOMETRY;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~PlaneGeometryImpl()
+	virtual ~PlaneGeometryDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PlaneGeometryImpl(const PlaneGeometryImpl &other)
+	PlaneGeometryDef(const PlaneGeometryDef &other)
 	{
 		*this = other;
 	}
@@ -1539,15 +1539,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new PlaneGeometryImpl(*this);
+		return new PlaneGeometryDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	PlaneGeometryImpl& operator=(const PlaneGeometryImpl& other)
+	PlaneGeometryDef& operator=(const PlaneGeometryDef& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(other);
+			GeometryDef::operator=(other);
 		}
 		return *this;
 	}
@@ -1556,28 +1556,28 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		GeometryImpl::initDOM();
+		GeometryDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Geometry *dom = static_cast< Geometry *>(&mDOM); // Get the DOM base class.
-			*dom = *(GeometryImpl::getGeometry()); // Assign the base class DOM components.
+			*dom = *(GeometryDef::getGeometry()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 	}
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	PlaneGeometryImpl(PlaneGeometryImpl &&other)
+	PlaneGeometryDef(PlaneGeometryDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	PlaneGeometryImpl& operator=(PlaneGeometryImpl&& other)
+	PlaneGeometryDef& operator=(PlaneGeometryDef&& other)
 	{
 		if (this != &other )
 		{
-			GeometryImpl::operator=(std::move(other));
+			GeometryDef::operator=(std::move(other));
 		}
 		return *this;
 	}
@@ -1588,23 +1588,23 @@ private:
 
 
 // Defines a single instance of a geometry
-class GeometryInstanceImpl: public CloneObject
+class GeometryInstanceDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	GeometryInstanceImpl() { }
+	GeometryInstanceDef() { }
 
 
 	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~GeometryInstanceImpl()
+	virtual ~GeometryInstanceDef()
 	{
 		delete mGeometry; // Delete this object
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	GeometryInstanceImpl(const GeometryInstanceImpl &other)
+	GeometryInstanceDef(const GeometryInstanceDef &other)
 	{
 		*this = other;
 	}
@@ -1619,11 +1619,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new GeometryInstanceImpl(*this);
+		return new GeometryInstanceDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	GeometryInstanceImpl& operator=(const GeometryInstanceImpl& other)
+	GeometryInstanceDef& operator=(const GeometryInstanceDef& other)
 	{
 		if (this != &other )
 		{
@@ -1631,7 +1631,7 @@ public:
 			mGeometry = nullptr; // set the pointer to null.
 			if ( other.mGeometry )
 			{
-				mGeometry = static_cast<GeometryImpl *>(other.mGeometry->clone()); // perform the deep copy and assignment here
+				mGeometry = static_cast<GeometryDef *>(other.mGeometry->clone()); // perform the deep copy and assignment here
 			}
 			mMaterials = other.mMaterials;
 			mLocalPose = other.mLocalPose;
@@ -1649,24 +1649,24 @@ public:
 			mDOM.geometry = mGeometry->getGeometry(); // assign the DOM reflection pointer.
 		}
 		// Initialize the const char * array from the array of std::strings vector mMaterials
-		mMaterialsImpl.reserve(mMaterials.size()); // Reserve room for string pointers.
+		mMaterialsDef.reserve(mMaterials.size()); // Reserve room for string pointers.
 		for (auto &i: mMaterials) // For each std::string
-			mMaterialsImpl.push_back( i.c_str() ); // Add the const char * for the string.
-		mDOM.materialsCount = uint32_t(mMaterialsImpl.size()); // Assign the number of strings
-		mDOM.materials = mDOM.materialsCount ? &mMaterialsImpl[0] : nullptr; // Assign the pointer array.
+			mMaterialsDef.push_back( i.c_str() ); // Add the const char * for the string.
+		mDOM.materialsCount = uint32_t(mMaterialsDef.size()); // Assign the number of strings
+		mDOM.materials = mDOM.materialsCount ? &mMaterialsDef[0] : nullptr; // Assign the pointer array.
 		mDOM.localPose = mLocalPose; // Simple member variable assignment to the DOM reflection: localPose
 		mDOM.collisionFilterSettings = mCollisionFilterSettings.c_str(); // Assign the current string pointer.
 	}
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	GeometryInstanceImpl(GeometryInstanceImpl &&other)
+	GeometryInstanceDef(GeometryInstanceDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	GeometryInstanceImpl& operator=(GeometryInstanceImpl&& other)
+	GeometryInstanceDef& operator=(GeometryInstanceDef&& other)
 	{
 		if (this != &other )
 		{
@@ -1679,39 +1679,39 @@ public:
 		return *this;
 	}
 
-	GeometryImpl *mGeometry{ nullptr };							// The geometry associated with this instance
+	GeometryDef	*mGeometry{ nullptr };   						// The geometry associated with this instance
 	StringVector mMaterials; 									// Id of physical material(s) associated with this geometry instance (usually one material; but for heightifields and triangle meshes can be more than one)
 	Pose 		mLocalPose;   										// The local pose for this geometry instance
 	std::string	mCollisionFilterSettings;  						// Describes collision filtering settings; what other types of objects this object will collide with
 private:
 	GeometryInstance mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
-	ConstCharVector mMaterialsImpl; // Scratch array for const char pointers.
+	ConstCharVector mMaterialsDef; // Scratch array for const char pointers.
 };
 
-typedef std::vector< GeometryInstanceImpl *> GeometryInstanceVectorImpl; // Forward declare the 'GeometryInstance' vector for the implementation object pointers
+typedef std::vector< GeometryInstanceDef *> GeometryInstanceVectorDef; // Forward declare the 'GeometryInstance' vector for the implementation object pointers
 typedef std::vector< GeometryInstance *> GeometryInstanceVectorDOM; // Forward declare the 'GeometryInstance' vector for the implementation object pointers
 
 // Defines the common properties for a rigid body
-class RigidBodyImpl : public NodeImpl
+class RigidBodyDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	RigidBodyImpl()
+	RigidBodyDef()
 	{
-		NodeImpl::mType = NT_RIGID_BODY;
+		NodeDef::mType = NT_RIGID_BODY;
 	}
 
 
 	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~RigidBodyImpl()
+	virtual ~RigidBodyDef()
 	{
 		for (auto &i:mGeometryInstances) delete i; // Delete all of the object pointers in this array
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RigidBodyImpl(const RigidBodyImpl &other)
+	RigidBodyDef(const RigidBodyDef &other)
 	{
 		*this = other;
 	}
@@ -1732,19 +1732,19 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new RigidBodyImpl(*this);
+		return new RigidBodyDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	RigidBodyImpl& operator=(const RigidBodyImpl& other)
+	RigidBodyDef& operator=(const RigidBodyDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			for (auto &i:mGeometryInstances) delete i; // Delete all of the object pointers in this array
 			mGeometryInstances.clear(); // Clear the current array
 			mGeometryInstances.reserve(other.mGeometryInstances.size()); // Reserve number of items for the new array
-			for (auto &i:other.mGeometryInstances) mGeometryInstances.push_back( static_cast< GeometryInstanceImpl *>(i->clone())); // Deep copy object pointers into the array
+			for (auto &i:other.mGeometryInstances) mGeometryInstances.push_back( static_cast< GeometryInstanceDef *>(i->clone())); // Deep copy object pointers into the array
 			mGlobalPose = other.mGlobalPose;
 		}
 		return *this;
@@ -1754,11 +1754,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mGeometryInstancesDOM.clear();
@@ -1775,17 +1775,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	RigidBodyImpl(RigidBodyImpl &&other)
+	RigidBodyDef(RigidBodyDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	RigidBodyImpl& operator=(RigidBodyImpl&& other)
+	RigidBodyDef& operator=(RigidBodyDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mGeometryInstances = other.mGeometryInstances;
 			other.mGeometryInstances.clear(); // Clear the 'other' array now that we have moved it
 			mGlobalPose = other.mGlobalPose;
@@ -1793,7 +1793,7 @@ public:
 		return *this;
 	}
 
-	GeometryInstanceVectorImpl mGeometryInstances;   			// The set of geometries to instance with this actor
+	GeometryInstanceVectorDef mGeometryInstances;  				// The set of geometries to instance with this actor
 	Pose 		mGlobalPose;											// The global pose for this actor
 private:
 	RigidBody  	mDOM; // Declare the DOM version.
@@ -1803,24 +1803,24 @@ private:
 
 
 // Defines a static rigid body
-class RigidStaticImpl : public RigidBodyImpl
+class RigidStaticDef : public RigidBodyDef
 {
 public:
 	// Declare the constructor.
-	RigidStaticImpl()
+	RigidStaticDef()
 	{
-		NodeImpl::mType = NT_RIGID_STATIC;
+		NodeDef::mType = NT_RIGID_STATIC;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~RigidStaticImpl()
+	virtual ~RigidStaticDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RigidStaticImpl(const RigidStaticImpl &other)
+	RigidStaticDef(const RigidStaticDef &other)
 	{
 		*this = other;
 	}
@@ -1841,15 +1841,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new RigidStaticImpl(*this);
+		return new RigidStaticDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	RigidStaticImpl& operator=(const RigidStaticImpl& other)
+	RigidStaticDef& operator=(const RigidStaticDef& other)
 	{
 		if (this != &other )
 		{
-			RigidBodyImpl::operator=(other);
+			RigidBodyDef::operator=(other);
 		}
 		return *this;
 	}
@@ -1858,28 +1858,28 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		RigidBodyImpl::initDOM();
+		RigidBodyDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			RigidBody *dom = static_cast< RigidBody *>(&mDOM); // Get the DOM base class.
-			*dom = *(RigidBodyImpl::getRigidBody()); // Assign the base class DOM components.
+			*dom = *(RigidBodyDef::getRigidBody()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 	}
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	RigidStaticImpl(RigidStaticImpl &&other)
+	RigidStaticDef(RigidStaticDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	RigidStaticImpl& operator=(RigidStaticImpl&& other)
+	RigidStaticDef& operator=(RigidStaticDef&& other)
 	{
 		if (this != &other )
 		{
-			RigidBodyImpl::operator=(std::move(other));
+			RigidBodyDef::operator=(std::move(other));
 		}
 		return *this;
 	}
@@ -1890,24 +1890,24 @@ private:
 
 
 // Defines a dynamic rigid body
-class RigidDynamicImpl : public RigidBodyImpl
+class RigidDynamicDef : public RigidBodyDef
 {
 public:
 	// Declare the constructor.
-	RigidDynamicImpl()
+	RigidDynamicDef()
 	{
-		NodeImpl::mType = NT_RIGID_DYNAMIC;
+		NodeDef::mType = NT_RIGID_DYNAMIC;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~RigidDynamicImpl()
+	virtual ~RigidDynamicDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	RigidDynamicImpl(const RigidDynamicImpl &other)
+	RigidDynamicDef(const RigidDynamicDef &other)
 	{
 		*this = other;
 	}
@@ -1928,15 +1928,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new RigidDynamicImpl(*this);
+		return new RigidDynamicDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	RigidDynamicImpl& operator=(const RigidDynamicImpl& other)
+	RigidDynamicDef& operator=(const RigidDynamicDef& other)
 	{
 		if (this != &other )
 		{
-			RigidBodyImpl::operator=(other);
+			RigidBodyDef::operator=(other);
 			mDisableGravity = other.mDisableGravity;
 			mCenterOfMassLocalPose = other.mCenterOfMassLocalPose;
 			mMass = other.mMass;
@@ -1955,11 +1955,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		RigidBodyImpl::initDOM();
+		RigidBodyDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			RigidBody *dom = static_cast< RigidBody *>(&mDOM); // Get the DOM base class.
-			*dom = *(RigidBodyImpl::getRigidBody()); // Assign the base class DOM components.
+			*dom = *(RigidBodyDef::getRigidBody()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.disableGravity = mDisableGravity; // Simple member variable assignment to the DOM reflection: disableGravity
@@ -1976,17 +1976,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	RigidDynamicImpl(RigidDynamicImpl &&other)
+	RigidDynamicDef(RigidDynamicDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	RigidDynamicImpl& operator=(RigidDynamicImpl&& other)
+	RigidDynamicDef& operator=(RigidDynamicDef&& other)
 	{
 		if (this != &other )
 		{
-			RigidBodyImpl::operator=(std::move(other));
+			RigidBodyDef::operator=(std::move(other));
 			mDisableGravity = other.mDisableGravity;
 			mCenterOfMassLocalPose = other.mCenterOfMassLocalPose;
 			mMass = other.mMass;
@@ -2017,24 +2017,24 @@ private:
 
 
 // Defines the common properties for a joint
-class JointImpl : public NodeImpl
+class JointDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	JointImpl()
+	JointDef()
 	{
-		NodeImpl::mType = NT_JOINT;
+		NodeDef::mType = NT_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~JointImpl()
+	virtual ~JointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	JointImpl(const JointImpl &other)
+	JointDef(const JointDef &other)
 	{
 		*this = other;
 	}
@@ -2055,15 +2055,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new JointImpl(*this);
+		return new JointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	JointImpl& operator=(const JointImpl& other)
+	JointDef& operator=(const JointDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mBody0 = other.mBody0;
 			mBody1 = other.mBody1;
 			mLocalpose0 = other.mLocalpose0;
@@ -2077,11 +2077,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.body0 = mBody0.c_str(); // Assign the current string pointer.
@@ -2093,17 +2093,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	JointImpl(JointImpl &&other)
+	JointDef(JointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	JointImpl& operator=(JointImpl&& other)
+	JointDef& operator=(JointDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mBody0 = other.mBody0;
 			mBody1 = other.mBody1;
 			mLocalpose0 = other.mLocalpose0;
@@ -2125,24 +2125,24 @@ private:
 
 // Defines the properties specific to a fixed joint 
 // Not all properties yet defined!
-class FixedJointImpl : public JointImpl
+class FixedJointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	FixedJointImpl()
+	FixedJointDef()
 	{
-		JointImpl::mType = NT_FIXED_JOINT;
+		JointDef::mType = NT_FIXED_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~FixedJointImpl()
+	virtual ~FixedJointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	FixedJointImpl(const FixedJointImpl &other)
+	FixedJointDef(const FixedJointDef &other)
 	{
 		*this = other;
 	}
@@ -2163,15 +2163,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new FixedJointImpl(*this);
+		return new FixedJointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	FixedJointImpl& operator=(const FixedJointImpl& other)
+	FixedJointDef& operator=(const FixedJointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 		}
 		return *this;
 	}
@@ -2180,28 +2180,28 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 	}
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	FixedJointImpl(FixedJointImpl &&other)
+	FixedJointDef(FixedJointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	FixedJointImpl& operator=(FixedJointImpl&& other)
+	FixedJointDef& operator=(FixedJointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 		}
 		return *this;
 	}
@@ -2213,24 +2213,24 @@ private:
 
 // Defines the properties specific to a spherical joint 
 // Not all properties yet defined!
-class SphericalJointImpl : public JointImpl
+class SphericalJointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	SphericalJointImpl()
+	SphericalJointDef()
 	{
-		JointImpl::mType = NT_SPHERICAL_JOINT;
+		JointDef::mType = NT_SPHERICAL_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~SphericalJointImpl()
+	virtual ~SphericalJointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	SphericalJointImpl(const SphericalJointImpl &other)
+	SphericalJointDef(const SphericalJointDef &other)
 	{
 		*this = other;
 	}
@@ -2251,15 +2251,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new SphericalJointImpl(*this);
+		return new SphericalJointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	SphericalJointImpl& operator=(const SphericalJointImpl& other)
+	SphericalJointDef& operator=(const SphericalJointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 			mLimitY = other.mLimitY;
 			mLimitZ = other.mLimitZ;
 		}
@@ -2270,11 +2270,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.limitY = mLimitY; // Simple member variable assignment to the DOM reflection: limitY
@@ -2283,17 +2283,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	SphericalJointImpl(SphericalJointImpl &&other)
+	SphericalJointDef(SphericalJointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	SphericalJointImpl& operator=(SphericalJointImpl&& other)
+	SphericalJointDef& operator=(SphericalJointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 			mLimitY = other.mLimitY;
 			mLimitZ = other.mLimitZ;
 		}
@@ -2309,24 +2309,24 @@ private:
 
 // Defines the properties specific to a revolute joint 
 // Not all properties yet defined!
-class HingeJointImpl : public JointImpl
+class HingeJointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	HingeJointImpl()
+	HingeJointDef()
 	{
-		JointImpl::mType = NT_HINGE_JOINT;
+		JointDef::mType = NT_HINGE_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~HingeJointImpl()
+	virtual ~HingeJointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	HingeJointImpl(const HingeJointImpl &other)
+	HingeJointDef(const HingeJointDef &other)
 	{
 		*this = other;
 	}
@@ -2347,15 +2347,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new HingeJointImpl(*this);
+		return new HingeJointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	HingeJointImpl& operator=(const HingeJointImpl& other)
+	HingeJointDef& operator=(const HingeJointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 			mLimtLow = other.mLimtLow;
 			mLimitHigh = other.mLimitHigh;
 		}
@@ -2366,11 +2366,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.limtLow = mLimtLow; // Simple member variable assignment to the DOM reflection: limtLow
@@ -2379,17 +2379,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	HingeJointImpl(HingeJointImpl &&other)
+	HingeJointDef(HingeJointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	HingeJointImpl& operator=(HingeJointImpl&& other)
+	HingeJointDef& operator=(HingeJointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 			mLimtLow = other.mLimtLow;
 			mLimitHigh = other.mLimitHigh;
 		}
@@ -2405,24 +2405,24 @@ private:
 
 // Defines the properties specific to a prismatic joint 
 // Not all properties yet defined!
-class PrismaticJointImpl : public JointImpl
+class PrismaticJointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	PrismaticJointImpl()
+	PrismaticJointDef()
 	{
-		JointImpl::mType = NT_PRISMATIC_JOINT;
+		JointDef::mType = NT_PRISMATIC_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~PrismaticJointImpl()
+	virtual ~PrismaticJointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PrismaticJointImpl(const PrismaticJointImpl &other)
+	PrismaticJointDef(const PrismaticJointDef &other)
 	{
 		*this = other;
 	}
@@ -2443,15 +2443,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new PrismaticJointImpl(*this);
+		return new PrismaticJointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	PrismaticJointImpl& operator=(const PrismaticJointImpl& other)
+	PrismaticJointDef& operator=(const PrismaticJointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 			mLimitLow = other.mLimitLow;
 			mLimitHigh = other.mLimitHigh;
 		}
@@ -2462,11 +2462,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.limitLow = mLimitLow; // Simple member variable assignment to the DOM reflection: limitLow
@@ -2475,17 +2475,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	PrismaticJointImpl(PrismaticJointImpl &&other)
+	PrismaticJointDef(PrismaticJointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	PrismaticJointImpl& operator=(PrismaticJointImpl&& other)
+	PrismaticJointDef& operator=(PrismaticJointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 			mLimitLow = other.mLimitLow;
 			mLimitHigh = other.mLimitHigh;
 		}
@@ -2501,24 +2501,24 @@ private:
 
 // Defines the properties specific to a distance joint 
 // Not all properties yet defined!
-class DistanceJointImpl : public JointImpl
+class DistanceJointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	DistanceJointImpl()
+	DistanceJointDef()
 	{
-		JointImpl::mType = NT_DISTANCE_JOINT;
+		JointDef::mType = NT_DISTANCE_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~DistanceJointImpl()
+	virtual ~DistanceJointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	DistanceJointImpl(const DistanceJointImpl &other)
+	DistanceJointDef(const DistanceJointDef &other)
 	{
 		*this = other;
 	}
@@ -2539,15 +2539,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new DistanceJointImpl(*this);
+		return new DistanceJointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	DistanceJointImpl& operator=(const DistanceJointImpl& other)
+	DistanceJointDef& operator=(const DistanceJointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 			mDistanceLow = other.mDistanceLow;
 			mDistanceHigh = other.mDistanceHigh;
 		}
@@ -2558,11 +2558,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.distanceLow = mDistanceLow; // Simple member variable assignment to the DOM reflection: distanceLow
@@ -2571,17 +2571,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	DistanceJointImpl(DistanceJointImpl &&other)
+	DistanceJointDef(DistanceJointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	DistanceJointImpl& operator=(DistanceJointImpl&& other)
+	DistanceJointDef& operator=(DistanceJointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 			mDistanceLow = other.mDistanceLow;
 			mDistanceHigh = other.mDistanceHigh;
 		}
@@ -2597,24 +2597,24 @@ private:
 
 // Defines the properties specific to a ball and socket joint 
 // Not all properties yet defined!
-class BallAndSocketJointImpl : public JointImpl
+class BallAndSocketJointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	BallAndSocketJointImpl()
+	BallAndSocketJointDef()
 	{
-		JointImpl::mType = NT_BALL_AND_SOCKET_JOINT;
+		JointDef::mType = NT_BALL_AND_SOCKET_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~BallAndSocketJointImpl()
+	virtual ~BallAndSocketJointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	BallAndSocketJointImpl(const BallAndSocketJointImpl &other)
+	BallAndSocketJointDef(const BallAndSocketJointDef &other)
 	{
 		*this = other;
 	}
@@ -2635,15 +2635,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new BallAndSocketJointImpl(*this);
+		return new BallAndSocketJointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	BallAndSocketJointImpl& operator=(const BallAndSocketJointImpl& other)
+	BallAndSocketJointDef& operator=(const BallAndSocketJointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 			mLimitXLow = other.mLimitXLow;
 			mLimitXHigh = other.mLimitXHigh;
 			mLimitY = other.mLimitY;
@@ -2656,11 +2656,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.limitXLow = mLimitXLow; // Simple member variable assignment to the DOM reflection: limitXLow
@@ -2671,17 +2671,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	BallAndSocketJointImpl(BallAndSocketJointImpl &&other)
+	BallAndSocketJointDef(BallAndSocketJointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	BallAndSocketJointImpl& operator=(BallAndSocketJointImpl&& other)
+	BallAndSocketJointDef& operator=(BallAndSocketJointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 			mLimitXLow = other.mLimitXLow;
 			mLimitXHigh = other.mLimitXHigh;
 			mLimitY = other.mLimitY;
@@ -2701,24 +2701,24 @@ private:
 
 // Defines the properties specific to a six degree of freedom joint 
 // Not all properties yet defined!
-class D6JointImpl : public JointImpl
+class D6JointDef : public JointDef
 {
 public:
 	// Declare the constructor.
-	D6JointImpl()
+	D6JointDef()
 	{
-		JointImpl::mType = NT_D6_JOINT;
+		JointDef::mType = NT_D6_JOINT;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~D6JointImpl()
+	virtual ~D6JointDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	D6JointImpl(const D6JointImpl &other)
+	D6JointDef(const D6JointDef &other)
 	{
 		*this = other;
 	}
@@ -2739,15 +2739,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new D6JointImpl(*this);
+		return new D6JointDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	D6JointImpl& operator=(const D6JointImpl& other)
+	D6JointDef& operator=(const D6JointDef& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(other);
+			JointDef::operator=(other);
 		}
 		return *this;
 	}
@@ -2756,28 +2756,28 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		JointImpl::initDOM();
+		JointDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Joint *dom = static_cast< Joint *>(&mDOM); // Get the DOM base class.
-			*dom = *(JointImpl::getJoint()); // Assign the base class DOM components.
+			*dom = *(JointDef::getJoint()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 	}
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	D6JointImpl(D6JointImpl &&other)
+	D6JointDef(D6JointDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	D6JointImpl& operator=(D6JointImpl&& other)
+	D6JointDef& operator=(D6JointDef&& other)
 	{
 		if (this != &other )
 		{
-			JointImpl::operator=(std::move(other));
+			JointDef::operator=(std::move(other));
 		}
 		return *this;
 	}
@@ -2788,16 +2788,16 @@ private:
 
 
 // Defines two bodies, by id, that should not collide with each other
-class BodyPairFilterImpl: public CloneObject
+class BodyPairFilterDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	BodyPairFilterImpl() { }
+	BodyPairFilterDef() { }
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	BodyPairFilterImpl(const BodyPairFilterImpl &other)
+	BodyPairFilterDef(const BodyPairFilterDef &other)
 	{
 		*this = other;
 	}
@@ -2812,11 +2812,11 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new BodyPairFilterImpl(*this);
+		return new BodyPairFilterDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	BodyPairFilterImpl& operator=(const BodyPairFilterImpl& other)
+	BodyPairFilterDef& operator=(const BodyPairFilterDef& other)
 	{
 		if (this != &other )
 		{
@@ -2835,13 +2835,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	BodyPairFilterImpl(BodyPairFilterImpl &&other)
+	BodyPairFilterDef(BodyPairFilterDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	BodyPairFilterImpl& operator=(BodyPairFilterImpl&& other)
+	BodyPairFilterDef& operator=(BodyPairFilterDef&& other)
 	{
 		if (this != &other )
 		{
@@ -2857,28 +2857,28 @@ private:
 	BodyPairFilter   mDOM; // Declare the DOM version.
 };
 
-typedef std::vector< BodyPairFilterImpl > BodyPairFilterVectorImpl; // Forward declare the 'BodyPairFilter' vector
+typedef std::vector< BodyPairFilterDef > BodyPairFilterVectorDef; // Forward declare the 'BodyPairFilter' vector
 typedef std::vector< BodyPairFilter > BodyPairFilterVectorDOM; // Forward declare the 'BodyPairFilter' vector
 
 // A collection of body pair filters
-class BodyPairFiltersImpl : public NodeImpl
+class BodyPairFiltersDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	BodyPairFiltersImpl()
+	BodyPairFiltersDef()
 	{
-		NodeImpl::mType = NT_BODY_PAIR_FILTERS;
+		NodeDef::mType = NT_BODY_PAIR_FILTERS;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~BodyPairFiltersImpl()
+	virtual ~BodyPairFiltersDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	BodyPairFiltersImpl(const BodyPairFiltersImpl &other)
+	BodyPairFiltersDef(const BodyPairFiltersDef &other)
 	{
 		*this = other;
 	}
@@ -2899,15 +2899,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new BodyPairFiltersImpl(*this);
+		return new BodyPairFiltersDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	BodyPairFiltersImpl& operator=(const BodyPairFiltersImpl& other)
+	BodyPairFiltersDef& operator=(const BodyPairFiltersDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mBodyPairs = other.mBodyPairs;
 		}
 		return *this;
@@ -2917,11 +2917,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.bodyPairsCount = uint32_t(mBodyPairsDOM.size()); // assign the number of items in the array.
@@ -2930,23 +2930,23 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	BodyPairFiltersImpl(BodyPairFiltersImpl &&other)
+	BodyPairFiltersDef(BodyPairFiltersDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	BodyPairFiltersImpl& operator=(BodyPairFiltersImpl&& other)
+	BodyPairFiltersDef& operator=(BodyPairFiltersDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mBodyPairs = other.mBodyPairs;
 		}
 		return *this;
 	}
 
-	BodyPairFilterVectorImpl mBodyPairs; 						// Array of body pair filters
+	BodyPairFilterVectorDef mBodyPairs;							// Array of body pair filters
 private:
 	BodyPairFilters mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
@@ -2954,24 +2954,24 @@ private:
 };
 
 
-class InstanceCollectionImpl : public NodeImpl
+class InstanceCollectionDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	InstanceCollectionImpl()
+	InstanceCollectionDef()
 	{
-		NodeImpl::mType = NT_INSTANCE_COLLECTION;
+		NodeDef::mType = NT_INSTANCE_COLLECTION;
 	}
 
 
 	// Declare the virtual destructor.
-	virtual ~InstanceCollectionImpl()
+	virtual ~InstanceCollectionDef()
 	{
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	InstanceCollectionImpl(const InstanceCollectionImpl &other)
+	InstanceCollectionDef(const InstanceCollectionDef &other)
 	{
 		*this = other;
 	}
@@ -2992,15 +2992,15 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new InstanceCollectionImpl(*this);
+		return new InstanceCollectionDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	InstanceCollectionImpl& operator=(const InstanceCollectionImpl& other)
+	InstanceCollectionDef& operator=(const InstanceCollectionDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mCollection = other.mCollection;
 			mPose = other.mPose;
 			mScale = other.mScale;
@@ -3012,11 +3012,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.collection = mCollection.c_str(); // Assign the current string pointer.
@@ -3026,17 +3026,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	InstanceCollectionImpl(InstanceCollectionImpl &&other)
+	InstanceCollectionDef(InstanceCollectionDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	InstanceCollectionImpl& operator=(InstanceCollectionImpl&& other)
+	InstanceCollectionDef& operator=(InstanceCollectionDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mCollection = other.mCollection;
 			mPose = other.mPose;
 			mScale = other.mScale;
@@ -3051,29 +3051,29 @@ private:
 	InstanceCollection mDOM; // Declare the DOM version.
 };
 
-typedef std::vector< NodeImpl *> NodeVectorImpl; // Forward declare the 'Node' vector for the implementation object pointers
+typedef std::vector< NodeDef *> NodeVectorDef; // Forward declare the 'Node' vector for the implementation object pointers
 typedef std::vector< Node *> NodeVectorDOM; // Forward declare the 'Node' vector for the implementation object pointers
 
 // A collection of nodes
-class CollectionImpl : public NodeImpl
+class CollectionDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	CollectionImpl()
+	CollectionDef()
 	{
-		NodeImpl::mType = NT_COLLECTION;
+		NodeDef::mType = NT_COLLECTION;
 	}
 
 
 	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~CollectionImpl()
+	virtual ~CollectionDef()
 	{
 		for (auto &i:mNodes) delete i; // Delete all of the object pointers in this array
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	CollectionImpl(const CollectionImpl &other)
+	CollectionDef(const CollectionDef &other)
 	{
 		*this = other;
 	}
@@ -3094,19 +3094,19 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new CollectionImpl(*this);
+		return new CollectionDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	CollectionImpl& operator=(const CollectionImpl& other)
+	CollectionDef& operator=(const CollectionDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			for (auto &i:mNodes) delete i; // Delete all of the object pointers in this array
 			mNodes.clear(); // Clear the current array
 			mNodes.reserve(other.mNodes.size()); // Reserve number of items for the new array
-			for (auto &i:other.mNodes) mNodes.push_back( static_cast< NodeImpl *>(i->clone())); // Deep copy object pointers into the array
+			for (auto &i:other.mNodes) mNodes.push_back( static_cast< NodeDef *>(i->clone())); // Deep copy object pointers into the array
 		}
 		return *this;
 	}
@@ -3115,11 +3115,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mNodesDOM.clear();
@@ -3135,24 +3135,24 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	CollectionImpl(CollectionImpl &&other)
+	CollectionDef(CollectionDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	CollectionImpl& operator=(CollectionImpl&& other)
+	CollectionDef& operator=(CollectionDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mNodes = other.mNodes;
 			other.mNodes.clear(); // Clear the 'other' array now that we have moved it
 		}
 		return *this;
 	}
 
-	NodeVectorImpl   mNodes; 									// Array of nodes in this collection
+	NodeVectorDef  mNodes;   									// Array of nodes in this collection
 private:
 	Collection   mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
@@ -3161,25 +3161,25 @@ private:
 
 
 // A special type of 'collection' which is instantiated on startup
-class SceneImpl : public NodeImpl
+class SceneDef : public NodeDef
 {
 public:
 	// Declare the constructor.
-	SceneImpl()
+	SceneDef()
 	{
-		NodeImpl::mType = NT_SCENE;
+		NodeDef::mType = NT_SCENE;
 	}
 
 
 	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~SceneImpl()
+	virtual ~SceneDef()
 	{
 		for (auto &i:mNodes) delete i; // Delete all of the object pointers in this array
 	}
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	SceneImpl(const SceneImpl &other)
+	SceneDef(const SceneDef &other)
 	{
 		*this = other;
 	}
@@ -3200,20 +3200,20 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const override
 	{
-		return new SceneImpl(*this);
+		return new SceneDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	SceneImpl& operator=(const SceneImpl& other)
+	SceneDef& operator=(const SceneDef& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(other);
+			NodeDef::operator=(other);
 			mGravity = other.mGravity;
 			for (auto &i:mNodes) delete i; // Delete all of the object pointers in this array
 			mNodes.clear(); // Clear the current array
 			mNodes.reserve(other.mNodes.size()); // Reserve number of items for the new array
-			for (auto &i:other.mNodes) mNodes.push_back( static_cast< NodeImpl *>(i->clone())); // Deep copy object pointers into the array
+			for (auto &i:other.mNodes) mNodes.push_back( static_cast< NodeDef *>(i->clone())); // Deep copy object pointers into the array
 		}
 		return *this;
 	}
@@ -3222,11 +3222,11 @@ public:
 	virtual void initDOM(void) override
 	{
 		// Initialize the DOM for the base class.
-		NodeImpl::initDOM();
+		NodeDef::initDOM();
 		// Copy the elements from the base class DOM to our reflection DOM
 		{
 			Node *dom = static_cast< Node *>(&mDOM); // Get the DOM base class.
-			*dom = *(NodeImpl::getNode()); // Assign the base class DOM components.
+			*dom = *(NodeDef::getNode()); // Assign the base class DOM components.
 		}
 		mDOM.type = mType; // Simple member variable assignment to the DOM reflection: type
 		mDOM.gravity = mGravity; // Simple member variable assignment to the DOM reflection: gravity
@@ -3243,17 +3243,17 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	SceneImpl(SceneImpl &&other)
+	SceneDef(SceneDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	SceneImpl& operator=(SceneImpl&& other)
+	SceneDef& operator=(SceneDef&& other)
 	{
 		if (this != &other )
 		{
-			NodeImpl::operator=(std::move(other));
+			NodeDef::operator=(std::move(other));
 			mGravity = other.mGravity;
 			mNodes = other.mNodes;
 			other.mNodes.clear(); // Clear the 'other' array now that we have moved it
@@ -3262,29 +3262,29 @@ public:
 	}
 
 	Vec3 		mGravity{ 0.0f,-9.8f,0.0f };							// Gravity
-	NodeVectorImpl   mNodes; 									// Array of nodes in this collection
+	NodeVectorDef  mNodes;   									// Array of nodes in this collection
 private:
 	Scene  		mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.
 	NodeVectorDOM  mNodesDOM; // Scratch array for const char pointers.
 };
 
-typedef std::vector< CollectionImpl *> CollectionVectorImpl; // Forward declare the 'Collection' vector for the implementation object pointers
+typedef std::vector< CollectionDef *> CollectionVectorDef; // Forward declare the 'Collection' vector for the implementation object pointers
 typedef std::vector< Collection *> CollectionVectorDOM; // Forward declare the 'Collection' vector for the implementation object pointers
-typedef std::vector< SceneImpl *> SceneVectorImpl; // Forward declare the 'Scene' vector for the implementation object pointers
+typedef std::vector< SceneDef *> SceneVectorDef; // Forward declare the 'Scene' vector for the implementation object pointers
 typedef std::vector< Scene *> SceneVectorDOM; // Forward declare the 'Scene' vector for the implementation object pointers
 
 // The root node container
-class PhysicsDOMImpl: public CloneObject
+class PhysicsDOMDef: public CloneObject
 {
 public:
 
 	// Declare the constructor.
-	PhysicsDOMImpl() { }
+	PhysicsDOMDef() { }
 
 
 	// Declare the virtual destructor; cleanup any pointers or arrays of pointers
-	virtual ~PhysicsDOMImpl()
+	virtual ~PhysicsDOMDef()
 	{
 		for (auto &i:mCollections) delete i; // Delete all of the object pointers in this array
 		for (auto &i:mScenes) delete i; // Delete all of the object pointers in this array
@@ -3292,7 +3292,7 @@ public:
 
 
 	// Declare the deep copy constructor; handles copying pointers and pointer arrays
-	PhysicsDOMImpl(const PhysicsDOMImpl &other)
+	PhysicsDOMDef(const PhysicsDOMDef &other)
 	{
 		*this = other;
 	}
@@ -3307,22 +3307,22 @@ public:
 	// Declare the virtual clone method using a deep copy
 	virtual CloneObject* clone() const
 	{
-		return new PhysicsDOMImpl(*this);
+		return new PhysicsDOMDef(*this);
 	}
 
 	// Declare and implement the deep copy assignment operator
-	PhysicsDOMImpl& operator=(const PhysicsDOMImpl& other)
+	PhysicsDOMDef& operator=(const PhysicsDOMDef& other)
 	{
 		if (this != &other )
 		{
 			for (auto &i:mCollections) delete i; // Delete all of the object pointers in this array
 			mCollections.clear(); // Clear the current array
 			mCollections.reserve(other.mCollections.size()); // Reserve number of items for the new array
-			for (auto &i:other.mCollections) mCollections.push_back( static_cast< CollectionImpl *>(i->clone())); // Deep copy object pointers into the array
+			for (auto &i:other.mCollections) mCollections.push_back( static_cast< CollectionDef *>(i->clone())); // Deep copy object pointers into the array
 			for (auto &i:mScenes) delete i; // Delete all of the object pointers in this array
 			mScenes.clear(); // Clear the current array
 			mScenes.reserve(other.mScenes.size()); // Reserve number of items for the new array
-			for (auto &i:other.mScenes) mScenes.push_back( static_cast< SceneImpl *>(i->clone())); // Deep copy object pointers into the array
+			for (auto &i:other.mScenes) mScenes.push_back( static_cast< SceneDef *>(i->clone())); // Deep copy object pointers into the array
 		}
 		return *this;
 	}
@@ -3352,13 +3352,13 @@ public:
 
 
 	// Declare the move constructor; handles copying pointers and pointer arrays
-	PhysicsDOMImpl(PhysicsDOMImpl &&other)
+	PhysicsDOMDef(PhysicsDOMDef &&other)
 	{
 		*this = std::move(other);
 	}
 
 	// Declare and implement the move assignment operator
-	PhysicsDOMImpl& operator=(PhysicsDOMImpl&& other)
+	PhysicsDOMDef& operator=(PhysicsDOMDef&& other)
 	{
 		if (this != &other )
 		{
@@ -3370,8 +3370,8 @@ public:
 		return *this;
 	}
 
-	CollectionVectorImpl mCollections;   						// The array of top level collections
-	SceneVectorImpl mScenes; 									// The array of top level scenes; a scene is instantiated into the physics simulation
+	CollectionVectorDef mCollections;  							// The array of top level collections
+	SceneVectorDef   mScenes;  									// The array of top level scenes; a scene is instantiated into the physics simulation
 private:
 	PhysicsDOM   mDOM; // Declare the DOM version.
 // Declare private temporary array(s) to hold flat DOM version of arrays.

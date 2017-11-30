@@ -119,6 +119,8 @@
 		</ClInclude>
 		<ClInclude Include="..\..\public\PhysicsDOM.h">
 		</ClInclude>
+		<ClInclude Include="..\..\public\PhysicsDOMDef.h">
+		</ClInclude>
 		<ClCompile Include="..\..\public\NvPhysXFrameworkBinding.cpp">
 		</ClCompile>
 	</ItemGroup>
