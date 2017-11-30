@@ -448,7 +448,7 @@ namespace IMPORT_PHYSX_DOM
 
 #define MAX_STACK 32
 
-	typedef std::unordered_map< uint32_t, PHYSICS_DOM::NodeDef * > NodeIdMap;
+	typedef std::unordered_map< std::string, PHYSICS_DOM::NodeDef * > NodeIdMap;
 
 	class ImportPhysXDOMImpl : public ImportPhysXDOM, public FAST_XML::FastXml::Callback
 	{
@@ -650,7 +650,6 @@ namespace IMPORT_PHYSX_DOM
 					break;
 				case ET_UpVector:
 				case ET_Length:
-				case ET_Mass:
 				case ET_Speed:
 				case ET_ActorFlags:
 				case ET_DominanceGroup:
@@ -690,12 +689,28 @@ namespace IMPORT_PHYSX_DOM
 					// We ignore these elements currently; may need to add support for some of them
 					// later as custom properties.  Many are just safely ignored however.
 					break;
+				case ET_Mass:
+					if (mPreviousType == ET_PxRigidDynamic)
+					{
+						if (mCurrentRigidDynamic)
+						{
+							mCurrentRigidDynamic->mMass = STRING_HELPER::getFloatValue(elementData, nullptr);
+						}
+					}
+					else if (mPreviousType == ET_Scale)
+					{
+
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PxRigidDynamic, mPreviousType);
+					}
+					break;
 				case ET_actor0:
 				case ET_actor1:
 					if (mPreviousType == ET_Actors)
 					{
-						uint32_t id = uint32_t(atoi(elementData));
-						auto found = mNodeIdMap.find(id);
+						auto found = mNodeIdMap.find(std::string(elementData));
 						if (found == mNodeIdMap.end())
 						{
 							reportError(lineno, "Unable to find node id: %s", elementData);
@@ -820,8 +835,7 @@ namespace IMPORT_PHYSX_DOM
 				case ET_ConvexMesh:
 					if (mCurrentConvexHullGeometry)
 					{
-						uint32_t id = uint32_t(atoi(elementData));
-						auto found = mNodeIdMap.find(id);
+						auto found = mNodeIdMap.find(std::string(elementData));
 						if (found == mNodeIdMap.end())
 						{
 							reportError(lineno, "Unable to find node id: %s", elementData);
@@ -836,8 +850,7 @@ namespace IMPORT_PHYSX_DOM
 				case ET_PxMaterialRef:
 					if (mCurrentGeometryInstance)
 					{
-						uint32_t id = uint32_t(atoi(elementData));
-						auto found = mNodeIdMap.find(id);
+						auto found = mNodeIdMap.find(std::string(elementData));
 						if (found == mNodeIdMap.end())
 						{
 							reportError(lineno, "Unable to find node id: %s", elementData);
@@ -1079,8 +1092,7 @@ namespace IMPORT_PHYSX_DOM
 						case ET_PxFixedJoint:
 							if (mCurrentNode)
 							{
-								uint32_t id = (uint32_t)atoi(elementData);
-								mNodeIdMap[id] = mCurrentNode;
+								mNodeIdMap[std::string(elementData)] = mCurrentNode;
 							}
 							break;
 						default:

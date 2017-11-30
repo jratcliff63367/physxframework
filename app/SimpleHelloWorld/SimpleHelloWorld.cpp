@@ -150,10 +150,11 @@ public:
 
 	void testImportXML(void)
 	{
-		NV_PHYSX_FRAMEWORK::PhysicsDOMContainer *pcontain = mPhysXFramework->importPhysXDOM("ConvexDecomposition1.xml");
+		NV_PHYSX_FRAMEWORK::PhysicsDOMContainer *pcontain = mPhysXFramework->importPhysXDOM("ConvexDecomposition2.xml");
 		if (pcontain)
 		{
 			mPhysXFramework->loadPhysicsDOM(*pcontain->getPhysicsDOM());
+			mPhysXFramework->serializeXML("f:\\github\\physxframework\\dom.xml");
 			pcontain->release();
 		}
 	}

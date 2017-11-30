@@ -23,6 +23,11 @@ namespace PHYSICS_DOM_PHYSX
 
 	// Map node id to physx materials
 	typedef std::unordered_map< std::string, physx::PxMaterial *> MaterialMap;
+	// Map node id to ConvexMeshes
+	typedef std::unordered_map< std::string, physx::PxConvexMesh *> ConvexMeshMap;
+	// Map node id to PxActor's
+	typedef std::unordered_map< std::string, physx::PxActor *> ActorMap;
+
 
 	class PhysicsDOMPhysXImpl : public PhysicsDOMPhysX
 	{
@@ -34,6 +39,10 @@ namespace PHYSICS_DOM_PHYSX
 
 		virtual ~PhysicsDOMPhysXImpl(void)
 		{
+			for (auto &i : mActors)
+			{
+				i.second->release();
+			}
 			for (auto &i : mScenes)
 			{
 				i->release();
@@ -43,6 +52,10 @@ namespace PHYSICS_DOM_PHYSX
 				mDefaultMaterial->release();
 			}
 			for (auto &i : mMaterials)
+			{
+				i.second->release();
+			}
+			for (auto &i : mConvexMeshes)
 			{
 				i.second->release();
 			}
@@ -177,6 +190,16 @@ namespace PHYSICS_DOM_PHYSX
 			return ret;
 		}
 
+		physx::PxVec3 getVec3(const PHYSICS_DOM::Vec3 &v)
+		{
+			return physx::PxVec3(v.x, v.y, v.z);
+		}
+
+		physx::PxQuat getQuat(const PHYSICS_DOM::Quat &q)
+		{
+			return physx::PxQuat(q.x, q.y, q.z, q.w);
+		}
+
 		void reportWarning(const char *fmt,...)
 		{
 			va_list         args;
@@ -186,6 +209,19 @@ namespace PHYSICS_DOM_PHYSX
 			va_end(args);
 			printf("[PHYSICS_DOM::Warning]%s\r\n", buffer);
 		}
+
+		// fixed joint
+		physx::PxJoint* createFixedJoint(physx::PxRigidActor* a0,
+										const physx::PxTransform& t0,
+										physx::PxRigidActor* a1,
+										const physx::PxTransform& t1)
+		{
+			physx::PxFixedJoint* j = physx::PxFixedJointCreate(*mPhysics, a0, t0, a1, t1);
+			j->setConstraintFlag(physx::PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+			j->setConstraintFlag(physx::PxConstraintFlag::eDISABLE_PREPROCESSING, true);
+			return j;
+		}
+
 
 		void processNode(const PHYSICS_DOM::Node *n,		// Node to process
 						 const PHYSICS_DOM::Pose &pose,		// Parent relative pose
@@ -212,7 +248,19 @@ namespace PHYSICS_DOM_PHYSX
 					reportWarning("Node type not yet implemented");
 					break;
 				case PHYSICS_DOM::NT_CONVEXHULL:						// Defines the contents of a convex hull
-					reportWarning("Node type not yet implemented");
+					{
+						auto m = static_cast<const PHYSICS_DOM::ConvexHull *>(n);
+
+						physx::PxConvexMeshDesc desc;
+						desc.points.data = (float *)m->points;
+						desc.points.count = m->pointsCount;
+						desc.points.stride = sizeof(float) * 3;
+						desc.flags = physx::PxConvexFlag::eCOMPUTE_CONVEX;
+
+						physx::PxConvexMesh *convexMesh = mCooking->createConvexMesh(desc, mPhysics->getPhysicsInsertionCallback());
+						mConvexMeshes[n->id] = convexMesh;
+
+					}
 					break;
 				case PHYSICS_DOM::NT_HEIGHTFIELD: 					// Defines the contents of a heightfield
 					reportWarning("Node type not yet implemented");
@@ -242,7 +290,7 @@ namespace PHYSICS_DOM_PHYSX
 						// let's create the shapes and add them...
 						for (uint32_t j=0; j<rb->geometryInstancesCount; j++)
 						{
-							PHYSICS_DOM::GeometryInstance *gi = rb->geometryInstances[j];
+							const PHYSICS_DOM::GeometryInstance *gi = rb->geometryInstances[j];
 							std::vector< physx::PxMaterial *> materials;
 							if (gi->materialsCount == 0 )
 							{
@@ -256,9 +304,27 @@ namespace PHYSICS_DOM_PHYSX
 								}
 							}
 							physx::PxBoxGeometry box;
+							physx::PxPlaneGeometry plane;
+							physx::PxConvexMeshGeometry convexMesh;
 							physx::PxGeometry *geometry = nullptr;
 							switch (gi->geometry->type )
 							{
+								case PHYSICS_DOM::GT_CONVEXHULL_GEOMETRY:
+									{
+										auto convexGeom = static_cast<const PHYSICS_DOM::ConvexHullGeometry *>(gi->geometry);
+										geometry = static_cast<physx::PxGeometry *>(&convexMesh);
+										convexMesh.scale.scale = getVec3(convexGeom->scale.scale);
+										convexMesh.scale.rotation = getQuat(convexGeom->scale.rotation);
+										auto found = mConvexMeshes.find(std::string(convexGeom->convexMesh));
+										if (found != mConvexMeshes.end())
+										{
+											convexMesh.convexMesh = found->second;
+										}
+									}
+									break;
+								case PHYSICS_DOM::GT_PLANE_GEOMETRY:
+									geometry = static_cast<physx::PxGeometry *>(&plane);
+									break;
 								case PHYSICS_DOM::GT_BOX_GEOMETRY:
 									{
 										auto boxGeom = static_cast<const PHYSICS_DOM::BoxGeometry *>(gi->geometry);
@@ -279,6 +345,25 @@ namespace PHYSICS_DOM_PHYSX
 								}
 							}
 						}
+						ractor->setGlobalPose(getTransform(rb->globalPose));
+						if (n->type == PHYSICS_DOM::NT_RIGID_DYNAMIC)
+						{
+							auto rd = static_cast<const PHYSICS_DOM::RigidDynamic *>(n);
+							if (rd)
+							{
+								// TODO gravity flag..
+								pdynamic->setCMassLocalPose(getTransform(rd->centerOfMassLocalPose));
+								pdynamic->setMass(rd->mass);
+								pdynamic->setMassSpaceInertiaTensor(getVec3(rd->massSpaceInertiaTensor));
+								pdynamic->setMassSpaceInertiaTensor(getVec3(rd->massSpaceInertiaTensor));
+								pdynamic->setAngularVelocity(getVec3(rd->angularVelocity));
+								pdynamic->setAngularDamping(rd->angularDamping);
+
+								pdynamic->setLinearVelocity(getVec3(rd->linearVelocity));
+								pdynamic->setLinearDamping(rd->linearDamping);
+							}
+						}
+						mActors[std::string(n->id)] = static_cast<physx::PxActor *>(ractor);
 						mActiveScene->addActor(*ractor);
 					}
 					break;
@@ -289,7 +374,25 @@ namespace PHYSICS_DOM_PHYSX
 					reportWarning("Node type not yet implemented");
 					break;
 				case PHYSICS_DOM::NT_FIXED_JOINT:						// A fixed joint
-					reportWarning("Node type not yet implemented");
+					{
+						auto fj = static_cast<const PHYSICS_DOM::FixedJoint *>(n);
+						physx::PxTransform t0 = getTransform(fj->localpose0);
+						physx::PxTransform t1 = getTransform(fj->localpose1);
+						auto found0 = mActors.find(std::string(fj->body0));
+						auto found1 = mActors.find(std::string(fj->body1));
+						if (found0 != mActors.end() && found1 != mActors.end())
+						{
+							physx::PxActor *actor0 = found0->second;
+							physx::PxActor *actor1 = found1->second;
+							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
+							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
+							physx::PxJoint *j = createFixedJoint(ractor0, t0, ractor1, t1);
+							if (j)
+							{
+							//
+							}
+						}
+					}
 					break;
 				case PHYSICS_DOM::NT_SPHERICAL_JOINT:				// A spherical joint
 					reportWarning("Node type not yet implemented");
@@ -372,7 +475,7 @@ namespace PHYSICS_DOM_PHYSX
 		physx::PxTransform getTransform(const PHYSICS_DOM::Pose &pose)
 		{
 			physx::PxTransform rpose;
-			rpose.p = physx::PxVec3(pose.p.x, pose.p.x, pose.p.z);
+			rpose.p = physx::PxVec3(pose.p.x, pose.p.y, pose.p.z);
 			rpose.q = physx::PxQuat(pose.q.x, pose.q.y, pose.q.z, pose.q.w);
 			return rpose;
 		}
@@ -385,6 +488,8 @@ namespace PHYSICS_DOM_PHYSX
 		NodeMap				mNodeMap;	// map of Id's to nodes
 		physx::PxMaterial	*mDefaultMaterial{ nullptr };
 		MaterialMap			mMaterials;	// Materials created
+		ConvexMeshMap		mConvexMeshes;
+		ActorMap			mActors;
 	};
 
 	PhysicsDOMPhysX *PhysicsDOMPhysX::create(physx::PxPhysics *p, physx::PxCooking *c)

@@ -1884,6 +1884,11 @@ public:
 		return *this;
 	}
 
+	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
+	{
+		return static_cast<Node *>(&mDOM); // return the address of the DOM.
+	}
+
 private:
 	RigidStatic	mDOM; // Declare the DOM version.
 };
@@ -1999,6 +2004,11 @@ public:
 			mKinematic = other.mKinematic;
 		}
 		return *this;
+	}
+
+	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
+	{
+		return static_cast<Node *>(&mDOM); // return the address of the DOM.
 	}
 
 	bool 		mDisableGravity{ false }; 							// Disables scene gravity for this actor
