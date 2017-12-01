@@ -396,6 +396,9 @@ namespace PHYSICS_DOM_PHYSX
 
 								pdynamic->setLinearVelocity(getVec3(rd->linearVelocity));
 								pdynamic->setLinearDamping(rd->linearDamping);
+
+								physx::PxRigidBodyExt::setMassAndUpdateInertia(*pdynamic, rd->mass);
+
 							}
 						}
 						mActors[std::string(n->id)] = static_cast<physx::PxActor *>(ractor);

@@ -399,8 +399,6 @@ typedef std::vector< PxJoint * > PxJointVector;
 						break;
 					case CT_BALL_AND_SOCKET:
 						break;
-					case CT_REVOLUTE:
-						break;
 				}
 				if (joint)
 				{
