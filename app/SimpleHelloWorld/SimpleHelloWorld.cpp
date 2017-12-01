@@ -4,10 +4,10 @@
 #include "NvPhysXFramework.h"
 #include "PhysicsDOMDef.h"
 
-#define USE_DEBUG 0
+#define USE_DEBUG 1
 
-#define TEST_IMPORT_XML 0
-#define TEST_PHYSICS_DOM 1
+#define TEST_IMPORT_XML 1
+#define TEST_PHYSICS_DOM 0
 #define TEST_SOME_OF_EVERYTHING 0
 #define TEST_BOX 0
 #define BOX_SIZE 1

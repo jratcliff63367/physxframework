@@ -373,11 +373,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	PhysicsMaterial * getPhysicsMaterial(void) // Declare virtual method to return the DOM version
+	virtual PhysicsMaterial * getPhysicsMaterial(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -481,11 +481,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	ConvexHull * getConvexHull(void) // Declare virtual method to return the DOM version
+	virtual ConvexHull * getConvexHull(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -576,11 +576,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	TriangleMesh * getTriangleMesh(void) // Declare virtual method to return the DOM version
+	virtual TriangleMesh * getTriangleMesh(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -680,11 +680,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	HeightField * getHeightField(void) // Declare virtual method to return the DOM version
+	virtual HeightField * getHeightField(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -853,11 +853,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	BoxGeometry * getBoxGeometry(void) // Declare virtual method to return the DOM version
+	virtual BoxGeometry * getBoxGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -944,11 +944,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	SphereGeometry * getSphereGeometry(void) // Declare virtual method to return the DOM version
+	virtual SphereGeometry * getSphereGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1035,11 +1035,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	CapsuleGeometry * getCapsuleGeometry(void) // Declare virtual method to return the DOM version
+	virtual CapsuleGeometry * getCapsuleGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1130,11 +1130,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	CylinderGeometry * getCylinderGeometry(void) // Declare virtual method to return the DOM version
+	virtual CylinderGeometry * getCylinderGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1225,11 +1225,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	ConvexHullGeometry * getConvexHullGeometry(void) // Declare virtual method to return the DOM version
+	virtual ConvexHullGeometry * getConvexHullGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1320,11 +1320,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	TriangleMeshGeometry * getTriangleMeshGeometry(void) // Declare virtual method to return the DOM version
+	virtual TriangleMeshGeometry * getTriangleMeshGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1419,11 +1419,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	HeightFieldGeometry * getHeightFieldGeometry(void) // Declare virtual method to return the DOM version
+	virtual HeightFieldGeometry * getHeightFieldGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1526,11 +1526,11 @@ public:
 
 	virtual Geometry * getGeometry(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Geometry *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	PlaneGeometry * getPlaneGeometry(void) // Declare virtual method to return the DOM version
+	virtual PlaneGeometry * getPlaneGeometry(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1719,11 +1719,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	RigidBody * getRigidBody(void) // Declare virtual method to return the DOM version
+	virtual RigidBody * getRigidBody(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1828,11 +1828,17 @@ public:
 
 	virtual RigidBody * getRigidBody(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< RigidBody *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	RigidStatic * getRigidStatic(void) // Declare virtual method to return the DOM version
+	virtual RigidStatic * getRigidStatic(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -1884,11 +1890,6 @@ public:
 		return *this;
 	}
 
-	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
-	{
-		return static_cast<Node *>(&mDOM); // return the address of the DOM.
-	}
-
 private:
 	RigidStatic	mDOM; // Declare the DOM version.
 };
@@ -1920,11 +1921,17 @@ public:
 
 	virtual RigidBody * getRigidBody(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< RigidBody *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	RigidDynamic * getRigidDynamic(void) // Declare virtual method to return the DOM version
+	virtual RigidDynamic * getRigidDynamic(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2006,11 +2013,6 @@ public:
 		return *this;
 	}
 
-	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
-	{
-		return static_cast<Node *>(&mDOM); // return the address of the DOM.
-	}
-
 	bool 		mDisableGravity{ false }; 							// Disables scene gravity for this actor
 	Pose 		mCenterOfMassLocalPose;   							// Center of mass and local pose
 	float  		mMass{ 1 }; 										// Sets the mass of a dynamic actor.
@@ -2052,11 +2054,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	Joint * getJoint(void) // Declare virtual method to return the DOM version
+	virtual Joint * getJoint(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2160,11 +2162,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	FixedJoint * getFixedJoint(void) // Declare virtual method to return the DOM version
+	virtual FixedJoint * getFixedJoint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2248,11 +2256,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	SphericalJoint * getSphericalJoint(void) // Declare virtual method to return the DOM version
+	virtual SphericalJoint * getSphericalJoint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2344,11 +2358,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	HingeJoint * getHingeJoint(void) // Declare virtual method to return the DOM version
+	virtual HingeJoint * getHingeJoint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2440,11 +2460,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	PrismaticJoint * getPrismaticJoint(void) // Declare virtual method to return the DOM version
+	virtual PrismaticJoint * getPrismaticJoint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2536,11 +2562,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	DistanceJoint * getDistanceJoint(void) // Declare virtual method to return the DOM version
+	virtual DistanceJoint * getDistanceJoint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2632,11 +2664,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	BallAndSocketJoint * getBallAndSocketJoint(void) // Declare virtual method to return the DOM version
+	virtual BallAndSocketJoint * getBallAndSocketJoint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2736,11 +2774,17 @@ public:
 
 	virtual Joint * getJoint(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Joint *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	D6Joint * getD6Joint(void) // Declare virtual method to return the DOM version
+	virtual D6Joint * getD6Joint(void) // Declare virtual method to return the DOM version
+	{
+		return &mDOM; // return the address of the DOM.
+	}
+
+
+	virtual Node * getNode(void) // Declare virtual method to return the DOM version based on multiple inheritance
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2896,11 +2940,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	BodyPairFilters * getBodyPairFilters(void) // Declare virtual method to return the DOM version
+	virtual BodyPairFilters * getBodyPairFilters(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -2989,11 +3033,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	InstanceCollection * getInstanceCollection(void) // Declare virtual method to return the DOM version
+	virtual InstanceCollection * getInstanceCollection(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -3091,11 +3135,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	Collection * getCollection(void) // Declare virtual method to return the DOM version
+	virtual Collection * getCollection(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}
@@ -3197,11 +3241,11 @@ public:
 
 	virtual Node * getNode(void) // Declare virtual method to return DOM version of base class.
 	{
-		return static_cast< Node *>(&mDOM); // return the address of the DOM.
+		return &mDOM; // return the address of the DOM.
 	}
 
 
-	Scene * getScene(void) // Declare virtual method to return the DOM version
+	virtual Scene * getScene(void) // Declare virtual method to return the DOM version
 	{
 		return &mDOM; // return the address of the DOM.
 	}

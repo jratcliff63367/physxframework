@@ -568,7 +568,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_InternalCompliance:
 				case ET_InternalDriveIterations:
 				case ET_Joint:
-				case ET_LimitCone:
 				case ET_LinearLimit:
 				case ET_Links:
 				case ET_MaxDistance:
@@ -597,13 +596,11 @@ namespace IMPORT_PHYSX_DOM
 				case ET_PxPrismaticJoint:
 				case ET_PxShapeRef:
 				case ET_PxSphereGeometry:
-				case ET_PxSphericalJoint:
 				case ET_PxTriangleMeshGeometry:
 				case ET_Radius:
 				case ET_RowScale:
 				case ET_SelfCollision:
 				case ET_SeparationTolerance:
-				case ET_SphericalJointFlags:
 				case ET_SwingLimit:
 				case ET_SwingLimitContactDistance:
 				case ET_SwingLimitEnabled:
@@ -619,8 +616,6 @@ namespace IMPORT_PHYSX_DOM
 				case ET_TwistLimitContactDistance:
 				case ET_TwistLimitEnabled:
 				case ET_Value:
-				case ET_YAngle:
-				case ET_ZAngle:
 				case ET_angular:
 				case ET_eSLERP:
 				case ET_eSWING:
@@ -686,8 +681,31 @@ namespace IMPORT_PHYSX_DOM
 				case ET_DriveForceLimit:
 				case ET_DriveGearRatio:
 				case ET_RevoluteJointFlags:
+				case ET_LimitCone:
+				case ET_SphericalJointFlags:
 					// We ignore these elements currently; may need to add support for some of them
 					// later as custom properties.  Many are just safely ignored however.
+					break;
+				case ET_YAngle:
+				case ET_ZAngle:
+					if (mPreviousType == ET_LimitCone && mPreviousPreviousType == ET_PxSphericalJoint)
+					{
+						if (mCurrentSphericalJoint)
+						{
+							if (mCurrentType == ET_YAngle )
+							{
+								mCurrentSphericalJoint->mLimitY = STRING_HELPER::getFloatValue(elementData, nullptr);
+							}
+							else
+							{
+								mCurrentSphericalJoint->mLimitZ = STRING_HELPER::getFloatValue(elementData, nullptr);
+							}
+						}
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_LimitCone, mPreviousType);
+					}
 					break;
 				case ET_Upper:
 				case ET_Lower:
@@ -936,6 +954,7 @@ namespace IMPORT_PHYSX_DOM
 								break;
 							case ET_PxFixedJoint:
 							case ET_PxRevoluteJoint:
+							case ET_PxSphericalJoint:
 							case ET_LocalPose:
 								if (mCurrentJoint)
 								{
@@ -978,6 +997,20 @@ namespace IMPORT_PHYSX_DOM
 					if (mCurrentNode && elementData )
 					{
 						mCurrentNode->mName = std::string(elementData);
+					}
+					break;
+				case ET_PxSphericalJoint:
+					if (mPreviousType == ET_PhysX30Collection)
+					{
+						mCurrentSphericalJoint = new PHYSICS_DOM::SphericalJointDef;
+						mCurrentNode = static_cast<PHYSICS_DOM::NodeDef *>(mCurrentSphericalJoint);
+						mCurrentJoint = static_cast<PHYSICS_DOM::JointDef *>(mCurrentSphericalJoint);
+						mCurrentSphericalJoint->mId = getID();
+						mCurrentCollection->mNodes.push_back(mCurrentSphericalJoint);
+					}
+					else
+					{
+						nestingError(lineno, mCurrentType, ET_PhysX30Collection, mPreviousType);
 					}
 					break;
 				case ET_PxRevoluteJoint:
@@ -1087,7 +1120,7 @@ namespace IMPORT_PHYSX_DOM
 							mCurrentMaterial->mRestitution = STRING_HELPER::getFloatValue(elementData, nullptr);
 						}
 					}
-					else if (mPreviousType == ET_Limit)
+					else if (mPreviousType == ET_Limit || mPreviousType == ET_LimitCone )
 					{
 						// TODO: process custom property
 					}
@@ -1131,6 +1164,7 @@ namespace IMPORT_PHYSX_DOM
 						case ET_PxRigidDynamic:
 						case ET_PxFixedJoint:
 						case ET_PxRevoluteJoint:
+						case ET_PxSphericalJoint:
 							if (mCurrentNode)
 							{
 								mNodeIdMap[std::string(elementData)] = mCurrentNode;
@@ -1250,6 +1284,12 @@ namespace IMPORT_PHYSX_DOM
 				break;
 			case ET_PxFixedJoint:
 				mCurrentFixedJoint = nullptr;
+				mCurrentJoint = nullptr;
+				mCurrentNode = nullptr;
+				break;
+			case ET_PxRevoluteJoint:
+				mCurrentHingeJoint = nullptr;
+				mCurrentJoint = nullptr;
 				mCurrentNode = nullptr;
 				break;
 			case ET_PxMaterial:
@@ -1290,6 +1330,7 @@ namespace IMPORT_PHYSX_DOM
 	PHYSICS_DOM::JointDef			*mCurrentJoint{ nullptr };
 	PHYSICS_DOM::FixedJointDef		*mCurrentFixedJoint{ nullptr };
 	PHYSICS_DOM::HingeJointDef		*mCurrentHingeJoint{ nullptr };
+	PHYSICS_DOM::SphericalJointDef	*mCurrentSphericalJoint{ nullptr };
 	uint32_t						mStackLocation{ 0 };
 	ElementType						mCurrentType{ ET_LAST };	// The current element type we are processing
 	ElementType						mPreviousType{ ET_LAST };	// The previous element type (parent node type)

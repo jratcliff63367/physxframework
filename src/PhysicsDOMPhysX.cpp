@@ -240,6 +240,24 @@ namespace PHYSICS_DOM_PHYSX
 			return j;
 		}
 
+		// spherical joint limited to an angle of at most pi/4 radians (45 degrees)
+		physx::PxJoint* createLimitedSpherical(physx::PxRigidActor* a0,
+											const physx::PxTransform& t0, 
+											physx::PxRigidActor* a1, 
+											const physx::PxTransform& t1, 
+											float limitY,float limitZ)
+		{
+			physx::PxSphericalJoint* j = PxSphericalJointCreate(*mPhysics, a0, t0, a1, t1);
+
+
+			j->setLimitCone(physx::PxJointLimitCone(limitY, limitZ));
+			j->setSphericalJointFlag(physx::PxSphericalJointFlag::eLIMIT_ENABLED, true);
+			j->setConstraintFlag(physx::PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
+			j->setConstraintFlag(physx::PxConstraintFlag::eDISABLE_PREPROCESSING, true);
+
+			return j;
+		}
+
 		void processNode(const PHYSICS_DOM::Node *n,		// Node to process
 						 const PHYSICS_DOM::Pose &pose,		// Parent relative pose
 						const PHYSICS_DOM::Vec3 &scale)		// Parent relative scale
@@ -408,7 +426,21 @@ namespace PHYSICS_DOM_PHYSX
 					}
 					break;
 				case PHYSICS_DOM::NT_SPHERICAL_JOINT:				// A spherical joint
-					reportWarning("Node type not yet implemented");
+					{
+						auto hj = static_cast<const PHYSICS_DOM::SphericalJoint *>(n);
+						physx::PxTransform t0 = getTransform(hj->localpose0);
+						physx::PxTransform t1 = getTransform(hj->localpose1);
+						auto found0 = mActors.find(std::string(hj->body0));
+						auto found1 = mActors.find(std::string(hj->body1));
+						if (found0 != mActors.end() && found1 != mActors.end())
+						{
+							physx::PxActor *actor0 = found0->second;
+							physx::PxActor *actor1 = found1->second;
+							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
+							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
+							createLimitedSpherical(ractor0, t0, ractor1, t1, hj->limitY, hj->limitZ);
+						}
+					}
 					break;
 				case PHYSICS_DOM::NT_HINGE_JOINT:   				// A hinge joint
 					{
