@@ -4,12 +4,11 @@
 #include "NvPhysXFramework.h"
 #include "PhysicsDOMDef.h"
 
-#define USE_DEBUG 1
+#define USE_DEBUG 0
 
-#define TEST_IMPORT_XML 1
+#define TEST_IMPORT_XML 0
 #define TEST_PHYSICS_DOM 0
 #define TEST_SOME_OF_EVERYTHING 0
-#define TEST_BOX 0
 #define BOX_SIZE 1
 
 class SimpleHelloWorld : public NV_PHYSX_FRAMEWORK::PhysXFramework::CommandCallback
@@ -37,16 +36,6 @@ public:
 			mPhysXFramework->setCommandCallback(this);
 #if TEST_SOME_OF_EVERYTHING
 			mPhysXFramework->createSomeOfEverything();
-#elif TEST_BOX
-			float boxSize[3];
-			boxSize[0] = BOX_SIZE;
-			boxSize[1] = BOX_SIZE;
-			boxSize[2] = BOX_SIZE;
-			float boxPosition[3];
-			boxPosition[0] = 0;
-			boxPosition[1] = BOX_SIZE*0.5f;
-			boxPosition[2] = 0;
-			mPhysXFramework->createBox(boxSize, boxPosition);
 #elif TEST_PHYSICS_DOM
 			testPhysicsDOM();
 #elif TEST_IMPORT_XML

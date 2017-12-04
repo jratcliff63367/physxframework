@@ -89,342 +89,6 @@ typedef	std::vector< PxRigidDynamic * > PxActorVector;
 typedef std::vector< PxShape * > PxShapeVector;
 typedef std::vector< PxJoint * > PxJointVector;
 
-	class ConvexMeshImp : public PhysXFramework::ConvexMesh
-	{
-	public:
-		ConvexMeshImp(uint32_t vcount,
-			const float *vertices,
-			uint32_t tcount,
-			const uint32_t *indices,
-			PxCooking *cooking,
-			PxPhysics *physics)
-		{
-
-			PxConvexMeshDesc desc;
-			desc.points.data = vertices;
-			desc.points.count = vcount;
-			desc.points.stride = sizeof(float) * 3;
-			desc.flags = PxConvexFlag::eCOMPUTE_CONVEX;
-
-			mConvexMesh = cooking->createConvexMesh(desc, physics->getPhysicsInsertionCallback());
-
-			mBounds.setEmpty();
-			for (uint32_t i = 0; i < vcount; i++)
-			{
-				const float *p = &vertices[i * 3];
-				PxVec3 v(p[0], p[1], p[2]);
-				mBounds.include(v);
-			}
-
-
-		}
-		virtual ~ConvexMeshImp(void)
-		{
-			if (mConvexMesh)
-			{
-				mConvexMesh->release();
-			}
-		}
-
-		virtual void release(void) final
-		{
-			delete this;
-		};
-
-		PxBounds3				mBounds;
-		PxConvexMesh	*mConvexMesh{ nullptr };
-	}; 
-
-	class CompoundActorImpl : public PhysXFramework::CompoundActor
-	{
-	public:
-		CompoundActorImpl(PxPhysics *p,
-						PxScene *scene, 
-						PxMaterial *defaultMaterial,
-						RenderDebugPhysX *renderDebugPhysX) : mPhysics(p), mScene(scene), mDefaultMaterial(defaultMaterial), mRenderDebugPhysX(renderDebugPhysX)
-		{
-		}
-
-		virtual ~CompoundActorImpl(void)
-		{
-			for (size_t i = 0; i < mJoints.size(); i++)
-			{
-				mJoints[i]->release();
-			}
-			for (size_t i = 0; i < mActors.size(); i++)
-			{
-				mActors[i]->release();
-			}
-		}
-
-		virtual void addConvexMesh(PhysXFramework::ConvexMesh *cmesh,
-			float meshPosition[3],
-			float meshScale[3]) final
-		{
-			ConvexMeshImp *cm = static_cast<ConvexMeshImp *>(cmesh);
-			PxConvexMeshGeometry	convex;
-			convex.convexMesh = cm->mConvexMesh;
-			convex.scale = PxVec3(meshScale[0], meshScale[1], meshScale[2]);
-			PxTransform localPose(PxIdentity);
-			localPose.p = PxVec3(meshPosition[0], meshPosition[1], meshPosition[2]);
-			PxShape *shape = mPhysics->createShape(convex, *mDefaultMaterial, true);
-			if (shape)
-			{
-				shape->setLocalPose(localPose);
-				mShapes.push_back(shape);
-			}
-		}
-
-		// Create a simulated actor based on the collection of convex meshes
-		virtual void createActor(const float centerOfMass[3], float mass, bool asRagdoll) final
-		{
-			if (asRagdoll)
-			{
-				mass = mass / float(mShapes.size());
-				for (size_t i = 0; i < mShapes.size(); i++)
-				{
-					PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(PxIdentity));
-					mActors.push_back(actor);
-					PxShape *s = mShapes[i];
-					PxFilterData filterData;
-					filterData.word0 = uint32_t(i + 1);
-					s->setSimulationFilterData(filterData);
-					PxTransform actorPose = s->getLocalPose();
-					PxTransform identityPose(PxIdentity);
-					s->setLocalPose(identityPose);
-					actor->setGlobalPose(actorPose);
-					actor->attachShape(*s);
-					PxRigidBodyExt::setMassAndUpdateInertia(*actor, mass);
-					mScene->addActor(*actor);
-				}
-			}
-			else
-			{
-				PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(PxIdentity));
-				mActors.push_back(actor);
-				for (size_t i = 0; i < mShapes.size(); i++)
-				{
-					PxShape *s = mShapes[i];
-					actor->attachShape(*s);
-				}
-				PxVec3 com(centerOfMass[0], centerOfMass[1], centerOfMass[2]);
-				PxTransform p(com);
-				actor->setCMassLocalPose(p);
-				actor->setMass(mass);
-				PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
-				mScene->addActor(*actor);
-			}
-		}
-
-		// Sets the collision filter pairs.
-		virtual void setCollisionFilterPairs(uint32_t pairCount, const uint32_t *collisionPairs)
-		{
-			gCollisionFilters.clear();
-#if 0
-			uint32_t bodyCount = uint32_t(mActors.size());
-			for (uint32_t i = 0; i < bodyCount; i++)
-			{
-				for (uint32_t j = i + 1; j < bodyCount; j++)
-				{
-					uint64_t p1 = i + 1;
-					uint64_t p2 = j + 1;
-					uint64_t c1 = (p1 << 32) | p2;
-					uint64_t c2 = (p2 << 32) | p1;
-					gCollisionFilters.insert(c1);
-					gCollisionFilters.insert(c2);
-				}
-			}
-#else
-			// Add all collision pair filter permutations to the collion filter set
-			for (uint32_t i = 0; i < pairCount; i++)
-			{
-				uint64_t p1 = collisionPairs[i * 2 + 0]+1;
-				uint64_t p2 = collisionPairs[i * 2 + 1]+1;
-				uint64_t c1 = (p1 << 32) | p2;
-				uint64_t c2 = (p2 << 32) | p1;
-				gCollisionFilters.insert(c1);
-				gCollisionFilters.insert(c2);
-			}
-#endif
-		}
-
-		// If we are mouse dragging and the currently selected object is an actor in this compound
-		// system, then return true and assign 'bodyIndex' to the index number of the body selected.
-		virtual bool getSelectedBody(uint32_t &bodyIndex) final
-		{
-			bool ret = false;
-
-			bodyIndex = 0;
-			PxRigidActor *actor = mRenderDebugPhysX->getSelectedActor();
-			if (actor)
-			{
-				for (size_t i = 0; i < mActors.size(); ++i)
-				{
-					if (actor == mActors[i])
-					{
-						bodyIndex = uint32_t(i);
-						ret = true;
-						break;
-					}
-				}
-			}
-
-			return ret;
-		}
-
-
-		virtual bool getConstraintXform(float xform[16], uint32_t constraint)
-		{
-			bool ret = false;
-
-			if (constraint < uint32_t(mJoints.size()))
-			{
-				PxJoint *j = mJoints[constraint];
-				PxTransform p = j->getLocalPose(PxJointActorIndex::eACTOR0);
-				PxRigidActor *a1;
-				PxRigidActor *a2;
-				j->getActors(a1, a2);
-				if (a1)
-				{
-					p = a1->getGlobalPose()*p;
-				}
-				PxMat44 m(p);
-				memcpy(xform, m.front(), sizeof(float) * 16);
-				ret = true;
-			}
-
-			return ret;
-		}
-
-		virtual bool getXform(float xform[16],uint32_t index)
-		{
-			bool ret = false;
-			if (index < uint32_t(mActors.size()))
-			{
-				PxRigidDynamic *a = mActors[index];
-				PxTransform p = a->getGlobalPose();
-				PxMat44 m(p);
-				memcpy(xform, m.front(), sizeof(float)*16);
-				ret = true;
-			}
-			return ret;
-		}
-
-		// fixed joint
-		PxJoint* createFixedJoint(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1)
-		{
-			PxFixedJoint* j = PxFixedJointCreate(*mPhysics, a0, t0, a1, t1);
-			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
-			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
-			return j;
-		}
-
-		// spherical joint limited to an angle of at most pi/4 radians (45 degrees)
-		PxJoint* createLimitedSpherical(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1,uint32_t swing1Limit,uint32_t swing2Limit)
-		{
-			PxSphericalJoint* j = PxSphericalJointCreate(*mPhysics, a0, t0, a1, t1);
-
-			float lrange1 = (PxPi * 2) * (float(swing1Limit) / 360.0f);
-			float lrange2 = (PxPi * 2) * (float(swing2Limit) / 360.0f);
-
-			j->setLimitCone(PxJointLimitCone(lrange1, lrange2));
-			j->setSphericalJointFlag(PxSphericalJointFlag::eLIMIT_ENABLED, true);
-			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
-			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
-
-			return j;
-		}
-
-		// D6 joint with a spring maintaining its position
-		PxJoint* createHingeJoint(PxRigidActor* a0, const PxTransform& t0, PxRigidActor* a1, const PxTransform& t1, uint32_t limitRangeDegrees)
-		{
-			PxRevoluteJoint* j = PxRevoluteJointCreate(*mPhysics, a0, t0, a1, t1);
-			j->setConstraintFlag(PxConstraintFlag::eDISABLE_PREPROCESSING, true);
-
-			float lrange = (PxPi * 2) * (float(limitRangeDegrees) / 360.0f);
-			PxJointAngularLimitPair limit(-lrange, lrange);
-			j->setLimit(limit);
-			j->setRevoluteJointFlag(PxRevoluteJointFlag::eLIMIT_ENABLED, true);
-
-			j->setConstraintFlag(PxConstraintFlag::eVISUALIZATION, true); // enable visualization!!
-			return j;
-		}
-
-		// Creates a fixed constraint between these two bodies
-		virtual bool createConstraint(uint32_t bodyA, uint32_t bodyB, const float worldPos[3],					// World position of the constraint location
-			const float worldOrientation[4],
-			ConstraintType type,			// Type of constraint to use
-			float	distanceLimit,
-			uint32_t twistLimit,			// Twist limit in degrees (if used)
-			uint32_t swing1Limit,			// Swing 1 limit in degrees (if used)
-			uint32_t swing2Limit) final		// Swing 2 limit in degrees (if used)
-		{
-			bool ret = false;
-			uint32_t actorCount = uint32_t(mActors.size());
-			if (bodyA < actorCount && bodyB < actorCount)
-			{
-				PxRigidDynamic *a1 = mActors[bodyA];
-				PxRigidDynamic *a2 = mActors[bodyB];
-
-				PxTransform constraintWorld;
-
-				constraintWorld.p.x = worldPos[0];
-				constraintWorld.p.y = worldPos[1];
-				constraintWorld.p.z = worldPos[2];
-
-				constraintWorld.q.x = worldOrientation[0];
-				constraintWorld.q.y = worldOrientation[1];
-				constraintWorld.q.z = worldOrientation[2];
-				constraintWorld.q.w = worldOrientation[3];
-
-				PxTransform inverse1 = a1->getGlobalPose().getInverse();
-				PxTransform other1 = inverse1 * constraintWorld;
-
-
-				PxTransform inverse2 = a2->getGlobalPose().getInverse();
-				PxTransform other2 = inverse2 * constraintWorld;
-
-				PxJoint *joint = nullptr;
-
-				switch (type)
-				{
-					case CT_FIXED:
-						joint = createFixedJoint(a1, other1, a2, other2);
-						break;
-					case CT_HINGE:
-						joint = createHingeJoint(a1, other1, a2, other2, twistLimit);
-						break;
-					case CT_SPHERICAL:
-						joint = createLimitedSpherical(a1, other1, a2, other2, swing1Limit, swing2Limit);
-						break;
-					case CT_BALL_AND_SOCKET:
-						break;
-				}
-				if (joint)
-				{
-					mJoints.push_back(joint);
-				}
-			}
-			return ret;
-		}
-
-		virtual void release(void) final
-		{
-			delete this;
-		}
-
-		PxPhysics			*mPhysics{ nullptr };
-		PxScene				*mScene{ nullptr };
-		PxMaterial			*mDefaultMaterial{ nullptr };
-		RenderDebugPhysX	*mRenderDebugPhysX{ nullptr };
-
-		PxActorVector		mActors;
-		PxShapeVector		mShapes;
-		PxJointVector		mJoints;
-	};
-
-
-
 	class PhysXFrameworkImpl : public PhysXFramework, public RenderDebugPhysX::Interface
 	{
 	public:
@@ -642,41 +306,6 @@ typedef std::vector< PxJoint * > PxJointVector;
 			for (PxU32 i = 0; i < 5; i++)
 			{
 				createStack(PxTransform(PxVec3(0, 0, stackZ -= 10.0f)), 10, 2.0f);
-			}
-		}
-
-		// Create a convex mesh using the provided raw triangles describing a convex hull.
-		virtual ConvexMesh *createConvexMesh(uint32_t vcount,
-			const float *vertices,
-			uint32_t tcount,
-			const uint32_t *indices) final
-		{
-			ConvexMeshImp *c = new ConvexMeshImp(vcount, vertices, tcount, indices,mCooking,mPhysics);
-			return static_cast<ConvexMesh *>(c);
-		}
-
-		// Create a physically simulated compound actor comprised of a collection of convex meshes
-		virtual CompoundActor *createCompoundActor(void) final
-		{
-			CompoundActorImpl *c = new CompoundActorImpl(mPhysics, mScene, mMaterial,mRenderDebugPhysX);
-			return static_cast<CompoundActor *>(c);
-		}
-
-		// create a box in the simulated scene
-		virtual void createBox(const float boxSize[3], const float boxPosition[3])
-		{
-			PxVec3 pos(boxPosition[0], boxPosition[1], boxPosition[2]);
-			PxRigidDynamic *actor = mPhysics->createRigidDynamic(PxTransform(pos));
-			PxBoxGeometry	box;
-			box.halfExtents.x = boxSize[0] * 0.5f;
-			box.halfExtents.y = boxSize[1] * 0.5f;
-			box.halfExtents.z = boxSize[2] * 0.5f;
-			PxShape *shape = mPhysics->createShape(box, *mMaterial, true);
-			if (shape)
-			{
-				actor->attachShape(*shape);
-				PxRigidBodyExt::setMassAndUpdateInertia(*actor, actor->getMass());
-				mScene->addActor(*actor);
 			}
 		}
 
@@ -974,6 +603,28 @@ typedef std::vector< PxJoint * > PxJointVector;
 			return ret;
 		}
 
+		// Does a named lookup of a node with this ID and, if found, returns the 'NodeState'
+		// interface which can be used to query current state of this object
+		virtual PHYSICS_DOM::NodeState *getNodeState(const char *nodeId) final
+		{
+			PHYSICS_DOM::NodeState *ret = nullptr;
+
+			if (mPhysicsDOMPhysX)
+			{
+				ret = mPhysicsDOMPhysX->getNodeState(nodeId);
+			}
+
+			return ret;
+		}
+
+		virtual void releasePhysicsDOM(void) final
+		{
+			if (mPhysicsDOMPhysX)
+			{
+				mPhysicsDOMPhysX->release();
+				mPhysicsDOMPhysX = nullptr;
+			}
+		}
 
 		bool							mPaused{ false };
 		CommandCallback					*mCommandCallback{ nullptr };

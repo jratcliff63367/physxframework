@@ -102,6 +102,9 @@
 		<ClInclude Include="..\..\public\PhysicsDOMDef.h">
 			<Filter>PhysXFramework\public</Filter>
 		</ClInclude>
+		<ClInclude Include="..\..\public\PhysicsDOMInterface.h">
+			<Filter>PhysXFramework\public</Filter>
+		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
 		<Filter Include="PhysXFramework\src">

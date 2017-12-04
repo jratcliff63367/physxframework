@@ -171,6 +171,8 @@
 		</ClInclude>
 		<ClInclude Include="..\..\public\PhysicsDOMDef.h">
 		</ClInclude>
+		<ClInclude Include="..\..\public\PhysicsDOMInterface.h">
+		</ClInclude>
 	</ItemGroup>
 	<ItemGroup>
 		<ClCompile Include="..\..\src\DLLMain.cpp">

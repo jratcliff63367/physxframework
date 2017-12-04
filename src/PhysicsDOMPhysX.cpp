@@ -1,6 +1,7 @@
 #include "PhysicsDOMPhysX.h"
 #include "PhysicsDOM.h"
 #include "PxPhysicsAPI.h"
+#include "PhysicsDOMInterface.h"
 #include "NvBounds3.h"
 #include "StringHelper.h"
 #include <unordered_map>
@@ -21,12 +22,81 @@ namespace PHYSICS_DOM_PHYSX
 	typedef std::unordered_map< std::string,const PHYSICS_DOM::Node * > NodeMap;
 	typedef std::vector< physx::PxScene *> SceneVector;
 
+	class NodeStateImpl : public PHYSICS_DOM::NodeState
+	{
+	public:
+		NodeStateImpl(void)
+		{
+		}
+		NodeStateImpl(physx::PxActor *actor) :mActor(actor)
+		{
+		}
+		NodeStateImpl(physx::PxJoint *joint) :mJoint(joint)
+		{
+		}
+
+		virtual ~NodeStateImpl(void)
+		{
+			if (mActor)
+			{
+				mActor->release();
+			}
+			if (mJoint)
+			{
+				mJoint->release();
+			}
+		}
+		// Returns the current position and orientation for this node
+		// false if unable to return this information for this type of node
+		virtual bool getPose(float pos[3], float quat[4]) final
+		{
+			bool ret = false;
+
+			if (mActor)
+			{
+				auto a = static_cast<physx::PxRigidActor *>(mActor);
+				physx::PxTransform t = a->getGlobalPose();
+				pos[0] = t.p.x;
+				pos[1] = t.p.y;
+				pos[2] = t.p.z;
+				quat[0] = t.q.x;
+				quat[1] = t.q.y;
+				quat[2] = t.q.z;
+				quat[3] = t.q.w;
+				ret = true;
+			}
+			else if (mJoint)
+			{
+				physx::PxTransform t = mJoint->getLocalPose(physx::PxJointActorIndex::eACTOR0);
+				physx::PxRigidActor *a1;
+				physx::PxRigidActor *a2;
+				mJoint->getActors(a1, a2);
+				if (a1)
+				{
+					t = a1->getGlobalPose()*t;
+				}
+				pos[0] = t.p.x;
+				pos[1] = t.p.y;
+				pos[2] = t.p.z;
+				quat[0] = t.q.x;
+				quat[1] = t.q.y;
+				quat[2] = t.q.z;
+				quat[3] = t.q.w;
+			}
+
+			return ret;
+		}
+
+		physx::PxActor		*mActor{ nullptr };
+		physx::PxJoint		*mJoint{ nullptr };
+	};
+
 	// Map node id to physx materials
 	typedef std::unordered_map< std::string, physx::PxMaterial *> MaterialMap;
 	// Map node id to ConvexMeshes
 	typedef std::unordered_map< std::string, physx::PxConvexMesh *> ConvexMeshMap;
 	// Map node id to PxActor's
-	typedef std::unordered_map< std::string, physx::PxActor *> ActorMap;
+	typedef std::unordered_map< std::string, NodeStateImpl *> ActorMap;
 
 
 	class PhysicsDOMPhysXImpl : public PhysicsDOMPhysX
@@ -41,7 +111,7 @@ namespace PHYSICS_DOM_PHYSX
 		{
 			for (auto &i : mActors)
 			{
-				i.second->release();
+				delete i.second;
 			}
 			for (auto &i : mScenes)
 			{
@@ -401,7 +471,8 @@ namespace PHYSICS_DOM_PHYSX
 
 							}
 						}
-						mActors[std::string(n->id)] = static_cast<physx::PxActor *>(ractor);
+						NodeStateImpl *nsi = new NodeStateImpl(static_cast<physx::PxActor *>(ractor));
+						mActors[std::string(n->id)] = nsi;
 						mActiveScene->addActor(*ractor);
 					}
 					break;
@@ -420,11 +491,13 @@ namespace PHYSICS_DOM_PHYSX
 						auto found1 = mActors.find(std::string(fj->body1));
 						if (found0 != mActors.end() && found1 != mActors.end())
 						{
-							physx::PxActor *actor0 = found0->second;
-							physx::PxActor *actor1 = found1->second;
+							physx::PxActor *actor0 = found0->second->mActor;
+							physx::PxActor *actor1 = found1->second->mActor;
 							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
 							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
-							createFixedJoint(ractor0, t0, ractor1, t1);
+							physx::PxJoint *joint = createFixedJoint(ractor0, t0, ractor1, t1);
+							NodeStateImpl *nsi = new NodeStateImpl(joint);
+							mActors[std::string(n->id)] = nsi;
 						}
 					}
 					break;
@@ -437,11 +510,13 @@ namespace PHYSICS_DOM_PHYSX
 						auto found1 = mActors.find(std::string(hj->body1));
 						if (found0 != mActors.end() && found1 != mActors.end())
 						{
-							physx::PxActor *actor0 = found0->second;
-							physx::PxActor *actor1 = found1->second;
+							physx::PxActor *actor0 = found0->second->mActor;
+							physx::PxActor *actor1 = found1->second->mActor;
 							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
 							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
-							createLimitedSpherical(ractor0, t0, ractor1, t1, hj->limitY, hj->limitZ);
+							physx::PxJoint *joint = createLimitedSpherical(ractor0, t0, ractor1, t1, hj->limitY, hj->limitZ);
+							NodeStateImpl *nsi = new NodeStateImpl(joint);
+							mActors[std::string(n->id)] = nsi;
 						}
 					}
 					break;
@@ -454,11 +529,13 @@ namespace PHYSICS_DOM_PHYSX
 						auto found1 = mActors.find(std::string(hj->body1));
 						if (found0 != mActors.end() && found1 != mActors.end())
 						{
-							physx::PxActor *actor0 = found0->second;
-							physx::PxActor *actor1 = found1->second;
+							physx::PxActor *actor0 = found0->second->mActor;
+							physx::PxActor *actor1 = found1->second->mActor;
 							physx::PxRigidActor *ractor0 = static_cast<physx::PxRigidActor *>(actor0);
 							physx::PxRigidActor *ractor1 = static_cast<physx::PxRigidActor *>(actor1);
-							createHingeJoint(ractor0, t0, ractor1, t1, hj->limtLow, hj->limitHigh);
+							physx::PxJoint *joint = createHingeJoint(ractor0, t0, ractor1, t1, hj->limtLow, hj->limitHigh);
+							NodeStateImpl *nsi = new NodeStateImpl(joint);
+							mActors[std::string(n->id)] = nsi;
 						}
 					}
 					break;
@@ -541,6 +618,21 @@ namespace PHYSICS_DOM_PHYSX
 			rpose.q = physx::PxQuat(pose.q.x, pose.q.y, pose.q.z, pose.q.w);
 			return rpose;
 		}
+
+		// Return the optional node state interface for a Node matching this ID
+		virtual PHYSICS_DOM::NodeState *getNodeState(const char *id) final
+		{
+			PHYSICS_DOM::NodeState *ret = nullptr;
+
+			auto found = mActors.find(std::string(id));
+			if (found != mActors.end())
+			{
+				ret = found->second;
+			}
+
+			return ret;
+		}
+
 
 		physx::PxScene		*mActiveScene{ nullptr };
 

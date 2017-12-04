@@ -4,6 +4,7 @@
 namespace PHYSICS_DOM
 {
 	class PhysicsDOM;
+	class NodeState;
 }
 
 namespace physx
@@ -27,6 +28,9 @@ namespace PHYSICS_DOM_PHYSX
 		// If a PxScene is provided, then objects will be instantiated into it.
 		virtual bool loadPhysicsDOM(const PHYSICS_DOM::PhysicsDOM &p,
 									physx::PxScene *scene) = 0;
+
+		// Return the optional node state interface for a Node matching this ID
+		virtual PHYSICS_DOM::NodeState *getNodeState(const char *id) = 0;
 
 		virtual void reset(void) = 0;
 		virtual void release(void) = 0;

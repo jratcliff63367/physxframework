@@ -20,20 +20,13 @@ namespace RENDER_DEBUG
 namespace PHYSICS_DOM
 {
 	class PhysicsDOM;
+	class NodeState;
 }
 
 namespace NV_PHYSX_FRAMEWORK
 {
 
-enum ConstraintType
-{
-	CT_FIXED,
-	CT_SPHERICAL,
-	CT_HINGE,
-	CT_BALL_AND_SOCKET
-};
-
-#define PHYSX_FRAMEWORK_VERSION_NUMBER 106
+#define PHYSX_FRAMEWORK_VERSION_NUMBER 110
 
 class PhysicsDOMContainer
 {
@@ -46,6 +39,7 @@ public:
 class PhysXFramework
 {
 public:
+
 	class CommandCallback
 	{
 	public:
@@ -60,72 +54,13 @@ public:
 		virtual bool processDebugCommand(uint32_t argc, const char **argv) = 0;
 	};
 
-	// A convex mesh
-	class ConvexMesh
-	{
-	public:
-		virtual void release(void) = 0;
-	};
-
-	// A compound actor comprised of an array of convex meshes
-	class CompoundActor
-	{
-	public:
-		virtual void addConvexMesh(ConvexMesh *cmesh,
-			float meshPosition[3],
-			float meshScale[3]) = 0;
-
-		// Create a simulated actor based on the collection of convex meshes
-		virtual void createActor(const float centerOfMass[3],float mass,bool asRagdoll) = 0;
-
-		// Creates a fixed constraint between these two bodies
-		virtual bool createConstraint(uint32_t bodyA,	// Index of first body
-			uint32_t bodyB,								// Index of second body
-			const float worldPos[3],					// World position of the constraint location
-			const float worldOrientation[4],
-			ConstraintType type,			// Type of constraint to use
-			float	limitDistance,			// If a revolute joint, the distance limit
-			uint32_t twistLimit,			// Twist limit in degrees (if used)
-			uint32_t swing1Limit,			// Swing 1 limit in degrees (if used)
-			uint32_t swing2Limit) = 0;		// Swing 2 limit in degrees (if used)
-
-		virtual bool getXform(float xform[16],uint32_t index) = 0;
-		virtual bool getConstraintXform(float xform[16], uint32_t constraint) = 0;
-
-		// If we are mouse dragging and the currently selected object is an actor in this compound
-		// system, then return true and assign 'bodyIndex' to the index number of the body selected.
-		virtual bool getSelectedBody(uint32_t &bodyIndex) = 0;
-
-		// Sets the collision filter pairs.
-		virtual void setCollisionFilterPairs(uint32_t pairCount, const uint32_t *collisionPairs) = 0;
-
-
-		virtual void release(void) = 0;
-	};
-
-	// Create a convex mesh using the provided raw triangles describing a convex hull.
-	virtual ConvexMesh *createConvexMesh(uint32_t vcount,
-		const float *vertices,
-		uint32_t tcount,
-		const uint32_t *indices) = 0;
-
-	// Create a physically simulated compound actor comprised of a collection of convex meshes
-	virtual CompoundActor *createCompoundActor(void) = 0;
-
 	// Returns delta time since last simulation step
 	virtual float simulate(bool showPhysics) = 0;
 
-	// Create a default series of stacked boxes for testing purposes
-	virtual void createDefaultStacks(void) = 0;
-
 	virtual void setCommandCallback(CommandCallback *cc) = 0;
-
-	// create a box in the simulated scene
-	virtual void createBox(const float boxSize[3], const float boxPosition[3]) = 0;
 
 	// Return the render debug interface if available
 	virtual RENDER_DEBUG::RenderDebug *getRenderDebug(void) = 0;
-
 
 	virtual void setDragForce(float force) = 0;
 
@@ -135,6 +70,9 @@ public:
 	// serialize the current state to an XML file
 	virtual void serializeXML(const char *fname) = 0;
 
+	// Debug feature; create some default box stacks
+	virtual void createDefaultStacks(void) = 0;
+
 	// Create some of everything so we can serialize the scenes and get a detailed
 	// XML output for analysis
 	virtual void createSomeOfEverything(void) = 0;
@@ -142,8 +80,14 @@ public:
 	// Load this physics DOM
 	virtual bool loadPhysicsDOM(const PHYSICS_DOM::PhysicsDOM &physicsDOM) = 0;
 
+	virtual void releasePhysicsDOM(void) = 0;
+
 	// Parses a PhysX RepX XML file and loads the contents into a PhysicsDOM container
 	virtual PhysicsDOMContainer *importPhysXDOM(const char *fname) = 0;
+
+	// Does a named lookup of a node with this ID and, if found, returns the 'NodeState'
+	// interface which can be used to query current state of this object
+	virtual PHYSICS_DOM::NodeState *getNodeState(const char *nodeId) = 0;
 
 	// Release the PhysXFramework interface
 	virtual void release(void) = 0;
